@@ -6,19 +6,30 @@ Author: Who wrote it
 Maintainer: The package maintainer <yourself@somewhere.net>
 Description: More about what it does (maybe more than one line) Use four
     spaces when indenting paragraphs within the Description.
-License: What license is it under?
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.2.2
 LinkingTo: 
     Rcpp,
-    RcppArmadillo
+    RcppArmadillo,
+    BH
 Imports: 
-    BH,
-    ggplot2,
+    rlang,
     Matrix,
     Rcpp,
-    rlang
+    RcppArmadillo,
+    BH,
+    RSpectra,
+    spam,
+    RColorBrewer,
+    tidyr,
+    dplyr,
+    ggplot2,
+    data.table,
+    magrittr,
+    methods,
+    utils
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3

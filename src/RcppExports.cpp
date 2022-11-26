@@ -11,35 +11,23 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// prox_dp_norm
-vec prox_dp_norm(vec& y, double& lam);
-RcppExport SEXP _rtestim_prox_dp_norm(SEXP ySEXP, SEXP lamSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< vec& >::type y(ySEXP);
-    Rcpp::traits::input_parameter< double& >::type lam(lamSEXP);
-    rcpp_result_gen = Rcpp::wrap(prox_dp_norm(y, lam));
-    return rcpp_result_gen;
-END_RCPP
-}
 // admm
-List admm(int M, vec y, vec x, int n, vec theta, vec z, vec u, double lambda, double rho, double mu, sp_mat D, double tol);
+Rcpp::List admm(int M, arma::vec y, arma::vec x, int n, arma::vec theta, arma::vec z, arma::vec u, double lambda, double rho, double mu, arma::sp_mat D, double tol);
 RcppExport SEXP _rtestim_admm(SEXP MSEXP, SEXP ySEXP, SEXP xSEXP, SEXP nSEXP, SEXP thetaSEXP, SEXP zSEXP, SEXP uSEXP, SEXP lambdaSEXP, SEXP rhoSEXP, SEXP muSEXP, SEXP DSEXP, SEXP tolSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< int >::type M(MSEXP);
-    Rcpp::traits::input_parameter< vec >::type y(ySEXP);
-    Rcpp::traits::input_parameter< vec >::type x(xSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type y(ySEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type x(xSEXP);
     Rcpp::traits::input_parameter< int >::type n(nSEXP);
-    Rcpp::traits::input_parameter< vec >::type theta(thetaSEXP);
-    Rcpp::traits::input_parameter< vec >::type z(zSEXP);
-    Rcpp::traits::input_parameter< vec >::type u(uSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type z(zSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type u(uSEXP);
     Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
     Rcpp::traits::input_parameter< double >::type rho(rhoSEXP);
     Rcpp::traits::input_parameter< double >::type mu(muSEXP);
-    Rcpp::traits::input_parameter< sp_mat >::type D(DSEXP);
+    Rcpp::traits::input_parameter< arma::sp_mat >::type D(DSEXP);
     Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
     rcpp_result_gen = Rcpp::wrap(admm(M, y, x, n, theta, z, u, lambda, rho, mu, D, tol));
     return rcpp_result_gen;
@@ -47,7 +35,6 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_rtestim_prox_dp_norm", (DL_FUNC) &_rtestim_prox_dp_norm, 2},
     {"_rtestim_admm", (DL_FUNC) &_rtestim_admm, 12},
     {NULL, NULL, 0}
 };
