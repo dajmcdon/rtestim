@@ -4,10 +4,12 @@
 \alias{summary.admm_rr}
 \title{Summarize results of a admm_rr model}
 \usage{
-\method{summary}{admm_rr}(mod)
+\method{summary}{admm_rr}(object, ...)
 }
 \arguments{
-\item{mod}{a fitted admm_rr model}
+\item{object}{a fitted admm_rr model}
+
+\item{...}{.}
 }
 \value{
 a data table of estimates and a logical value of convergence

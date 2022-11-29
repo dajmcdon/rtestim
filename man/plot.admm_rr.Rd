@@ -4,14 +4,27 @@
 \alias{plot.admm_rr}
 \title{Plot a `admm_rr' class object}
 \usage{
-\method{plot}{admm_rr}(mod)
+\method{plot}{admm_rr}(x, y, ...)
 }
 \arguments{
-\item{mod}{a fitted admm_rr model}
+\item{x}{time}
+
+\item{y}{signal; estimated poisson mean}
+
+\item{...}{.}
 }
 \value{
 a plot
 }
 \description{
 Plot a `admm_rr' class object
+}
+\examples{
+y <- c(rev(seq(2, 6, by = 1)), seq(2, 6, by = 1))
+mod = admm_solver(
+  y = y, x = rep(1, 10), k = 1,
+  init = admm_initializer(y = y, x = rep(1, 10), k = 1)
+)
+res <- summary(mod)$Results
+plot(res$pois_para, y)
 }
