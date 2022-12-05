@@ -4,21 +4,30 @@
 \alias{admm_initializer}
 \title{ADMM initialization}
 \usage{
-admm_initializer(y, x, k, z = NULL, u = NULL)
+admm_initializer(
+  current_counts,
+  weighted_past_counts,
+  degree,
+  auxi_var = NULL,
+  dual_var = NULL
+)
 }
 \arguments{
-\item{y}{observed daily infection count}
+\item{current_counts}{the current daily infection counts}
 
-\item{x}{scales of reproduction rate}
+\item{weighted_past_counts}{the weighted sum of past infection counts with
+corresponding serial interval functions (or its Gamma approximation) as
+weights}
 
-\item{k}{order of divided difference matrix D}
+\item{degree}{degree of the piecewise polynomial curves to be fitted,
+e.g., degree = 0 corresponds to piecewise constant curves}
 
-\item{z}{auxiliary variable}
+\item{auxi_var}{auxiliary variable in the ADMM algorithm}
 
-\item{u}{dual variable}
+\item{dual_var}{dual variable in the ADMM algorithm}
 }
 \value{
-a list of model initialization
+a list of model initialization with class `admm_initializer`
 }
 \description{
 ADMM initialization

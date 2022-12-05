@@ -2,16 +2,21 @@
 % Please edit documentation in R/buildD.R
 \name{generate_D}
 \alias{generate_D}
-\title{Generate a divided difference matrix of order zero}
+\title{Generate a divided difference matrix of order (degree - 1) when degree > 0;
+generate an identity matrix when degree = 0}
 \usage{
-generate_D(n)
+generate_D(n, degree = 1)
 }
 \arguments{
-\item{n}{number of matrix rows}
+\item{n}{column dimension}
+
+\item{degree}{order of the divided difference matrix, i.e., degree of the
+piecewise polynomial curve to be fitted}
 }
 \value{
-a (n-1) * n sparse matrix
+a sparse matrix of dimension (n - degree) * n
 }
 \description{
-Generate a divided difference matrix of order zero
+Generate a divided difference matrix of order (degree - 1) when degree > 0;
+generate an identity matrix when degree = 0
 }

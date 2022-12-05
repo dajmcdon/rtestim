@@ -5,3 +5,7 @@ admm <- function(M, y, x, n, theta, z, u, lambda, rho, mu, D, tol) {
     .Call(`_rtestim_admm`, M, y, x, n, theta, z, u, lambda, rho, mu, D, tol)
 }
 
+dptf <- function(y, lam) {
+    .Call(`_rtestim_dptf`, y, lam)
+}
+

@@ -1,7 +1,7 @@
 #ifndef __ADMM_H
 #define __ADMM_H
 
-double update_primal(double c, double mu2);
+double update_primal(double c, double mu, int n);
 
 Rcpp::List admm(int M,
                 arma::vec y,

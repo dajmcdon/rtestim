@@ -1,6 +1,6 @@
 #include <RcppArmadillo.h>
 #include <boost/math/special_functions/lambert_w.hpp>
-#include "dp.h"
+#include "dptf.h"
 #include "admm.h"
 
 // [[Rcpp::depends(RcppArmadillo)]]
@@ -35,6 +35,7 @@ Rcpp::List admm(int M,
   sp_mat DD = Dt * D;
   double lam_z = lambda / rho;
   vec c;
+  vec beta = z;
 
   // start of iteration:
   for (iter = 0; iter < M; iter++) {
@@ -46,7 +47,9 @@ Rcpp::List admm(int M,
 
     // update alternating variable:
     c = D * theta + u;
-    z = prox_dp_norm(c, lam_z);
+    //    beta.transform([*](double beta) { return tf_dp(n, c, lam_z, beta); });
+    //    z = beta;
+    z = dptf(c, lam_z);
 
     // update dual variable:
     u += D * theta - z;
@@ -64,7 +67,5 @@ Rcpp::List admm(int M,
     z_old = z;
   }
 
-  return List::create(Named("theta") = wrap(theta), Named("z") = wrap(z),
-                      Named("u") = wrap(u), Named("prim_res") = r_norm,
-                      Named("dual_res") = s_norm, Named("iter_num") = iter);
+  return List::create(Named("theta") = wrap(theta), Named("iter_num") = iter);
 }

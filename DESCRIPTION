@@ -15,21 +15,12 @@ LinkingTo:
     RcppArmadillo,
     BH
 Imports: 
-    rlang,
-    Matrix,
     Rcpp,
-    RcppArmadillo,
-    BH,
-    RSpectra,
-    spam,
-    RColorBrewer,
-    tidyr,
-    dplyr,
-    ggplot2,
-    data.table,
     magrittr,
-    methods,
-    utils
+    Matrix,
+    cli,
+    rlang,
+    ggplot2
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3

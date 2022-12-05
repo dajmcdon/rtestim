@@ -7,13 +7,25 @@
 \method{summary}{admm_rr}(object, ...)
 }
 \arguments{
-\item{object}{a fitted admm_rr model}
+\item{object}{a fitted model of class `admm_rr`}
 
 \item{...}{.}
 }
 \value{
-a data table of estimates and a logical value of convergence
+a data table of estimates and a logical value of convergence.
+The data table columns include the current observed daily counts (Signal),
+the estimated reproduction rate (R_rate), and the estimated Poisson mean
+parameter (pois_mean)
 }
 \description{
 Summarize results of a admm_rr model
+}
+\examples{
+y <- c(rev(seq(2, 6, by = 1)), seq(2, 6, by = 1))
+mod = admm_solver(
+  current_counts = y, weighted_past_counts = rep(1, 10), degree = 1,
+  init = admm_initializer(current_counts = y,
+  weighted_past_counts = rep(1, 10), degree = 1)
+)
+summary(mod)
 }

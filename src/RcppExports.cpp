@@ -33,9 +33,22 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// dptf
+arma::vec dptf(arma::vec y, double lam);
+RcppExport SEXP _rtestim_dptf(SEXP ySEXP, SEXP lamSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type y(ySEXP);
+    Rcpp::traits::input_parameter< double >::type lam(lamSEXP);
+    rcpp_result_gen = Rcpp::wrap(dptf(y, lam));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_rtestim_admm", (DL_FUNC) &_rtestim_admm, 12},
+    {"_rtestim_dptf", (DL_FUNC) &_rtestim_dptf, 2},
     {NULL, NULL, 0}
 };
 

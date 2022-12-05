@@ -10,7 +10,7 @@ generate_I(n)
 \item{n}{matrix dimension}
 }
 \value{
-a sparse matrix
+a sparse square matrix of dimension n*n
 }
 \description{
 Generate an identity matrix

@@ -5,41 +5,46 @@
 \title{ADMM solver}
 \usage{
 admm_solver(
-  y,
-  x,
-  k,
+  current_counts,
+  weighted_past_counts,
+  degree,
   lambda = 0.01,
   mu = NULL,
   tol = 0.001,
   maxiter = 1000L,
-  init = admm_initializer(y, x, k)
+  init = admm_initializer(current_counts, weighted_past_counts, degree)
 )
 }
 \arguments{
-\item{y}{observed daily infection count}
+\item{current_counts}{the current daily infection counts}
 
-\item{x}{scales of reproduction rate}
+\item{weighted_past_counts}{the weighted sum of past infection counts with
+corresponding serial interval functions (or its Gamma approximation) as
+weights}
 
-\item{k}{order of divided difference matrix}
+\item{degree}{degree of the piecewise polynomial curve to be fitted,
+e.g., degree = 0 corresponds to a piecewise constant curve}
 
-\item{lambda}{Lagrangian multiplier}
+\item{lambda}{a parameter to balance the data fidelity and graphical
+smoothness of fitted curves; a greater lambda results in a smoother curve}
 
-\item{mu}{a hyper parameter depending on order, problem size, and lambda}
+\item{mu}{a parameter used in the algorithm; use mu = NULL to compute it
+using a default method (`get_mu`)}
 
 \item{tol}{tolerance of convergence of primal & dual residuals}
 
 \item{maxiter}{maximal number of iteration}
 
-\item{init}{ADMM initializer}
+\item{init}{a list of model initialization of class `admm_initializer`}
 }
 \value{
-y: observed daily infection count
+current_counts the current daily infection counts
 
-x: scales of reproduction rate
+weighted_past_counts the weighted sum of past infection counts
 
-R_rate: reproduction rate
+R_rate: the estimated reproduction rate
 
-convr: if the model converges (convr==TRUE) or not (convr==FALSE)
+convr: if the model converges `convr==TRUE` or not `convr==FALSE`
 }
 \description{
 ADMM solver
@@ -47,7 +52,8 @@ ADMM solver
 \examples{
 y <- c(rev(seq(2, 6, by = 1)), seq(2, 6, by = 1))
 admm_solver(
-  y = y, x = rep(1, 10), k = 1,
-  init = admm_initializer(y = y, x = rep(1, 10), k = 1)
+  current_counts = y, weighted_past_counts = rep(1, 10), degree = 1,
+  init = admm_initializer(current_counts = y,
+  weighted_past_counts = rep(1, 10), degree = 1)
 )
 }
