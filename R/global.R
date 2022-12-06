@@ -1,0 +1,8 @@
+# package level documentation
+
+#' @importFrom Rcpp sourceCpp
+#' @importFrom magrittr %>%
+#' @importFrom rlang .data
+#' @importFrom ggplot2 aes ggplot geom_point geom_line labs theme_bw
+#' @useDynLib rtestim, .registration = TRUE
+NULL
