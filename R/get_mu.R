@@ -12,6 +12,6 @@
 #'
 #' @examples get_mu(5, 1, 0.1)
 get_mu <- function(n, degree, lambda) {
-  mu <- 2 * lambda * (4^degree - 1/n)
+  mu <- 2 * lambda * 4^degree
   mu
 }

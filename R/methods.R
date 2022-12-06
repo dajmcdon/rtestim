@@ -29,7 +29,30 @@ summary.admm_rr <- function(object, ...){
     pois_mean = object$R_rate * object$weighted_past_counts
   )
 
-  fig <- res %>%
+  lst = list(Results = res, Convergence = object$convr)
+  class(lst) = "summary.admm_rr"
+  return(lst)
+}
+
+#' Plot summary of `admm_rr` models
+#'
+#' @method plot summary.admm_rr
+#' @param x summary of `admm_rr` models
+#' @param ... .
+#'
+#' @return a figure
+#' @export
+#'
+#' @examples
+#' y <- c(rev(seq(2, 6, by = 1)), seq(2, 6, by = 1))
+#' mod = admm_solver(
+#'   current_counts = y, weighted_past_counts = rep(1, 10), degree = 1,
+#'   init = admm_initializer(current_counts = y,
+#'   weighted_past_counts = rep(1, 10), degree = 1)
+#' )
+#' plot(summary(mod))
+plot.summary.admm_rr <- function(x, ...){
+  fig <- x$Results %>%
     ggplot(aes(x = .data$Time)) +
     geom_point(aes(y = .data$Signal)) +
     geom_line(aes(y = .data$pois_mean), col = "#08519C") +
@@ -37,8 +60,4 @@ summary.admm_rr <- function(object, ...){
          title = "The estimated piecewise polynomial curve (in line)") +
     theme_bw()
   print(fig)
-
-  lst = list(Results = res, Convergence = object$convr)
-  class(lst) = "summary.admm_rr"
-  return(lst)
 }
