@@ -91,10 +91,12 @@ List rtestim_path(
 
   // Return
   List out = List::create(
-    Named("y") = y,
-    Named("n") = n,
+    Named("current_counts") = y,
+    Named("x") = x,
+    Named("weighted_past_counts") = w,
+    Named("Rt") = theta,
     Named("lambda") = lambda,
-    Named("theta") = theta,
+    Named("degree") = korder,
     Named("niter") = niter
   );
   return out;
