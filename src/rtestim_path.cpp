@@ -13,6 +13,8 @@ List rtestim_path(
     arma::vec w, // weighted past cases
     int korder,
     arma::vec lambda,
+    double lambdamax = -1,
+    double lambdamin = -1,
     int nsol = 100,
     double rho_adjust = -1,
     double rho = -1,
@@ -31,18 +33,18 @@ List rtestim_path(
   // Build D matrix
   arma::sp_mat D;
   arma::sp_mat Dk;
-  D = buildDx(korder, x);
-  Dk = buildDx_tilde(korder, x);
+  D = buildDx(n, korder, x);
+  Dk = buildDx_tilde(n, korder, x);
   arma::sp_mat DkDk = Dk.t() * Dk;
 
   // Generate lambda sequence if necessary
-  // if (lambdamax <= 0) {
-  //   arma::vec b(n - korder );
-  //   arma::spsolve(b, D.t(), w % y);
-  //   lambdamax = arma::norm(b, "inf");
-  //   lambdamax *= n;
-  // }
-  // create_lambda(lambda, lambdamin, lambdamax, lambda_min_ratio, nsol);
+  if (lambda.size() == 0 && lambdamax <= 0) {
+    arma::vec b(n - korder );
+    arma::spsolve(b, D.t(), w % y); // very approximate
+    lambdamax = arma::norm(b, "inf");
+    lambdamax *= n;
+  }
+  create_lambda(lambda, lambdamin, lambdamax, lambda_min_ratio, nsol);
 
   // ADMM parameters
   double tolerance_abs = std::sqrt(n) * tolerance; // adjust for number of parameters
@@ -76,7 +78,7 @@ List rtestim_path(
       // maxiter, tolerance_abs, iters);
 
     // Store solution
-    theta.col(i) = exp(theta);
+    theta.col(i) = exp(beta);
     niter(i) = iters;
 
     // Verbose handlers

@@ -23,9 +23,12 @@ arma::sp_mat buildD(int n, int ord) {
 }
 
 // [[Rcpp::export]]
-arma::sp_mat buildDx(int k, const arma::vec& x) {
+arma::sp_mat buildDx(int n, int k, const arma::vec& x) {
   // x should be in increasing order
-  int n = x.size();
+  if (x.size() == 0) {
+    arma::sp_mat Dmat = buildD(n, k);
+    return(Dmat);
+  }
   arma::sp_mat Dmat(n - 1, n); // output
   arma::sp_mat D1(n - 1, n);
   D1.diag(0) -= 1;
@@ -45,14 +48,17 @@ arma::sp_mat buildDx(int k, const arma::vec& x) {
 }
 
 // [[Rcpp::export]]
-arma::sp_mat buildDx_tilde(int k, const arma::vec& x) {
-  int n = x.size();
+arma::sp_mat buildDx_tilde(int n, int k, const arma::vec& x) {
+  if (x.size() == 0) {
+    arma::sp_mat Dmat = buildD(n, k);
+    return(Dmat);
+  }
   if (k == 0) { // Only useful for k >= 1
     arma::sp_mat Dk(n, n);
     Dk.eye();
     return(Dk);
   }
-  arma::sp_mat Dk = buildDx(k - 1, x);
+  arma::sp_mat Dk = buildDx(n, k - 1, x);
   arma::vec lagdiff = k / (x.tail(n - k) - x.head(n - k));
   arma::sp_mat delx(n - k, n - k);
   delx.diag(0) = lagdiff;
@@ -72,16 +78,17 @@ void create_lambda(arma::vec& lambda,
   } else {
     lambda.set_size(nsol);
     lambdamin = (lambdamin < 0) ? lambda_min_ratio * lambdamax : lambdamin;
-    int sm_lam = lambdamin < 0;
-    if (sm_lam == 1) {
-      double lmpad = 1e-8;
+    double lmpad = 1e-20;
+    if (lambdamin < lmpad) {
       lambda.tail(nsol - 1) = arma::logspace(log10(lmpad), log10(lambdamax), nsol - 1);
-      lambda(0) = 0;
+      lambda(0) = lambdamin;
     } else {
       lambda = arma::logspace(log10(lambdamin), log10(lambdamax), nsol);
     }
   }
 }
+
+
 
 
 void EntrywiseSoftThreshold(arma::vec& z, double lam) {

@@ -9,8 +9,8 @@ dptf <- function(y, lam) {
     .Call(`_rtestim_dptf`, y, lam)
 }
 
-rtestim_path <- function(y, x, w, korder, lambda, nsol = 100L, rho_adjust = -1, rho = -1, maxiter = 1e5L, tolerance = 1e-3, lambda_min_ratio = 1e-4, verbose = 0L) {
-    .Call(`_rtestim_rtestim_path`, y, x, w, korder, lambda, nsol, rho_adjust, rho, maxiter, tolerance, lambda_min_ratio, verbose)
+rtestim_path <- function(y, x, w, korder, lambda, lambdamax = -1, lambdamin = -1, nsol = 100L, rho_adjust = -1, rho = -1, maxiter = 1e5L, tolerance = 1e-3, lambda_min_ratio = 1e-4, verbose = 0L) {
+    .Call(`_rtestim_rtestim_path`, y, x, w, korder, lambda, lambdamax, lambdamin, nsol, rho_adjust, rho, maxiter, tolerance, lambda_min_ratio, verbose)
 }
 
 buildD <- function(n, ord) {
