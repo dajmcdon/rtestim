@@ -6,21 +6,20 @@
 \usage{
 admm_solver(
   current_counts,
-  weighted_past_counts,
   degree,
-  lambda = 0.01,
-  mu = NULL,
-  tol = 0.001,
-  maxiter = 1000L,
-  init = admm_initializer(current_counts, weighted_past_counts, degree)
+  dist_gamma = c(1, 1),
+  x = double(0),
+  lambda = double(0),
+  nsol = 100L,
+  lambdamin = -1,
+  lambdamax = -1,
+  lambda_min_ratio = 1e-04,
+  maxiter = 10000,
+  init = NULL
 )
 }
 \arguments{
 \item{current_counts}{the current daily infection counts}
-
-\item{weighted_past_counts}{the weighted sum of past infection counts with
-corresponding serial interval functions (or its Gamma approximation) as
-weights}
 
 \item{degree}{degree of the piecewise polynomial curve to be fitted,
 e.g., degree = 0 corresponds to a piecewise constant curve}
@@ -28,14 +27,18 @@ e.g., degree = 0 corresponds to a piecewise constant curve}
 \item{lambda}{a parameter to balance the data fidelity and graphical
 smoothness of fitted curves; a greater lambda results in a smoother curve}
 
+\item{maxiter}{maximal number of iteration}
+
+\item{init}{a list of model initialization of class `admm_initializer`}
+
+\item{weighted_past_counts}{the weighted sum of past infection counts with
+corresponding serial interval functions (or its Gamma approximation) as
+weights}
+
 \item{mu}{a parameter used in the algorithm; use mu = NULL to compute it
 using a default method (`get_mu`)}
 
 \item{tol}{tolerance of convergence of primal & dual residuals}
-
-\item{maxiter}{maximal number of iteration}
-
-\item{init}{a list of model initialization of class `admm_initializer`}
 }
 \value{
 current_counts the current daily infection counts
@@ -47,7 +50,7 @@ R_rate: the estimated reproduction rate
 convr: if the model converges `convr==TRUE` or not `convr==FALSE`
 }
 \description{
-ADMM solver
+We should rename this function.
 }
 \examples{
 y <- c(rev(seq(2, 6, by = 1)), seq(2, 6, by = 1))

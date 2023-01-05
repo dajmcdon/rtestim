@@ -6,29 +6,37 @@
 \usage{
 admm_initializer(
   current_counts,
-  weighted_past_counts,
   degree,
+  weighted_past_counts = NULL,
+  primal_var = NULL,
   auxi_var = NULL,
-  dual_var = NULL
+  dual_var = NULL,
+  rho = -1,
+  rho_adjust = -1,
+  tolerance = 1e-04,
+  verbose = 0
 )
 }
 \arguments{
 \item{current_counts}{the current daily infection counts}
 
+\item{degree}{degree of the piecewise polynomial curves to be fitted,
+e.g., degree = 0 corresponds to piecewise constant curves}
+
 \item{weighted_past_counts}{the weighted sum of past infection counts with
 corresponding serial interval functions (or its Gamma approximation) as
 weights}
 
-\item{degree}{degree of the piecewise polynomial curves to be fitted,
-e.g., degree = 0 corresponds to piecewise constant curves}
+\item{primal_var}{the initial value of log(Rt)}
 
 \item{auxi_var}{auxiliary variable in the ADMM algorithm}
 
 \item{dual_var}{dual variable in the ADMM algorithm}
 }
 \value{
-a list of model initialization with class `admm_initializer`
+a list of model parameters with class `admm_initializer`
 }
 \description{
-ADMM initialization
+We should convert this into an S3 method so that we can pass in a
+vector of counts or an admm_initializer object (and overwrite)
 }

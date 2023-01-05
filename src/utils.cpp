@@ -50,7 +50,7 @@ arma::sp_mat buildDx(int n, int k, const arma::vec& x) {
 // [[Rcpp::export]]
 arma::sp_mat buildDx_tilde(int n, int k, const arma::vec& x) {
   if (x.size() == 0) {
-    arma::sp_mat Dmat = buildD(n, k);
+    arma::sp_mat Dmat = buildD(n, k - 1);
     return(Dmat);
   }
   if (k == 0) { // Only useful for k >= 1

@@ -17,11 +17,11 @@ buildD <- function(n, ord) {
     .Call(`_rtestim_buildD`, n, ord)
 }
 
-buildDx <- function(k, x) {
-    .Call(`_rtestim_buildDx`, k, x)
+buildDx <- function(n, k, x) {
+    .Call(`_rtestim_buildDx`, n, k, x)
 }
 
-buildDx_tilde <- function(k, x) {
-    .Call(`_rtestim_buildDx_tilde`, k, x)
+buildDx_tilde <- function(n, k, x) {
+    .Call(`_rtestim_buildDx_tilde`, n, k, x)
 }
 

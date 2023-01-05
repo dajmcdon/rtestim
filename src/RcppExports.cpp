@@ -83,26 +83,28 @@ BEGIN_RCPP
 END_RCPP
 }
 // buildDx
-arma::sp_mat buildDx(int k, const arma::vec& x);
-RcppExport SEXP _rtestim_buildDx(SEXP kSEXP, SEXP xSEXP) {
+arma::sp_mat buildDx(int n, int k, const arma::vec& x);
+RcppExport SEXP _rtestim_buildDx(SEXP nSEXP, SEXP kSEXP, SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
     Rcpp::traits::input_parameter< int >::type k(kSEXP);
     Rcpp::traits::input_parameter< const arma::vec& >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(buildDx(k, x));
+    rcpp_result_gen = Rcpp::wrap(buildDx(n, k, x));
     return rcpp_result_gen;
 END_RCPP
 }
 // buildDx_tilde
-arma::sp_mat buildDx_tilde(int k, const arma::vec& x);
-RcppExport SEXP _rtestim_buildDx_tilde(SEXP kSEXP, SEXP xSEXP) {
+arma::sp_mat buildDx_tilde(int n, int k, const arma::vec& x);
+RcppExport SEXP _rtestim_buildDx_tilde(SEXP nSEXP, SEXP kSEXP, SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
     Rcpp::traits::input_parameter< int >::type k(kSEXP);
     Rcpp::traits::input_parameter< const arma::vec& >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(buildDx_tilde(k, x));
+    rcpp_result_gen = Rcpp::wrap(buildDx_tilde(n, k, x));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -112,8 +114,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rtestim_dptf", (DL_FUNC) &_rtestim_dptf, 2},
     {"_rtestim_rtestim_path", (DL_FUNC) &_rtestim_rtestim_path, 14},
     {"_rtestim_buildD", (DL_FUNC) &_rtestim_buildD, 2},
-    {"_rtestim_buildDx", (DL_FUNC) &_rtestim_buildDx, 2},
-    {"_rtestim_buildDx_tilde", (DL_FUNC) &_rtestim_buildDx_tilde, 2},
+    {"_rtestim_buildDx", (DL_FUNC) &_rtestim_buildDx, 3},
+    {"_rtestim_buildDx_tilde", (DL_FUNC) &_rtestim_buildDx_tilde, 3},
     {NULL, NULL, 0}
 };
 
