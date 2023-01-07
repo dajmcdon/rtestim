@@ -164,7 +164,7 @@ admm_solver <- function(current_counts,
     if(abs(count_int - count) > 1e-3){
       cli::cli_abort(paste0("counts at index " , str(idx), " is not an integer"))
     }
-    current_count[idx] = count_int # Does this save more space?
+    current_count[idx] = count_int # save space by using integer
   }
 
   # or O(2n) but no for-loop
@@ -190,7 +190,7 @@ admm_solver <- function(current_counts,
       # Is it better to make nsol=lambda in this case?
       cli::cli_abort("nsol has to be equal to the size of lambda when the size of lambda is greater than 0")
     }
-    nsol = nsol_int # Does this save more space?
+    nsol = nsol_int # save space by using integer
   }
 
   if(lambda_min_ratio < 0 || lambda_min_ratio > 1){
@@ -208,7 +208,7 @@ admm_solver <- function(current_counts,
     cli::cli_abort("x needs to be a double vector")
   }
 
-  if(length(x) != n & length(x) != 0){
+  if(!(length(x) == n | length(x) == 0)){
     cli::cli_abort("x needs to be of size either 0 or n")
   }
 

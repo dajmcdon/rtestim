@@ -5,7 +5,7 @@
 #' @param shape shape parameter of the Gamma distribution
 #' @param scale scale parameter of the Gamma distribution
 #'
-#' @return probability mass of discretized gamma distribution in a vector
+#' @return probability mass of discretized gamma distribution in a vector of size n-1
 #' @export
 #'
 #' @examples discretize_gamma(30, shape = 2, scale = 2)

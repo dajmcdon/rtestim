@@ -14,7 +14,7 @@ delay_calculator <- function(current_counts, dist_gamma){
 
   for(idx in 2:n){
     w  = discretize_gamma(idx, dist_gamma[1], dist_gamma[2])
-    output[idx] = current_counts[idx:1]*w
+    output[idx] = current_counts[(idx-1):1]*w
   }
   return(output)
 }
