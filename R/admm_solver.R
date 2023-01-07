@@ -95,18 +95,18 @@ admm_initializer <- function(current_counts,
 #' We should rename this function.
 #'
 #' @param current_counts the current daily infection counts
-#' @param weighted_past_counts the weighted sum of past infection counts with
-#' corresponding serial interval functions (or its Gamma approximation) as
-#' weights
 #' @param degree degree of the piecewise polynomial curve to be fitted,
 #' e.g., degree = 0 corresponds to a piecewise constant curve
 #' @param lambda a parameter to balance the data fidelity and graphical
 #' smoothness of fitted curves; a greater lambda results in a smoother curve
-#' @param mu a parameter used in the algorithm; use mu = NULL to compute it
-#' using a default method (`get_mu`)
-#' @param tol tolerance of convergence of primal & dual residuals
 #' @param maxiter maximal number of iteration
 #' @param init a list of model initialization of class `admm_initializer`
+#' @param dist_gamma
+#' @param x
+#' @param nsol
+#' @param lambdamin smallest lambda the optimization will run on
+#' @param lambdamax largest lambda the optimization will run on
+#' @param lambda_min_ratio
 #'
 #' @return current_counts the current daily infection counts
 #' @return weighted_past_counts the weighted sum of past infection counts
@@ -150,6 +150,72 @@ admm_solver <- function(current_counts,
   maxiter <- as.integer(maxiter)
 
   n <- length(current_counts)
+
+
+  # (1) check that counts are non-negative, integer
+
+  # O(n) with for-loop
+  for(idx in 1:n){
+    count = current_count[idx]
+    if(count < 0){
+      cli::cli_abort(paste0("counts at index " , str(idx), " is smaller than 0"))
+    }
+    count_int = as.integer(count)
+    if(abs(count_int - count) > 1e-3){
+      cli::cli_abort(paste0("counts at index " , str(idx), " is not an integer"))
+    }
+    current_count[idx] = count_int # Does this save more space?
+  }
+
+  # or O(2n) but no for-loop
+
+  if(sum(current_counts < 0) > 0){
+    cli::cli_abort("counts need to be non-negative")
+  }
+
+  if(sum(abs(current_counts - as.integer(current_counts))) > 1e-3){
+    cli::cli_abort("counts need to be integer")
+  }
+
+
+  # (2) checks on lambda, lambdamin, lambdamax
+  lambda_size = length(lambda)
+
+  if(lambda_size > 0){
+    if(lambdamin < 0 || lambdamax < 0){
+      cli::cli_abort("both lambdamin and lambdamax have to be non-negative")
+    }
+    nsol_int = as.integer(nsol)
+    if(nsol_int != lambda_size || abs(nsol-nsol_int) > 1e-3){
+      # Is it better to make nsol=lambda in this case?
+      cli::cli_abort("nsol has to be equal to the size of lambda when the size of lambda is greater than 0")
+    }
+    nsol = nsol_int # Does this save more space?
+  }
+
+  if(lambda_min_ratio < 0 || lambda_min_ratio > 1){
+    cli:cli_abort("lambda_min_ratio has to be in [0,1]")
+  }
+
+  if(!(lambdamin == -1 & lambdamax == -1)){
+    if(lambdamin > lambdamax){
+      cli::cli_abort("lambdamin needs to be smaller than lambdamax, or both or them have to be -1")
+    }
+  }
+
+  # (3) check that x is a double vector of length 0 or n
+  if(!(typeof(x) == "double")){
+    cli::cli_abort("x needs to be a double vector")
+  }
+
+  if(length(x) != n & length(x) != 0){
+    cli::cli_abort("x needs to be of size either 0 or n")
+  }
+
+
+
+
+
 
   # (1) check that counts are non-negative, integer
   # (2) checks on lambda, lambdamin, lambdamax (don't need to adjust)
