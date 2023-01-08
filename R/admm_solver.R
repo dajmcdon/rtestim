@@ -101,7 +101,7 @@ admm_initializer <- function(current_counts,
 #' smoothness of fitted curves; a greater lambda results in a smoother curve
 #' @param maxiter maximal number of iteration
 #' @param init a list of model initialization of class `admm_initializer`
-#' @param dist_gamma
+#' @param dist_gamma shape and scale parameter of the discretized Gamma distribution
 #' @param x
 #' @param nsol
 #' @param lambdamin smallest lambda the optimization will run on

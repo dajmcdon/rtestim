@@ -24,21 +24,20 @@ admm_solver(
 \item{degree}{degree of the piecewise polynomial curve to be fitted,
 e.g., degree = 0 corresponds to a piecewise constant curve}
 
+\item{dist_gamma}{shape and scale parameter of the discretized Gamma distribution}
+
 \item{lambda}{a parameter to balance the data fidelity and graphical
 smoothness of fitted curves; a greater lambda results in a smoother curve}
+
+\item{lambdamin}{smallest lambda the optimization will run on}
+
+\item{lambdamax}{largest lambda the optimization will run on}
+
+\item{lambda_min_ratio}{}
 
 \item{maxiter}{maximal number of iteration}
 
 \item{init}{a list of model initialization of class `admm_initializer`}
-
-\item{weighted_past_counts}{the weighted sum of past infection counts with
-corresponding serial interval functions (or its Gamma approximation) as
-weights}
-
-\item{mu}{a parameter used in the algorithm; use mu = NULL to compute it
-using a default method (`get_mu`)}
-
-\item{tol}{tolerance of convergence of primal & dual residuals}
 }
 \value{
 current_counts the current daily infection counts
