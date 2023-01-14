@@ -140,7 +140,6 @@ admm_solver <- function(current_counts,
                         maxiter = 1e4,
                         init = NULL) {
   # create weighted past cases
-  # TODO: check dist_gamma has size 2 and > 0
   weighted_past_counts <- delay_calculator(current_counts, dist_gamma)
   if (is.null(init)) {
     init <- admm_initializer(current_counts, degree, weighted_past_counts)
@@ -180,7 +179,7 @@ admm_solver <- function(current_counts,
 
 
   # (3) check that x is a double vector of length 0 or n
-  if (!(typeof(x) == "double")) cli::cli_abort("x must be a double vector")
+  if (!is.double(x)) cli::cli_abort("x must be a double vector")
   if (!(length(x) == n | length(x) == 0)) cli::cli_abort("x must be of size either 0 or n")
 
   # Based on the create_lambda helper function in utils.cpp
