@@ -2,21 +2,27 @@
 % Please edit documentation in R/delay_calculator.R
 \name{delay_calculator}
 \alias{delay_calculator}
-\title{Delay Calculator}
+\title{Calculate the total infectiousness at each observed time point.}
 \usage{
 delay_calculator(current_counts, dist_gamma)
 }
 \arguments{
-\item{current_counts}{the current daily infection counts}
+\item{current_counts}{A vector of size n, containing all observed case counts}
 
-\item{dist_gamma}{scale and shape parameter of the discretized Gamma distribution}
+\item{dist_gamma}{A vector of size 2, representing the shape and scale parameter of the discretized Gamma distribution}
 }
 \value{
-list of counts weighted by the discretized Gamma distribution
+A vector of size n-1, containing the total infectiousness at each observed time point
 }
 \description{
-Delay Calculator
+Calculate the total infectiousness at each observed time point.
+}
+\details{
+The total infectiousness at each observed time point is calculated by \eqn{\sum_{a=1}^t I_{t-s}w_s}
+, where \eqn{I} denotes the vector containing all observed case counts, and \eqn{w} denotes the serial interval distribution.
+The serial interval distribution expresses the probability of the symptom onset of a secondary infection occurred a given
+number of days after the primary infection
 }
 \examples{
-delay_calculator(c(3,2,5,3,1), c(2,2))
+delay_calculator(c(3,2,5,3,1), c(2.5, 2.5))
 }

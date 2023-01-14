@@ -1,20 +1,26 @@
-#' Delay Calculator
+#' Calculate the total infectiousness at each observed time point.
 #'
-#' @param current_counts the current daily infection counts
-#' @param dist_gamma scale and shape parameter of the discretized Gamma distribution
+#' @details The total infectiousness at each observed time point is calculated by \eqn{\sum_{a=1}^t I_{t-s}w_s}
+#' , where \eqn{I} denotes the vector containing all observed case counts, and \eqn{w} denotes the serial interval distribution.
+#' The serial interval distribution expresses the probability of the symptom onset of a secondary infection occurred a given
+#' number of days after the primary infection
 #'
-#' @return list of counts weighted by the discretized Gamma distribution
+#' @usage delay_calculator(current_counts, dist_gamma)
+#'
+#' @param current_counts A vector of size n, containing all observed case counts
+#' @param dist_gamma A vector of size 2, representing the shape and scale parameter of the discretized Gamma distribution
+#'
+#' @return A vector of size n-1, containing the total infectiousness at each observed time point
 #' @export
 #'
-#' @examples delay_calculator(c(3,2,5,3,1), c(2,2))
+#' @examples
+#' delay_calculator(c(3,2,5,3,1), c(2.5, 2.5))
 delay_calculator <- function(current_counts, dist_gamma){
-  n = length(current_counts)
-  output = rep(0, n)
-  output[1] = current_counts[1]
-
-  for(idx in 2:n){
-    w  = discretize_gamma(idx, dist_gamma[1], dist_gamma[2])
-    output[idx] = current_counts[(idx-1):1]*w
-  }
-  return(output)
+  n <- length(current_counts)
+  w <- discretize_gamma(n, dist_gamma[1], dist_gamma[2])
+  cw <- cumsum(w)
+  convolved_seq <- convolve(current_counts, rev(w))[1:n]/cw
+  # convolved_seq is the weighted count at day 2 to day n+1.
+  # Should I use weighted count at day 2 as weighted count at day 1
+  c(convolved_seq[1], convolved_seq[1:(n-1)])
 }

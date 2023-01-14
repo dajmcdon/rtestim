@@ -2,23 +2,28 @@
 % Please edit documentation in R/discretize_gamma.R
 \name{discretize_gamma}
 \alias{discretize_gamma}
-\title{discretized Gamma distribution given shape and scale parameters. This is intended to be the serial interval distribution of the infectious disease.}
+\title{Density function for the discretized gamma function with the given shape and scale parameter}
 \usage{
-discretize_gamma(n, shape, scale)
+discretize_gamma(n, shape=2.5, scale=2.5)
 }
 \arguments{
-\item{n, }{length of past observations}
+\item{n, }{length of the observed case count}
 
-\item{shape}{shape parameter of the Gamma distribution}
+\item{shape}{shape parameter of the discretized Gamma distribution}
 
-\item{scale}{scale parameter of the Gamma distribution}
+\item{scale}{scale parameter of the discretized Gamma distribution}
 }
 \value{
-probability mass of discretized gamma distribution in a vector of size n-1
+probability mass of the discretized gamma distribution in a vector of size n
 }
 \description{
-discretized Gamma distribution given shape and scale parameters. This is intended to be the serial interval distribution of the infectious disease.
+Density function for the discretized gamma function with the given shape and scale parameter
+}
+\details{
+The serial interval distribution expresses the probability of the symptom onset of a secondary infection
+occurred a given number of days after the primary infection. The serial interval distribution is commonly represented
+by a discretized Gamma distribution in literature, parametrized by the shape and scale parameters.
 }
 \examples{
-discretize_gamma(30, shape = 2, scale = 2)
+discretize_gamma(30, shape = 2.5, scale = 2.5)
 }

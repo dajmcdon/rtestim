@@ -24,16 +24,21 @@ admm_solver(
 \item{degree}{degree of the piecewise polynomial curve to be fitted,
 e.g., degree = 0 corresponds to a piecewise constant curve}
 
-\item{dist_gamma}{shape and scale parameter of the discretized Gamma distribution}
+\item{dist_gamma}{shape and scale parameter of the discretized Gamma distribution,
+representing the serial interval distribution, which indicate how infectious someone is if they are infected a given days ago}
+
+\item{x}{the initial value of log(Rt)}
 
 \item{lambda}{a parameter to balance the data fidelity and graphical
 smoothness of fitted curves; a greater lambda results in a smoother curve}
+
+\item{nsol}{number of lambdas to generate, if lambda is not pre-determined}
 
 \item{lambdamin}{smallest lambda the optimization will run on}
 
 \item{lambdamax}{largest lambda the optimization will run on}
 
-\item{lambda_min_ratio}{}
+\item{lambda_min_ratio}{ratio between the smallest lambda to the largest lambda}
 
 \item{maxiter}{maximal number of iteration}
 
@@ -44,12 +49,17 @@ current_counts the current daily infection counts
 
 weighted_past_counts the weighted sum of past infection counts
 
-R_rate: the estimated reproduction rate
+R_rate: the estimated effective reproduction rate
 
 convr: if the model converges `convr==TRUE` or not `convr==FALSE`
 }
 \description{
-We should rename this function.
+Compute the Effective Reproduction Number Rt of infectious diseases using the Alternative Direction Method of Multipliers method
+}
+\details{
+The Effective Reproduction Number Rt of an infectious disease is estimated by the smoothed ratio between the
+observed daily infection counts and the total infectiousness each day of the past infected. The total infectiousness at day \eqn{t} is
+calculated by \eqn{TI_{t}\sum_{a=1}^t I_{t-s}w_s}, i.e. the expected number of new cases at day \eqn{t}
 }
 \examples{
 y <- c(rev(seq(2, 6, by = 1)), seq(2, 6, by = 1))

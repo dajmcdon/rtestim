@@ -92,7 +92,11 @@ admm_initializer <- function(current_counts,
 
 #' ADMM solver
 #'
-#' We should rename this function.
+#' Compute the Effective Reproduction Number Rt of infectious diseases using the Alternative Direction Method of Multipliers method
+#'
+#' @details The Effective Reproduction Number Rt of an infectious disease is estimated by the smoothed ratio between the
+#' observed daily infection counts and the total infectiousness each day of the past infected. The total infectiousness at day \eqn{t} is
+#' calculated by \eqn{TI_{t}\sum_{a=1}^t I_{t-s}w_s}, i.e. the expected number of new cases at day \eqn{t}
 #'
 #' @param current_counts the current daily infection counts
 #' @param degree degree of the piecewise polynomial curve to be fitted,
@@ -101,16 +105,18 @@ admm_initializer <- function(current_counts,
 #' smoothness of fitted curves; a greater lambda results in a smoother curve
 #' @param maxiter maximal number of iteration
 #' @param init a list of model initialization of class `admm_initializer`
-#' @param dist_gamma shape and scale parameter of the discretized Gamma distribution
-#' @param x
-#' @param nsol
-#' @param lambdamin smallest lambda the optimization will run on
-#' @param lambdamax largest lambda the optimization will run on
-#' @param lambda_min_ratio
+#' @param dist_gamma shape and scale parameter of the discretized Gamma distribution,
+#' representing the serial interval distribution, which indicate how infectious someone is if they are infected a given days ago
+#' @param x the initial value of log(Rt)
+#' @param nsol number of lambdas to generate, if lambda is not pre-determined
+#' @param lambdamin If lambda is not pre-determined, the program will generate a sequence of lambda, with lambdamin being the smallest lambda value
+#' @param lambdamax If lambda is not pre-determined, the program will generate a sequence of lambda, with lambdamin being the largest lambda value
+#' @param lambda_min_ratio If lambda is not pre-deteremined, and if lambdamin is not pre-determined, the program will generate a lambdamin
+#' by lambdamax * lambda_min_ratio
 #'
 #' @return current_counts the current daily infection counts
 #' @return weighted_past_counts the weighted sum of past infection counts
-#' @return R_rate: the estimated reproduction rate
+#' @return R_rate: the estimated effective reproduction rate
 #' @return convr: if the model converges `convr==TRUE` or not `convr==FALSE`
 #'
 #' @export
@@ -134,6 +140,7 @@ admm_solver <- function(current_counts,
                         maxiter = 1e4,
                         init = NULL) {
   # create weighted past cases
+  # TODO: check dist_gamma has size 2 and > 0
   weighted_past_counts <- delay_calculator(current_counts, dist_gamma)
   if (is.null(init)) {
     init <- admm_initializer(current_counts, degree, weighted_past_counts)
@@ -153,68 +160,35 @@ admm_solver <- function(current_counts,
 
 
   # (1) check that counts are non-negative, integer
-
-  # O(n) with for-loop
-  for(idx in 1:n){
-    count = current_count[idx]
-    if(count < 0){
-      cli::cli_abort(paste0("counts at index " , str(idx), " is smaller than 0"))
-    }
-    count_int = as.integer(count)
-    if(abs(count_int - count) > 1e-3){
-      cli::cli_abort(paste0("counts at index " , str(idx), " is not an integer"))
-    }
-    current_count[idx] = count_int # save space by using integer
-  }
-
-  # or O(2n) but no for-loop
-
-  if(sum(current_counts < 0) > 0){
-    cli::cli_abort("counts need to be non-negative")
-  }
-
-  if(sum(abs(current_counts - as.integer(current_counts))) > 1e-3){
-    cli::cli_abort("counts need to be integer")
-  }
+  if (any(counts < 0)) cli::cli_abort("counts must be non-negative")
+  if (!all(rlang::is_intergerish(current_counts))) cli::cli_abort("counts must be integers")
 
 
   # (2) checks on lambda, lambdamin, lambdamax
   lambda_size = length(lambda)
 
-  if(lambda_size > 0){
-    if(lambdamin < 0 || lambdamax < 0){
-      cli::cli_abort("both lambdamin and lambdamax have to be non-negative")
-    }
-    nsol_int = as.integer(nsol)
-    if(nsol_int != lambda_size || abs(nsol-nsol_int) > 1e-3){
-      # Is it better to make nsol=lambda in this case?
-      cli::cli_abort("nsol has to be equal to the size of lambda when the size of lambda is greater than 0")
-    }
-    nsol = nsol_int # save space by using integer
+  if (lambda_size > 0) {
+
+    if (nsol_int != lambda_size || nsol%%1 != nsol) cli::cli_abort("nsol must be integer, and nsol must be equal to the size of lambda when the size of lambda is greater than 0")
+
+  } else {
+
+    if (lambda_min_ratio < 0 || lambda_min_ratio > 1) cli::cli_abort("lambda_min_ratio must be in [0,1]")
+    if (lambdamax < 0) cli::cli_abort("If lambda is not determined, lambdamax must be specified and larger than 0")
+    if (lambdamin > lambdamax) cli::cli_abort("If lambda is not determined, lambdamin must be smaller than lambdamax")
   }
 
-  if(lambda_min_ratio < 0 || lambda_min_ratio > 1){
-    cli:cli_abort("lambda_min_ratio has to be in [0,1]")
-  }
-
-  if(!(lambdamin == -1 & lambdamax == -1)){
-    if(lambdamin > lambdamax){
-      cli::cli_abort("lambdamin needs to be smaller than lambdamax, or both or them have to be -1")
-    }
-  }
 
   # (3) check that x is a double vector of length 0 or n
-  if(!(typeof(x) == "double")){
-    cli::cli_abort("x needs to be a double vector")
-  }
+  if (!(typeof(x) == "double")) cli::cli_abort("x must be a double vector")
+  if (!(length(x) == n | length(x) == 0)) cli::cli_abort("x must be of size either 0 or n")
 
-  if(!(length(x) == n | length(x) == 0)){
-    cli::cli_abort("x needs to be of size either 0 or n")
-  }
-
-
-
-
+  # Based on the create_lambda helper function in utils.cpp
+  # If lambda has length > 0:
+  #   Doesn't matter what lambdamin, lambdamax, or lambda_min_ratio are, lambdamin, lambdamax are filled based on lambda in utils.cpp
+  # If lambda has length == 0:
+  #   1) lambdamin > 0 && lambdamax > 0 && lambdamin < lamdamax, ignore lambda_min_ratio
+  #   2) lambdamax > 0 && 0 <= lambda_min_ratio <= 1, ignore lambdamin
 
 
   # (1) check that counts are non-negative, integer
