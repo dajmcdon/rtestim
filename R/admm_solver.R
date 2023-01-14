@@ -107,7 +107,7 @@ admm_initializer <- function(current_counts,
 #' @param init a list of model initialization of class `admm_initializer`
 #' @param dist_gamma shape and scale parameter of the discretized Gamma distribution,
 #' representing the serial interval distribution, which indicate how infectious someone is if they are infected a given days ago
-#' @param x the initial value of log(Rt)
+#' @param x the observation position. Default to 1:n, indicating case counts are evenly spaced and collected.
 #' @param nsol number of lambdas to generate, if lambda is not pre-determined
 #' @param lambdamin If lambda is not pre-determined, the program will generate a sequence of lambda, with lambdamin being the smallest lambda value
 #' @param lambdamax If lambda is not pre-determined, the program will generate a sequence of lambda, with lambdamin being the largest lambda value
