@@ -27,18 +27,19 @@ e.g., degree = 0 corresponds to a piecewise constant curve}
 \item{dist_gamma}{shape and scale parameter of the discretized Gamma distribution,
 representing the serial interval distribution, which indicate how infectious someone is if they are infected a given days ago}
 
-\item{x}{the initial value of log(Rt)}
+\item{x}{the observation position.}
 
 \item{lambda}{a parameter to balance the data fidelity and graphical
 smoothness of fitted curves; a greater lambda results in a smoother curve}
 
-\item{nsol}{number of lambdas to generate, if lambda is not pre-determined}
+\item{nsol}{number of lambdas to generate, if lambda is not specified}
 
-\item{lambdamin}{smallest lambda the optimization will run on}
+\item{lambdamin}{If lambda is not specified, the program will generate a sequence of lambda, with lambdamin being the smallest lambda value}
 
-\item{lambdamax}{largest lambda the optimization will run on}
+\item{lambdamax}{If lambda is not specified, the program will generate a sequence of lambda, with lambdamin being the largest lambda value}
 
-\item{lambda_min_ratio}{ratio between the smallest lambda to the largest lambda}
+\item{lambda_min_ratio}{If lambda is not specified, and if lambdamin is not pre-determined, the program will generate a lambdamin
+by lambdamax * lambda_min_ratio}
 
 \item{maxiter}{maximal number of iteration}
 
@@ -54,12 +55,15 @@ R_rate: the estimated effective reproduction rate
 convr: if the model converges `convr==TRUE` or not `convr==FALSE`
 }
 \description{
-Compute the Effective Reproduction Number Rt of infectious diseases using the Alternative Direction Method of Multipliers method
-}
-\details{
-The Effective Reproduction Number Rt of an infectious disease is estimated by the smoothed ratio between the
-observed daily infection counts and the total infectiousness each day of the past infected. The total infectiousness at day \eqn{t} is
-calculated by \eqn{TI_{t}\sum_{a=1}^t I_{t-s}w_s}, i.e. the expected number of new cases at day \eqn{t}
+Alternative Direction Method of Multiplier (ADMM) to solve for a Smoothness Penalized Poisson regression
+
+The Effective Reproduction Number \eqn{R_t} of an infectious disease can be estimated by solving the Smoothnesss Penalized Poisson
+regression of the form:
+
+\eqn{R_t = argmin_{\theta} (\frac{1}{n} \sum_{i=1}^n e^{\theta_i} - y_i\theta_i) + \lambda||D^{(k)}\theta||_1}
+
+where \eqn{y_i} is the observed case count at day \eqn{i}, \eqn{\theta_i = \sum_{a=1}y_{a}w_{t-a}} is the weighted past count at day \eqn{i},
+\eqn{\lambda} is the smoothness penalty, and \eqn{D^{(k)}} is the \eqn{k}-th difference matrix
 }
 \examples{
 y <- c(rev(seq(2, 6, by = 1)), seq(2, 6, by = 1))

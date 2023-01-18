@@ -92,11 +92,15 @@ admm_initializer <- function(current_counts,
 
 #' ADMM solver
 #'
-#' Compute the Effective Reproduction Number Rt of infectious diseases using the Alternative Direction Method of Multipliers method
+#' @description Alternative Direction Method of Multiplier (ADMM) to solve for a Smoothness Penalized Poisson regression.
 #'
-#' @details The Effective Reproduction Number Rt of an infectious disease is estimated by the smoothed ratio between the
-#' observed daily infection counts and the total infectiousness each day of the past infected. The total infectiousness at day \eqn{t} is
-#' calculated by \eqn{TI_{t}\sum_{a=1}^t I_{t-s}w_s}, i.e. the expected number of new cases at day \eqn{t}
+#' @description  The Effective Reproduction Number \eqn{R_t} of an infectious disease can be estimated by solving the Smoothnesss Penalized Poisson
+#' regression of the form:
+#'
+#' @description \eqn{R_t = argmin_{\theta} (\frac{1}{n} \sum_{i=1}^n e^{\theta_i} - y_i\theta_i) + \lambda||D^{(k)}\theta||_1}
+#'
+#' @description where \eqn{y_i} is the observed case count at day \eqn{i}, \eqn{\theta_i = \sum_{a=1}y_{a}w_{t-a}} is the weighted past count at day \eqn{i},
+#' \eqn{\lambda} is the smoothness penalty, and \eqn{D^{(k)}} is the \eqn{k}-th difference matrix
 #'
 #' @param current_counts the current daily infection counts
 #' @param degree degree of the piecewise polynomial curve to be fitted,
@@ -107,11 +111,11 @@ admm_initializer <- function(current_counts,
 #' @param init a list of model initialization of class `admm_initializer`
 #' @param dist_gamma shape and scale parameter of the discretized Gamma distribution,
 #' representing the serial interval distribution, which indicate how infectious someone is if they are infected a given days ago
-#' @param x the observation position. Default to 1:n, indicating case counts are evenly spaced and collected.
-#' @param nsol number of lambdas to generate, if lambda is not pre-determined
-#' @param lambdamin If lambda is not pre-determined, the program will generate a sequence of lambda, with lambdamin being the smallest lambda value
-#' @param lambdamax If lambda is not pre-determined, the program will generate a sequence of lambda, with lambdamin being the largest lambda value
-#' @param lambda_min_ratio If lambda is not pre-deteremined, and if lambdamin is not pre-determined, the program will generate a lambdamin
+#' @param x the observation position
+#' @param nsol number of lambdas to generate, if lambda is not specified
+#' @param lambdamin If lambda is not specified, the program will generate a sequence of lambda, with lambdamin being the smallest lambda value
+#' @param lambdamax If lambda is not specified, the program will generate a sequence of lambda, with lambdamin being the largest lambda value
+#' @param lambda_min_ratio If lambda is not specified, and if lambdamin is not pre-determined, the program will generate a lambdamin
 #' by lambdamax * lambda_min_ratio
 #'
 #' @return current_counts the current daily infection counts
@@ -164,11 +168,11 @@ admm_solver <- function(current_counts,
 
 
   # (2) checks on lambda, lambdamin, lambdamax
-  lambda_size = length(lambda)
+  lambda_size <- length(lambda)
 
   if (lambda_size > 0) {
-
-    if (nsol_int != lambda_size || nsol%%1 != nsol) cli::cli_abort("nsol must be integer, and nsol must be equal to the size of lambda when the size of lambda is greater than 0")
+    nsol <- lambda_size
+    if (nsol%%1 != nsol) cli::cli_abort("nsol must be integer")
 
   } else {
 
@@ -179,24 +183,8 @@ admm_solver <- function(current_counts,
 
 
   # (3) check that x is a double vector of length 0 or n
-  if (!is.double(x)) cli::cli_abort("x must be a double vector")
+  if (any(is.double(x))) cli::cli_abort("x must be a double vector")
   if (!(length(x) == n | length(x) == 0)) cli::cli_abort("x must be of size either 0 or n")
-
-  # Based on the create_lambda helper function in utils.cpp
-  # If lambda has length > 0:
-  #   Doesn't matter what lambdamin, lambdamax, or lambda_min_ratio are, lambdamin, lambdamax are filled based on lambda in utils.cpp
-  # If lambda has length == 0:
-  #   1) lambdamin > 0 && lambdamax > 0 && lambdamin < lamdamax, ignore lambda_min_ratio
-  #   2) lambdamax > 0 && 0 <= lambda_min_ratio <= 1, ignore lambdamin
-
-
-  # (1) check that counts are non-negative, integer
-  # (2) checks on lambda, lambdamin, lambdamax (don't need to adjust)
-  #   * If lambda has length > 0, lambdamin and max should be negative
-  #   * Need 0 <= lambda_min_ratio <= 1
-  #   * need nsol > 0, integer, equal to length(lambda) when it has positive length
-  #   * lambdamin < lambdamax or both negative
-  # (3) check that x is a double vector of length 0 or n
 
 
   mod <- rtestim_path(
