@@ -90,11 +90,11 @@ admm_initializer <- function(current_counts,
   )
 }
 
-#' ADMM solver
+#' Alternating Direction Method of Multiplier (ADMM) solver for smoothness penalized Poisson regression
 #'
-#' @description Alternative Direction Method of Multiplier (ADMM) to solve for a Smoothness Penalized Poisson regression.
+#' @description Alternating Direction Method of Multiplier (ADMM) to solve for a smoothness penalized Poisson regression.
 #'
-#' @description  The Effective Reproduction Number \eqn{R_t} of an infectious disease can be estimated by solving the Smoothnesss Penalized Poisson
+#' @description  The Effective Reproduction Number \eqn{R_t} of an infectious disease can be estimated by solving the smoothnesss penalized Poisson
 #' regression of the form:
 #'
 #' @description \eqn{R_t = argmin_{\theta} (\frac{1}{n} \sum_{i=1}^n e^{\theta_i} - y_i\theta_i) + \lambda||D^{(k)}\theta||_1}
@@ -115,7 +115,7 @@ admm_initializer <- function(current_counts,
 #' @param nsol number of lambdas to generate, if lambda is not specified
 #' @param lambdamin If lambda is not specified, the program will generate a sequence of lambda, with lambdamin being the smallest lambda value
 #' @param lambdamax If lambda is not specified, the program will generate a sequence of lambda, with lambdamin being the largest lambda value
-#' @param lambda_min_ratio If lambda is not specified, and if lambdamin is not pre-determined, the program will generate a lambdamin
+#' @param lambda_min_ratio If lambda is not specified, and if lambdamin is not specified, the program will generate a lambdamin
 #' by lambdamax * lambda_min_ratio
 #'
 #' @return current_counts the current daily infection counts
@@ -161,7 +161,6 @@ admm_solver <- function(current_counts,
 
   n <- length(current_counts)
 
-
   # (1) check that counts are non-negative, integer
   if (any(counts < 0)) cli::cli_abort("counts must be non-negative")
   if (!all(rlang::is_intergerish(current_counts))) cli::cli_abort("counts must be integers")
@@ -172,18 +171,18 @@ admm_solver <- function(current_counts,
 
   if (lambda_size > 0) {
     nsol <- lambda_size
-    if (nsol%%1 != nsol) cli::cli_abort("nsol must be integer")
 
   } else {
 
     if (lambda_min_ratio < 0 || lambda_min_ratio > 1) cli::cli_abort("lambda_min_ratio must be in [0,1]")
-    if (lambdamax < 0) cli::cli_abort("If lambda is not determined, lambdamax must be specified and larger than 0")
-    if (lambdamin > lambdamax) cli::cli_abort("If lambda is not determined, lambdamin must be smaller than lambdamax")
+    if (lambdamax < 0) cli::cli_abort("If lambda is not specified, lambdamax must be specified and larger than 0")
+    if (lambdamin > lambdamax) cli::cli_abort("If lambda is not specified, lambdamin must be smaller than lambdamax")
   }
 
 
   # (3) check that x is a double vector of length 0 or n
-  if (any(is.double(x))) cli::cli_abort("x must be a double vector")
+  if (!is.numeric(x)) cli::cli_abort("x must be a numeric vector")
+  if (!is.double(x)) x = as.double(x)
   if (!(length(x) == n | length(x) == 0)) cli::cli_abort("x must be of size either 0 or n")
 
 

@@ -20,7 +20,5 @@ delay_calculator <- function(current_counts, dist_gamma){
   w <- discretize_gamma(n, dist_gamma[1], dist_gamma[2])
   cw <- cumsum(w)
   convolved_seq <- convolve(current_counts, rev(w))[1:n]/cw
-  # convolved_seq is the weighted count at day 2 to day n+1.
-  # Should I use weighted count at day 2 as weighted count at day 1
   c(convolved_seq[1], convolved_seq[1:(n-1)])
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/admm_solver.R
 \name{admm_solver}
 \alias{admm_solver}
-\title{ADMM solver}
+\title{Alternating Direction Method of Multiplier (ADMM) solver for smoothness penalized Poisson regression}
 \usage{
 admm_solver(
   current_counts,
@@ -27,7 +27,7 @@ e.g., degree = 0 corresponds to a piecewise constant curve}
 \item{dist_gamma}{shape and scale parameter of the discretized Gamma distribution,
 representing the serial interval distribution, which indicate how infectious someone is if they are infected a given days ago}
 
-\item{x}{the observation position.}
+\item{x}{the observation position}
 
 \item{lambda}{a parameter to balance the data fidelity and graphical
 smoothness of fitted curves; a greater lambda results in a smoother curve}
@@ -38,7 +38,7 @@ smoothness of fitted curves; a greater lambda results in a smoother curve}
 
 \item{lambdamax}{If lambda is not specified, the program will generate a sequence of lambda, with lambdamin being the largest lambda value}
 
-\item{lambda_min_ratio}{If lambda is not specified, and if lambdamin is not pre-determined, the program will generate a lambdamin
+\item{lambda_min_ratio}{If lambda is not specified, and if lambdamin is not specified, the program will generate a lambdamin
 by lambdamax * lambda_min_ratio}
 
 \item{maxiter}{maximal number of iteration}
@@ -55,9 +55,9 @@ R_rate: the estimated effective reproduction rate
 convr: if the model converges `convr==TRUE` or not `convr==FALSE`
 }
 \description{
-Alternative Direction Method of Multiplier (ADMM) to solve for a Smoothness Penalized Poisson regression
+Alternating Direction Method of Multiplier (ADMM) to solve for a smoothness penalized Poisson regression.
 
-The Effective Reproduction Number \eqn{R_t} of an infectious disease can be estimated by solving the Smoothnesss Penalized Poisson
+The Effective Reproduction Number \eqn{R_t} of an infectious disease can be estimated by solving the smoothnesss penalized Poisson
 regression of the form:
 
 \eqn{R_t = argmin_{\theta} (\frac{1}{n} \sum_{i=1}^n e^{\theta_i} - y_i\theta_i) + \lambda||D^{(k)}\theta||_1}
