@@ -4,7 +4,6 @@
 #include "utils.h"
 #include "admm.h"
 
-
 // [[Rcpp::depends(RcppArmadillo)]]
 // [[Rcpp::depends(BH)]]
 // [[Rcpp::plugins("cpp11")]]
@@ -14,11 +13,12 @@ using namespace arma;
 
 double update_pois(double c, double mu, int n) {
   // @elvis, explain why this is the solution
-  if (c < 500) { // deal with potential overflow from big exp(c)
+  if (c < 500) {  // deal with potential overflow from big exp(c)
     c -= boost::math::lambert_w0(exp(c) / (mu * n));
   } else {
-    // See: https://en.wikipedia.org/wiki/Lambert_W_function#Asymptotic_expansions
-    // We use the first four terms.
+    // See:
+    // https://en.wikipedia.org/wiki/Lambert_W_function#Asymptotic_expansions We
+    // use the first four terms.
     double la, lb;
     la = c - log(mu * n);
     lb = log(la);
@@ -26,7 +26,6 @@ double update_pois(double c, double mu, int n) {
   }
   return c;
 }
-
 
 void admm(int M,
           arma::vec const& y,
@@ -40,19 +39,18 @@ void admm(int M,
           double mu,
           arma::sp_mat const& DD,
           arma::sp_mat const& D,
-          double tol) {
-
-  int iter;
+          double tol,
+          int iter) {
   double r_norm, s_norm;
   vec z_old = z;
   sp_mat Dt = D.t();
   double lam_z = lambda / rho;
-  vec c;
-  vec beta = z;
+  vec c;  // a buffer
 
   // start of iteration:
   for (iter = 0; iter < M; iter++) {
-    if (iter % 1000 == 0) Rcpp::checkUserInterrupt();
+    if (iter % 1000 == 0)
+      Rcpp::checkUserInterrupt();
     // update primal variable:
     c = y / n - rho * DD * theta + rho * Dt * (z - u) + mu * theta;
     c = c / mu + log(w);
@@ -61,8 +59,6 @@ void admm(int M,
 
     // update alternating variable:
     c = D * theta + u;
-    //    beta.transform([*](double beta) { return tf_dp(n, c, lam_z, beta); });
-    //    z = beta;
     z = dptf(c, lam_z);
 
     // update dual variable:
@@ -71,7 +67,7 @@ void admm(int M,
     // stopping criteria check:
     r_norm = sqrt(mean(square(D * theta - z)));
     // dual residuals:
-    s_norm = sqrt(mean(square(z_old - z)));
+    s_norm = rho * sqrt(mean(square(z_old - z)));
 
     if ((r_norm < tol) && (s_norm < tol)) {
       iter++;
@@ -96,17 +92,12 @@ List admm_testing(int M,
                   double mu,
                   arma::sp_mat const& DD,
                   arma::sp_mat const& D,
-                  double tol) {
-  admm(M, y, w, n, theta, z, u, lambda, rho, mu, DD, D, tol);
-  List out = List::create(
-    Named("y") = y,
-    Named("n") = n,
-    Named("lambda") = lambda,
-    Named("theta") = exp(theta),
-    Named("z") = z,
-    Named("u") = u,
-    Named("niter") = M
-  );
+                  double tol,
+                  int iter) {
+  admm(M, y, w, n, theta, z, u, lambda, rho, mu, DD, D, tol, iter);
+  List out =
+      List::create(Named("y") = y, Named("n") = n, Named("lambda") = lambda,
+                   Named("theta") = exp(theta), Named("z") = z, Named("u") = u,
+                   Named("niter") = iter + 1);
   return out;
 }
-
