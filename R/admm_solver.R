@@ -90,27 +90,37 @@ admm_initializer <- function(current_counts,
   )
 }
 
-#' ADMM solver
+#' Alternating Direction Method of Multiplier (ADMM) solver for smoothness penalized Poisson regression
 #'
-#' We should rename this function.
+#' @description Alternating Direction Method of Multiplier (ADMM) to solve for a smoothness penalized Poisson regression.
+#'
+#' @description  The Effective Reproduction Number \eqn{R_t} of an infectious disease can be estimated by solving the smoothnesss penalized Poisson
+#' regression of the form:
+#'
+#' @description \eqn{R_t = argmin_{\theta} (\frac{1}{n} \sum_{i=1}^n e^{\theta_i} - y_i\theta_i) + \lambda||D^{(k)}\theta||_1}
+#'
+#' @description where \eqn{y_i} is the observed case count at day \eqn{i}, \eqn{\theta_i = \sum_{a=1}y_{a}w_{t-a}} is the weighted past count at day \eqn{i},
+#' \eqn{\lambda} is the smoothness penalty, and \eqn{D^{(k)}} is the \eqn{k}-th difference matrix
 #'
 #' @param current_counts the current daily infection counts
-#' @param weighted_past_counts the weighted sum of past infection counts with
-#' corresponding serial interval functions (or its Gamma approximation) as
-#' weights
 #' @param degree degree of the piecewise polynomial curve to be fitted,
 #' e.g., degree = 0 corresponds to a piecewise constant curve
 #' @param lambda a parameter to balance the data fidelity and graphical
 #' smoothness of fitted curves; a greater lambda results in a smoother curve
-#' @param mu a parameter used in the algorithm; use mu = NULL to compute it
-#' using a default method (`get_mu`)
-#' @param tol tolerance of convergence of primal & dual residuals
 #' @param maxiter maximal number of iteration
 #' @param init a list of model initialization of class `admm_initializer`
+#' @param dist_gamma shape and scale parameter of the discretized Gamma distribution,
+#' representing the serial interval distribution, which indicate how infectious someone is if they are infected a given days ago
+#' @param x the observation position
+#' @param nsol number of lambdas to generate, if lambda is not specified
+#' @param lambdamin If lambda is not specified, the program will generate a sequence of lambda, with lambdamin being the smallest lambda value
+#' @param lambdamax If lambda is not specified, the program will generate a sequence of lambda, with lambdamin being the largest lambda value
+#' @param lambda_min_ratio If lambda is not specified, and if lambdamin is not specified, the program will generate a lambdamin
+#' by lambdamax * lambda_min_ratio
 #'
 #' @return current_counts the current daily infection counts
 #' @return weighted_past_counts the weighted sum of past infection counts
-#' @return R_rate: the estimated reproduction rate
+#' @return R_rate: the estimated effective reproduction rate
 #' @return convr: if the model converges `convr==TRUE` or not `convr==FALSE`
 #'
 #' @export
@@ -152,12 +162,28 @@ admm_solver <- function(current_counts,
   n <- length(current_counts)
 
   # (1) check that counts are non-negative, integer
-  # (2) checks on lambda, lambdamin, lambdamax (don't need to adjust)
-  #   * If lambda has length > 0, lambdamin and max should be negative
-  #   * Need 0 <= lambda_min_ratio <= 1
-  #   * need nsol > 0, integer, equal to length(lambda) when it has positive length
-  #   * lambdamin < lambdamax or both negative
+  if (any(counts < 0)) cli::cli_abort("counts must be non-negative")
+  if (!all(rlang::is_intergerish(current_counts))) cli::cli_abort("counts must be integers")
+
+
+  # (2) checks on lambda, lambdamin, lambdamax
+  lambda_size <- length(lambda)
+
+  if (lambda_size > 0) {
+    nsol <- lambda_size
+
+  } else {
+
+    if (lambda_min_ratio < 0 || lambda_min_ratio > 1) cli::cli_abort("lambda_min_ratio must be in [0,1]")
+    if (lambdamax < 0) cli::cli_abort("If lambda is not specified, lambdamax must be specified and larger than 0")
+    if (lambdamin > lambdamax) cli::cli_abort("If lambda is not specified, lambdamin must be smaller than lambdamax")
+  }
+
+
   # (3) check that x is a double vector of length 0 or n
+  if (!is.numeric(x)) cli::cli_abort("x must be a numeric vector")
+  if (!is.double(x)) x = as.double(x)
+  if (!(length(x) == n | length(x) == 0)) cli::cli_abort("x must be of size either 0 or n")
 
 
   mod <- rtestim_path(
