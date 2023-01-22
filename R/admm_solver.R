@@ -6,12 +6,12 @@
 #' regression of the form:
 #'
 #' \eqn{R_t = argmin_{\theta} (\frac{1}{n} \sum_{i=1}^n e^{\theta_i} -
-#'   y_i\theta_i) + \lambda||D^{(k)}\theta||_1}
+#'   y_i\theta_i) + \lambda||D^{(k+1)}\theta||_1}
 #'
 #' where \eqn{y_i} is the observed case count at day \eqn{i},
 #' \eqn{\theta_i = \sum_{a=1}y_{a}w_{t-a}} is the weighted past counts
-#' at day \eqn{i}, \eqn{\lambda} is the smoothness penalty, and \eqn{D^{(k)}}
-#' is the \eqn{k}-th difference matrix
+#' at day \eqn{i}, \eqn{\lambda} is the smoothness penalty, and \eqn{D^{(k+1)}}
+#' is the \eqn{(k+1)}-th order difference matrix.
 #'
 #' @param observed_counts vector of the observed daily infection counts
 #' @param degree Integer. Degree of the piecewise polynomial curve to be
@@ -73,56 +73,58 @@
 #' )
 estimate_rt <- function(observed_counts,
                         degree = 3L,
-                        dist_gamma = c(1, 1),
-                        x = double(0),
-                        lambda = double(0),
+                        dist_gamma = c(2.5, 2.5),
+                        x = NULL,
+                        lambda = NULL,
                         nsol = 100L,
-                        lambdamin = -1,
-                        lambdamax = -1,
+                        lambdamin = NULL,
+                        lambdamax = NULL,
                         lambda_min_ratio = 1e-4,
                         maxiter = 1e4,
                         init = NULL) {
   # create weighted past cases
-  weighted_past_counts <- delay_calculator(observed_counts, dist_gamma)
-  if (is.null(init)) {
-    init <- admm_initializer(observed_counts, degree, weighted_past_counts)
-  }
-  if (!inherits(init, "rt_admm_configuration")) {
-    cli::cli_abort("`init` must be created with `admm_initializer()`.")
-  }
+  weighted_past_counts <- delay_calculator(observed_counts, x, dist_gamma)
+  if (is.null(init))
+    init <- configure_rt_admm(observed_counts, degree, weighted_past_counts)
+  if (!inherits(init, "rt_admm_configuration"))
+    cli::cli_abort("`init` must be created with `configure_rt_admm()`.")
   if (is.null(init$primal_var)) {
-    init <- admm_initializer(
+    init <- configure_rt_admm(
       observed_counts, init$degree, weighted_past_counts,
       auxi_var = init$auxi_var, dual_var = init$dual_var)
   }
   # validate maxiter
   maxiter <- as.integer(maxiter)
-
   n <- length(observed_counts)
 
   # (1) check that counts are non-negative, integer
-  if (any(counts < 0)) cli::cli_abort("counts must be non-negative")
-  if (!all(rlang::is_intergerish(observed_counts))) cli::cli_abort("counts must be integers")
+  if (any(counts < 0)) cli::cli_abort("`observed_counts` must be non-negative")
+  # if (!all(rlang::is_intergerish(observed_counts))) not required
+  #  cli::cli_abort("`observed_counts` must be integers")
 
 
   # (2) checks on lambda, lambdamin, lambdamax
   lambda_size <- length(lambda)
-
   if (lambda_size > 0) {
     nsol <- lambda_size
-
   } else {
-
-    if (lambda_min_ratio < 0 || lambda_min_ratio > 1) cli::cli_abort("lambda_min_ratio must be in [0,1]")
-    if (lambdamax < 0) cli::cli_abort("If lambda is not specified, lambdamax must be specified and larger than 0")
-    if (lambdamin > lambdamax) cli::cli_abort("If lambda is not specified, lambdamin must be smaller than lambdamax")
+    msg <- "If lambda is not specified,"
+    if (lambda_min_ratio < 0 || lambda_min_ratio > 1)
+      cli::cli_abort("{msg} lambda_min_ratio must be in [0,1]")
+    if (lambdamax < 0)
+      cli::cli_abort("{msg} lambdamax must be positive.")
+    if (lambdamin < 0)
+      cli::cli_abort("{msg} lambdamin must be positive.")
+    if (lambdamin >= lambdamax)
+      cli::cli_abort("{msg} lambdamin must be < lambdamax.")
   }
 
 
   # (3) check that x is a double vector of length 0 or n
   if (!is.numeric(x)) cli::cli_abort("x must be a numeric vector")
   if (!is.double(x)) x = as.double(x)
-  if (!(length(x) == n | length(x) == 0)) cli::cli_abort("x must be of size either 0 or n")
+  if (!(length(x) == n | length(x) == 0))
+    cli::cli_abort("x must be length 0 or n")
 
 
   mod <- rtestim_path(
@@ -134,7 +136,6 @@ estimate_rt <- function(observed_counts,
     lambdamax = lambdamax,
     lambdamin = lambdamin,
     nsol = nsol,
-    rho_adjust = init$rho_adjust,
     rho = init$rho,
     maxiter = maxiter,
     tolerance = init$tolerance,

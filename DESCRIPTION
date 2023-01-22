@@ -20,7 +20,8 @@ Imports:
     Matrix,
     cli,
     rlang,
-    ggplot2
+    ggplot2,
+    vctrs
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
