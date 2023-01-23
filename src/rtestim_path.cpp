@@ -81,16 +81,16 @@ List rtestim_path(arma::vec y,
     niter(i) = iters + 1;
 
     // Verbose handlers
-    if (verbose > 1)
-      Rcout << niter(i);
-    if (verbose > 2)
-      Rcout << "(" << lambda(i) << ")";
-    if (verbose > 0)
-      Rcout << std::endl;
+    if (verbose > 1) Rcout << niter(i);
+    if (verbose > 2) Rcout << "(" << lambda(i) << ")";
+    if (verbose > 0) Rcout << std::endl;
   }
 
   // Return
-  List out = List::create(Named("Rt") = theta, Named("lambda") = lambda,
-                          Named("degree") = korder, Named("niter") = niter);
+  List out = List::create(
+    Named("Rt") = theta,
+    Named("lambda") = lambda,
+    Named("degree") = korder,
+    Named("niter") = niter);
   return out;
 }

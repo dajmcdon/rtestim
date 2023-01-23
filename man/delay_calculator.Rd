@@ -4,23 +4,32 @@
 \alias{delay_calculator}
 \title{Calculate the total infectiousness at each observed time point.}
 \usage{
-delay_calculator(current_counts, dist_gamma)
+delay_calculator(observed_counts, x = NULL, dist_gamma = c(2.5, 2.5))
 }
 \arguments{
-\item{current_counts}{A vector of size n, containing all observed case counts}
+\item{observed_counts}{vector of the observed daily infection counts}
 
-\item{dist_gamma}{A vector of size 2, representing the shape and scale parameter of the discretized Gamma distribution}
+\item{x}{a vector of positions at which the counts have been observed. In an
+ideal case, we would observe data at regular intervals (e.g. daily or
+weekly) but this may not always be the case.}
+
+\item{dist_gamma}{Vector of length 2. These are the shape and scale for the
+assumed serial interval distribution. Roughly, this distribution describes
+the probability of an infectious individual infecting someone else after
+some period of time after having become infectious.
+As in most literature, we assume that this interval follows a gamma
+distribution with some shape and scale.}
 }
 \value{
-A vector of size n-1, containing the total infectiousness at each observed time point
+A vector of size n-1, containing the total infectiousness at each
+  observed time point
 }
 \description{
-Calculate the total infectiousness at each observed time point.
-}
-\details{
-The total infectiousness at each observed time point is calculated by \eqn{\sum_{a=1}^t I_{t-s}w_s}
-, where \eqn{I} denotes the vector containing all observed case counts, and \eqn{w} denotes the serial interval distribution.
-The serial interval distribution expresses the probability of the symptom onset of a secondary infection occurred a given
+The total infectiousness at each observed time point is calculated
+by \eqn{\sum_{a=1}^t I_{t-s}w_s}, where \eqn{I} denotes the vector containing
+all observed case counts, and \eqn{w} denotes the serial interval
+distribution. The serial interval distribution expresses the probability
+of the symptom onset of a secondary infection occurred a given
 number of days after the primary infection
 }
 \examples{
