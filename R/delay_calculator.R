@@ -19,7 +19,7 @@ delay_calculator <- function(observed_counts, x = NULL,
                              dist_gamma = c(2.5, 2.5)) {
   if (length(dist_gamma) != 2L)
     cli:cli_abort("dist_gamma must have length 2.")
-  if (any(dist_gamma) <= 0)
+  if (any(dist_gamma <= 0)) ### dist_gamma <= 0 inside any prevents warning messages
     cli::cli_abort("dist_gamma must be positive.")
   n <- length(observed_counts)
   if (!is.null(x)) {
@@ -37,7 +37,7 @@ delay_calculator <- function(observed_counts, x = NULL,
   cw <- cumsum(w)
   regular <- vctrs::vec_unique_count(diff(x)) == 1L
   if (regular) {
-    convolved_seq <- convolve(current_counts, rev(w))[1:n] / cw
+    convolved_seq <- convolve(observed_counts, rev(w))[1:n] / cw
     return(c(convolved_seq[1], convolved_seq[1:(n - 1)]))
   } else {
     cli::cli_abort("Uh oh. We don't support irregular x yet...")

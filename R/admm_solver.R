@@ -85,11 +85,11 @@ estimate_rt <- function(observed_counts,
   # create weighted past cases
   weighted_past_counts <- delay_calculator(observed_counts, x, dist_gamma)
   if (is.null(init))
-    init <- configure_rt_admm(observed_counts, degree, weighted_past_counts)
+    init <- rt_admm_configuration(observed_counts, degree, weighted_past_counts)
   if (!inherits(init, "rt_admm_configuration"))
-    cli::cli_abort("`init` must be created with `configure_rt_admm()`.")
+    cli::cli_abort("`init` must be created with `rt_admm_configuration()`.")
   if (is.null(init$primal_var)) {
-    init <- configure_rt_admm(
+    init <- rt_admm_configuration(
       observed_counts, init$degree, weighted_past_counts,
       auxi_var = init$auxi_var, dual_var = init$dual_var)
   }
@@ -98,7 +98,7 @@ estimate_rt <- function(observed_counts,
   n <- length(observed_counts)
 
   # (1) check that counts are non-negative, integer
-  if (any(counts < 0)) cli::cli_abort("`observed_counts` must be non-negative")
+  if (any(observed_counts < 0)) cli::cli_abort("`observed_counts` must be non-negative")
   # if (!all(rlang::is_intergerish(observed_counts))) not required
   #  cli::cli_abort("`observed_counts` must be integers")
 
