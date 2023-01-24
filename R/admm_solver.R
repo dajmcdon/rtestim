@@ -53,7 +53,7 @@
 #'   A very small value will lead to the solution `Rt = log(observed_counts)`.
 #'   This argument has no effect if there is user-defined `lambda` sequence.
 #'
-#' @return An object with S3 class `"poison_rt"`. Among the list components:
+#' @return An object with S3 class `"poisson_rt"`. Among the list components:
 #' * `observed_counts` the observed daily infection counts
 #' * `weighted_past_counts` the weighted sum of past infection counts
 #' * `R` the estimated effective reproduction rate. This is a matrix with
@@ -107,8 +107,12 @@ estimate_rt <- function(observed_counts,
   lambda_size <- length(lambda)
   if (lambda_size > 0) {
     nsol <- lambda_size
+    lambdamin <- min(lambda)
+    lambdamax <- max(lambda)
   } else {
     msg <- "If lambda is not specified,"
+    if (is.null(lambdamax))
+      cli::cli_abort("{msg} lambdamax must be specified")
     if (lambda_min_ratio < 0 || lambda_min_ratio > 1)
       cli::cli_abort("{msg} lambda_min_ratio must be in [0,1]")
     if (lambdamax < 0)
@@ -121,10 +125,13 @@ estimate_rt <- function(observed_counts,
 
 
   # (3) check that x is a double vector of length 0 or n
-  if (!is.numeric(x)) cli::cli_abort("x must be a numeric vector")
   if (!is.double(x)) x = as.double(x)
+  if (!is.numeric(x)) cli::cli_abort("x must be a numeric vector")
   if (!(length(x) == n | length(x) == 0))
     cli::cli_abort("x must be length 0 or n")
+
+  # (4) check degree smaller than data length
+  if (init$degree < n) cli::cli_abort("degree must be < than length of observed_counts")
 
 
   mod <- rtestim_path(

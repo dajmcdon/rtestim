@@ -24,7 +24,6 @@ List rtestim_path(arma::vec y,
   int n = y.n_elem;
   if (lambda.size() > 0)
     nsol = lambda.size();
-
   // Placeholders for solutions
   arma::mat theta(n, nsol);
   arma::vec niter(nsol);
@@ -45,6 +44,7 @@ List rtestim_path(arma::vec y,
     lambdamax *= n;
   }
   create_lambda(lambda, lambdamin, lambdamax, lambda_min_ratio, nsol);
+
 
   // ADMM parameters
   // double tolerance_abs = std::sqrt(n) * tolerance; // adjust for number of

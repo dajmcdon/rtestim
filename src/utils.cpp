@@ -20,6 +20,7 @@ arma::sp_mat buildD(int n, int ord) {
   arma::sp_mat D(m, n);
   double z;
   for (int i = 0; i <= c1; i++) {
+    std::cout << D;
     z = Rf_choose(c1, i) * std::pow(-1, i + c1);
     D.diag(i) += z;
   }
