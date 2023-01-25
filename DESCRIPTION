@@ -12,6 +12,7 @@ License: MIT + file LICENSE
 Imports: 
     cli,
     ggplot2,
+    ggpubr,
     magrittr,
     Matrix,
     Rcpp,

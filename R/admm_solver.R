@@ -82,6 +82,10 @@ estimate_rt <- function(observed_counts,
                         lambda_min_ratio = 1e-4,
                         maxiter = 1e4,
                         init = NULL) {
+
+  # (0) check observed_counts
+  if (!is.vector(observed_counts)) cli::cli_abort("observed_counts must be a vector")
+
   # create weighted past cases
   weighted_past_counts <- delay_calculator(observed_counts, x, dist_gamma)
   if (is.null(init))
@@ -129,10 +133,6 @@ estimate_rt <- function(observed_counts,
   if (!is.numeric(x)) cli::cli_abort("x must be a numeric vector")
   if (!(length(x) == n | length(x) == 0))
     cli::cli_abort("x must be length 0 or n")
-
-  # (4) check degree smaller than data length
-  if (init$degree < n) cli::cli_abort("degree must be < than length of observed_counts")
-
 
   mod <- rtestim_path(
     observed_counts,

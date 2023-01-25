@@ -70,7 +70,7 @@ A very small value will lead to the solution `Rt = log(observed_counts)`.
 This argument has no effect if there is user-defined `lambda` sequence.}
 }
 \value{
-An object with S3 class `"poison_rt"`. Among the list components:
+An object with S3 class `"poisson_rt"`. Among the list components:
 * `observed_counts` the observed daily infection counts
 * `weighted_past_counts` the weighted sum of past infection counts
 * `R` the estimated effective reproduction rate. This is a matrix with
