@@ -46,7 +46,7 @@
 #' @param lambdamin Optional value for the smallest `lambda` to use. This should
 #'   be greater than zero.
 #' @param lambdamax Optional value for the largest `lambda` to use.
-#' @param lambdamin_ratio If neither `lambda` nor `lambdamin` is specified, the
+#' @param lambda_min_ratio If neither `lambda` nor `lambdamin` is specified, the
 #'   program will generate a lambdamin by lambdamax * lambda_min_ratio
 #'   A multiplicative factor for the minimal lambda in the
 #'   `lambda` sequence, where `lambdamin = lambdamin_ratio * lambdamax`.
@@ -83,9 +83,6 @@ estimate_rt <- function(observed_counts,
                         maxiter = 1e4,
                         init = NULL) {
 
-  # (0) check observed_counts
-  if (!is.vector(observed_counts)) cli::cli_abort("observed_counts must be a vector")
-
   # create weighted past cases
   weighted_past_counts <- delay_calculator(observed_counts, x, dist_gamma)
   if (is.null(init))
@@ -101,8 +98,9 @@ estimate_rt <- function(observed_counts,
   maxiter <- as.integer(maxiter)
   n <- length(observed_counts)
 
-  # (1) check that counts are non-negative, integer
+  # (1) check that counts are non-negative, integer, vector
   if (any(observed_counts < 0)) cli::cli_abort("`observed_counts` must be non-negative")
+  if (!is.vector(observed_counts)) cli::cli_abort("observed_counts must be a vector")
   # if (!all(rlang::is_intergerish(observed_counts))) not required
   #  cli::cli_abort("`observed_counts` must be integers")
 
@@ -121,9 +119,9 @@ estimate_rt <- function(observed_counts,
       cli::cli_abort("{msg} lambda_min_ratio must be in [0,1]")
     if (lambdamax < 0)
       cli::cli_abort("{msg} lambdamax must be positive.")
-    if (lambdamin < 0)
+    if (lambdamin < 0 && !is.null(lambdamin))
       cli::cli_abort("{msg} lambdamin must be positive.")
-    if (lambdamin >= lambdamax)
+    if (lambdamin >= lambdamax && !is.null(lambdamin))
       cli::cli_abort("{msg} lambdamin must be < lambdamax.")
   }
 

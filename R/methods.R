@@ -37,23 +37,21 @@ summary.poisson_rt <- function(object, ...){
 
 
 
-#' Plot summary of `poisson_rt` models
+#' Plot predicted observed_count and estimated Rt from `summary(poisson_rt)` object
 #'
 #' @method plot summary.poisson_rt
 #' @param x summary of `poisson_rt` models
 #' @param ... .
 #'
-#' @return a figure
+#' @return Figure with two panels. Top panel shows the predicted observed_counts
+#' calculated from \eqn{weighted_count * Rt_estim}
 #' @export
 #'
 #' @examples
 #' TODO: change this example
 #' y <- c(rev(seq(2, 6, by = 1)), seq(2, 6, by = 1))
-#' mod = admm_solver(
-#'   current_counts = y, weighted_past_counts = rep(1, 10), degree = 1,
-#'   init = admm_initializer(current_counts = y,
-#'   weighted_past_counts = rep(1, 10), degree = 1)
-#' )
+#' mod <- estimate_rt(
+#'   observed_counts = y, degree = 1, lambda = 1)
 #' plot(summary(mod))
 plot.summary.poisson_rt <- function(summary, ...){
   fig_cases <- summary$Results %>%
