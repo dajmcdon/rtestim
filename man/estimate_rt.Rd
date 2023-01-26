@@ -53,6 +53,13 @@ be greater than zero.}
 
 \item{lambdamax}{Optional value for the largest `lambda` to use.}
 
+\item{lambda_min_ratio}{If neither `lambda` nor `lambdamin` is specified, the
+program will generate a lambdamin by lambdamax * lambda_min_ratio
+A multiplicative factor for the minimal lambda in the
+`lambda` sequence, where `lambdamin = lambdamin_ratio * lambdamax`.
+A very small value will lead to the solution `Rt = log(observed_counts)`.
+This argument has no effect if there is user-defined `lambda` sequence.}
+
 \item{maxiter}{Integer. Maximum number of iterations for the estimation
 algorithm.}
 
@@ -61,13 +68,6 @@ algorithm.}
 
 \item{nlambda}{Integer. The number of tuning parameters `lambda` at which to
 compute Rt.}
-
-\item{lambdamin_ratio}{If neither `lambda` nor `lambdamin` is specified, the
-program will generate a lambdamin by lambdamax * lambda_min_ratio
-A multiplicative factor for the minimal lambda in the
-`lambda` sequence, where `lambdamin = lambdamin_ratio * lambdamax`.
-A very small value will lead to the solution `Rt = log(observed_counts)`.
-This argument has no effect if there is user-defined `lambda` sequence.}
 }
 \value{
 An object with S3 class `"poisson_rt"`. Among the list components:

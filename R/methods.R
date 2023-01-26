@@ -36,7 +36,6 @@ summary.poisson_rt <- function(object, ...){
 }
 
 
-
 #' Plot predicted observed_count and estimated Rt from `summary(poisson_rt)` object
 #'
 #' @method plot summary.poisson_rt

@@ -2,7 +2,7 @@
 % Please edit documentation in R/methods.R
 \name{plot.summary.poisson_rt}
 \alias{plot.summary.poisson_rt}
-\title{Plot summary of `poisson_rt` models}
+\title{Plot predicted observed_count and estimated Rt from `summary(poisson_rt)` object}
 \usage{
 \method{plot}{summary.poisson_rt}(summary, ...)
 }
@@ -12,18 +12,16 @@
 \item{x}{summary of `poisson_rt` models}
 }
 \value{
-a figure
+Figure with two panels. Top panel shows the predicted observed_counts
+calculated from \eqn{weighted_count * Rt_estim}
 }
 \description{
-Plot summary of `poisson_rt` models
+Plot predicted observed_count and estimated Rt from `summary(poisson_rt)` object
 }
 \examples{
 TODO: change this example
 y <- c(rev(seq(2, 6, by = 1)), seq(2, 6, by = 1))
-mod = admm_solver(
-  current_counts = y, weighted_past_counts = rep(1, 10), degree = 1,
-  init = admm_initializer(current_counts = y,
-  weighted_past_counts = rep(1, 10), degree = 1)
-)
+mod <- estimate_rt(
+  observed_counts = y, degree = 1, lambda = 1)
 plot(summary(mod))
 }

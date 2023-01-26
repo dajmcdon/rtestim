@@ -2,6 +2,7 @@
 
 S3method(plot,summary.poisson_rt)
 S3method(summary,poisson_rt)
+export(cv_estimate_rt)
 export(delay_calculator)
 export(discretize_gamma)
 export(estimate_rt)
