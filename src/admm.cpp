@@ -1,6 +1,7 @@
 #include <RcppArmadillo.h>
 #include <boost/math/special_functions/lambert_w.hpp>
 #include "dptf.h"
+#include "utils.h"
 #include "admm.h"
 
 // [[Rcpp::depends(RcppArmadillo)]]
@@ -10,45 +11,54 @@
 using namespace Rcpp;
 using namespace arma;
 
-double update_primal(double c, double mu, int n) {
-  c -= boost::math::lambert_w0(exp(c) / (mu * n));
+double update_pois(double c, double mu, int n) {
+  // @elvis, explain why this is the solution
+  if (c < 500) {  // deal with potential overflow from big exp(c)
+    c -= boost::math::lambert_w0(exp(c) / (mu * n));
+  } else {
+    // See:
+    // https://en.wikipedia.org/wiki/Lambert_W_function#Asymptotic_expansions We
+    // use the first four terms.
+    double la, lb;
+    la = c - log(mu * n);
+    lb = log(la);
+    c -= la - lb + lb / la + (lb * (lb - 2)) / (2 * la * la);
+  }
   return c;
 }
 
-// [[Rcpp::export]]
-Rcpp::List admm(int M,
-                arma::vec y,
-                arma::vec x,
-                int n,
-                arma::vec theta,
-                arma::vec z,
-                arma::vec u,
-                double lambda,
-                double rho,
-                double mu,
-                arma::sp_mat D,
-                double tol) {
-  int iter;
+void admm(int M,
+          arma::vec const& y,
+          arma::vec const& w,
+          int n,
+          arma::vec& theta,
+          arma::vec& z,
+          arma::vec& u,
+          double lambda,
+          double rho,
+          double mu,
+          arma::sp_mat const& DD,
+          arma::sp_mat const& D,
+          double tol,
+          int iter) {
   double r_norm, s_norm;
   vec z_old = z;
   sp_mat Dt = D.t();
-  sp_mat DD = Dt * D;
   double lam_z = lambda / rho;
-  vec c;
-  vec beta = z;
+  vec c;  // a buffer
 
   // start of iteration:
   for (iter = 0; iter < M; iter++) {
+    if (iter % 1000 == 0)
+      Rcpp::checkUserInterrupt();
     // update primal variable:
     c = y / n - rho * DD * theta + rho * Dt * (z - u) + mu * theta;
-    c = c / mu + log(x);
-    c.transform([&](double c) { return update_primal(c, mu, n); });
-    theta = c - log(x);
+    c = c / mu + log(w);
+    c.transform([&](double c) { return update_pois(c, mu, n); });
+    theta = c - log(w);
 
     // update alternating variable:
     c = D * theta + u;
-    //    beta.transform([*](double beta) { return tf_dp(n, c, lam_z, beta); });
-    //    z = beta;
     z = dptf(c, lam_z);
 
     // update dual variable:
@@ -57,7 +67,7 @@ Rcpp::List admm(int M,
     // stopping criteria check:
     r_norm = sqrt(mean(square(D * theta - z)));
     // dual residuals:
-    s_norm = sqrt(mean(square(z_old - z)));
+    s_norm = rho * sqrt(mean(square(z_old - z)));
 
     if ((r_norm < tol) && (s_norm < tol)) {
       iter++;
@@ -66,6 +76,28 @@ Rcpp::List admm(int M,
     // auxiliary variables update:
     z_old = z;
   }
+}
 
-  return List::create(Named("theta") = wrap(theta), Named("iter_num") = iter);
+// This is a wrapper around the void function to use in test_that()
+// [[Rcpp::export]]
+List admm_testing(int M,
+                  arma::vec const& y,
+                  arma::vec const& w,
+                  int n,
+                  arma::vec theta,
+                  arma::vec z,
+                  arma::vec u,
+                  double lambda,
+                  double rho,
+                  double mu,
+                  arma::sp_mat const& DD,
+                  arma::sp_mat const& D,
+                  double tol,
+                  int iter) {
+  admm(M, y, w, n, theta, z, u, lambda, rho, mu, DD, D, tol, iter);
+  List out =
+      List::create(Named("y") = y, Named("n") = n, Named("lambda") = lambda,
+                   Named("theta") = exp(theta), Named("z") = z, Named("u") = u,
+                   Named("niter") = iter + 1);
+  return out;
 }

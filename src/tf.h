@@ -8,5 +8,11 @@
 
 void tf_dp(int n, double* y, double lam, double* beta);
 void tf_dp_weight(int n, double* y, double* w, double lam, double* beta);
+void tf_dp_past_weight(int n,
+                       double* y,
+                       double* past,
+                       double* w,
+                       double lam,
+                       double* beta);
 
 #endif
