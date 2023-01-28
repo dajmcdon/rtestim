@@ -2,7 +2,7 @@
 % Please edit documentation in R/cv.R
 \name{cv_estimate_rt}
 \alias{cv_estimate_rt}
-\title{CV for admm}
+\title{Leave-kth-out cross validation for choosing a optimal parameter lambda}
 \usage{
 cv_estimate_rt(
   observed_counts,
@@ -11,7 +11,7 @@ cv_estimate_rt(
   fold = 3,
   x = NULL,
   lambda = NULL,
-  nsol = 100L,
+  nlambda = 100L,
   lambdamin = NULL,
   lambdamax = NULL,
   lambda_min_ratio = 1e-04,
@@ -20,30 +20,72 @@ cv_estimate_rt(
 )
 }
 \arguments{
-\item{observed_counts}{}
+\item{observed_counts}{vector of the observed daily infection counts}
 
-\item{degree}{}
+\item{degree}{Integer. Degree of the piecewise polynomial curve to be
+estimated. Ror example, `degree = 0` corresponds to a piecewise constant
+curve.}
 
-\item{dist_gamma}{}
+\item{dist_gamma}{Vector of length 2. These are the shape and scale for the
+assumed serial interval distribution. Roughly, this distribution describes
+the probability of an infectious individual infecting someone else after
+some period of time after having become infectious.
+As in most literature, we assume that this interval follows a gamma
+distribution with some shape and scale.}
 
-\item{fold}{}
+\item{fold}{Integer. This the number of folds to conduct the leave-kth-out
+cross validation. For leave-kth-out cross validation, every kth
+observed_counts and their corresponding position (can be evenly or unevenly
+spaced) are placed into the same fold. The first and last observed_counts are
+not assigned to any folds.}
 
-\item{x}{}
+\item{x}{a vector of positions at which the counts have been observed. In an
+ideal case, we would observe data at regular intervals (e.g. daily or
+weekly) but this may not always be the case.}
 
-\item{lambda}{}
+\item{lambda}{Vector. A user supplied sequence of tuning parameters which
+determines the balance between data fidelity and
+smoothness of the estimated Rt; larger `lambda` results in a smoother
+estimate. The default, `NULL`
+results in an automatic computation based on `nlambda`, the largest value
+of `lambda` that would a maximally smooth estimate, and `lambdamin_ratio`.
+Supplying a value of `lambda` overrides
+this behaviour. It is likely better to supply a
+decreasing sequence of `lambda` values than a single (small) value. If
+supplied, the user-defined `lambda` sequence is automatically sorted in
+decreasing order.}
 
-\item{nsol}{}
+\item{nlambda}{Integer. The number of tuning parameters `lambda` at which to
+compute Rt.}
 
-\item{lambdamin}{}
+\item{lambdamin}{Optional value for the smallest `lambda` to use. This should
+be greater than zero.}
 
-\item{lambdamax}{}
+\item{lambdamax}{Optional value for the largest `lambda` to use.}
 
-\item{lambda_min_ratio}{}
+\item{lambda_min_ratio}{If neither `lambda` nor `lambdamin` is specified, the
+program will generate a lambdamin by lambdamax * lambda_min_ratio
+A multiplicative factor for the minimal lambda in the
+`lambda` sequence, where `lambdamin = lambdamin_ratio * lambdamax`.
+A very small value will lead to the solution `Rt = log(observed_counts)`.
+This argument has no effect if there is user-defined `lambda` sequence.}
 
-\item{maxiter}{}
+\item{maxiter}{Integer. Maximum number of iterations for the estimation
+algorithm.}
 
-\item{init}{}
+\item{init}{a list of internal configuration parameters of class
+`rt_admm_configuration`.}
+}
+\value{
+An object with S3 class `"cv_result"`. Among the list components:
+* `cv_scores` leave-kth-out cross validation score
+* `optimal_lambda` optimal lambda chosen from the cross validation
+* `optimal_Rt` the estimated effective reproduction rate, estimated with the
+optimal lambda
 }
 \description{
-CV for admm
+Leave-kth-out cross validation for choosing a optimal parameter lambda
+}
+\examples{
+TODO: add this later
 }
