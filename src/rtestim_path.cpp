@@ -22,8 +22,9 @@ List rtestim_path(arma::vec y,
                   double lambda_min_ratio = 1e-4,
                   int verbose = 0) {
   int n = y.n_elem;
-  if (lambda.size() > 0)
-    nsol = lambda.size();
+
+  if (lambda.size() > 0) nsol = lambda.size();
+
   // Placeholders for solutions
   arma::mat theta(n, nsol);
   arma::vec niter(nsol);
@@ -41,7 +42,6 @@ List rtestim_path(arma::vec y,
     arma::mat matD(D);                // convert to dense mat to avoid spsolve
     arma::solve(b, matD.t(), w % y);  // very approximate; for unevenly space?
     lambdamax = arma::norm(b, "inf");
-    lambdamax *= n;
   }
   create_lambda(lambda, lambdamin, lambdamax, lambda_min_ratio, nsol);
 
