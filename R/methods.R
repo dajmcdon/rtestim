@@ -1,8 +1,8 @@
-#' Summarize results of a admm_rr model
+#' Summarize results of a poisson_rt model
 #'
-#' @method summary admm_rr
+#' @method summary poisson_rt
 #'
-#' @param object a fitted model of class `admm_rr`
+#' @param object a fitted model of class `poisson_rt`
 #' @param ... .
 #'
 #' @return a data table of estimates and a logical value of convergence.
@@ -14,30 +14,31 @@
 #'
 #' @examples
 #' y <- c(rev(seq(2, 6, by = 1)), seq(2, 6, by = 1))
-#' mod = admm_solver(
-#'   current_counts = y, weighted_past_counts = rep(1, 10), degree = 1,
-#'   init = admm_initializer(current_counts = y,
-#'   weighted_past_counts = rep(1, 10), degree = 1)
+#' mod <- estimate_rt(
+#'   observed_counts = y, degree = 1, lambda = c(.1,.5),
+#'   algo = "linear_admm",
+#'   init = rt_admm_configuration(y, degree = 1)
 #' )
 #' summary(mod)
-summary.admm_rr <- function(object, ...){
-  n = length(object$current_counts)
-  res <- data.frame(
-    Time = 1:n,
-    Signal = object$current_counts,
-    R_rate = object$R_rate,
-    pois_mean = object$R_rate * object$weighted_past_counts
+summary.poisson_rt <- function(object, ...){
+  n <- length(object$observed_counts)
+  Results <- cbind(
+    Observed_counts = object$observed_counts,
+    Estimated_mean <- object$Rt * object$weighted_past_counts
   )
+  num = dim(Results)[2]-1
+  colnames(Results)[-1] <- paste("Estimated_mean_",1:num, sep="")
+  Convergence = object$niter < object$maxiter
 
-  lst = list(Results = res, Convergence = object$convr)
-  class(lst) = "summary.admm_rr"
+  lst = list(Results=as.data.frame(Results), Convergence=Convergence)
+  class(lst) = "summary.poisson_rt"
   return(lst)
 }
 
-#' Plot summary of `admm_rr` models
+#' Plot summary of `poisson_rt` models
 #'
-#' @method plot summary.admm_rr
-#' @param x summary of `admm_rr` models
+#' @method plot summary.poisson_rt
+#' @param x summary of `poisson_rt` models
 #' @param ... .
 #'
 #' @return a figure
@@ -45,17 +46,18 @@ summary.admm_rr <- function(object, ...){
 #'
 #' @examples
 #' y <- c(rev(seq(2, 6, by = 1)), seq(2, 6, by = 1))
-#' mod = admm_solver(
-#'   current_counts = y, weighted_past_counts = rep(1, 10), degree = 1,
-#'   init = admm_initializer(current_counts = y,
-#'   weighted_past_counts = rep(1, 10), degree = 1)
+#' mod <- estimate_rt(
+#'   observed_counts = y, dist_gamma=c(1,1), degree = 1, lambda = .1,
+#'   algo = "linear_admm",
+#'   init = rt_admm_configuration(y, degree = 1)
 #' )
 #' plot(summary(mod))
-plot.summary.admm_rr <- function(x, ...){
+plot.summary.poisson_rt <- function(x, ...){
+  n = dim(x$Results)[1]
   fig <- x$Results %>%
-    ggplot(aes(x = .data$Time)) +
-    geom_point(aes(y = .data$Signal)) +
-    geom_line(aes(y = .data$pois_mean), col = "#08519C") +
+    ggplot(aes(x = 1:n)) +
+    geom_point(aes(y = .data$Observed_counts)) +
+    geom_line(aes(y = .data$Estimated_mean_1), col = "#08519C") +
     labs(x = "Time", y = "Daily infection counts (on dots)",
          title = "The estimated piecewise polynomial curve (in line)") +
     theme_bw()

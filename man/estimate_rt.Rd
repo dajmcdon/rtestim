@@ -108,7 +108,7 @@ is the \eqn{(k+1)}-th order difference matrix.
 \examples{
 y <- c(rev(seq(2, 6, by = 1)), seq(2, 6, by = 1))
 estimate_rt(
-  observed_counts = y, degree = 1, lambda = .1,
+  observed_counts = y, degree = 2, lambda = .1,
   algo = "linear_admm",
   init = rt_admm_configuration(y, degree = 1)
 )
