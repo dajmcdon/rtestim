@@ -8,7 +8,8 @@
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-List rtestim_path(arma::vec y,
+List rtestim_path(int algo,
+                  arma::vec y,
                   arma::vec x,  // positions
                   arma::vec w,  // weighted past cases
                   int korder,
@@ -20,9 +21,12 @@ List rtestim_path(arma::vec y,
                   int maxiter = 1e5,
                   double tolerance = 1e-3,
                   double lambda_min_ratio = 1e-4,
+                  double ls_alpha = 0.5,
+                  double ls_gamma = 0.9,
                   int verbose = 0) {
   int n = y.n_elem;
-  if (lambda.size() > 0) nsol = lambda.size();
+  if (lambda.size() > 0)
+    nsol = lambda.size();
 
   // Placeholders for solutions
   arma::mat theta(n, nsol);
@@ -71,24 +75,32 @@ List rtestim_path(arma::vec y,
       Rcout << ".";
     Rcpp::checkUserInterrupt();
 
-    admm(maxiter, y, w, n, beta, alpha, u, lambda(i), _rho, mu * lambda(i),
-         DkDk, Dk, tolerance, iters);  // add rho_adjust?
+    switch (algo) {
+      case 1:
+        admm(maxiter, y, w, n, beta, alpha, u, lambda(i), _rho, mu * lambda(i),
+             DkDk, Dk, tolerance, iters);  // add rho_adjust?
+        break;
+      case 2:
+        irls_admm(maxiter, n, y, w, beta, alpha, u, lambda(i), _rho,
+                  mu * lambda(i), ls_alpha, ls_gamma, Dk, tolerance, iters);
+        break;
+    }
 
     // Store solution
     theta.col(i) = exp(beta);
     niter(i) = iters + 1;
 
     // Verbose handlers
-    if (verbose > 1) Rcout << niter(i);
-    if (verbose > 2) Rcout << "(" << lambda(i) << ")";
-    if (verbose > 0) Rcout << std::endl;
+    if (verbose > 1)
+      Rcout << niter(i);
+    if (verbose > 2)
+      Rcout << "(" << lambda(i) << ")";
+    if (verbose > 0)
+      Rcout << std::endl;
   }
 
   // Return
-  List out = List::create(
-    Named("Rt") = theta,
-    Named("lambda") = lambda,
-    Named("degree") = korder,
-    Named("niter") = niter);
+  List out = List::create(Named("Rt") = theta, Named("lambda") = lambda,
+                          Named("degree") = korder, Named("niter") = niter);
   return out;
 }

@@ -35,6 +35,31 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// admm_gauss
+arma::vec admm_gauss(int M, int n, arma::vec const& y, arma::vec const& w, arma::vec& theta, arma::vec& z, arma::vec& u, double rho, double lam_z, double r_norm, double s_norm, arma::sp_mat const& D, arma::sp_mat const& DD, arma::sp_mat const& Dt, double tol);
+RcppExport SEXP _rtestim_admm_gauss(SEXP MSEXP, SEXP nSEXP, SEXP ySEXP, SEXP wSEXP, SEXP thetaSEXP, SEXP zSEXP, SEXP uSEXP, SEXP rhoSEXP, SEXP lam_zSEXP, SEXP r_normSEXP, SEXP s_normSEXP, SEXP DSEXP, SEXP DDSEXP, SEXP DtSEXP, SEXP tolSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type M(MSEXP);
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type y(ySEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type w(wSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type z(zSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type u(uSEXP);
+    Rcpp::traits::input_parameter< double >::type rho(rhoSEXP);
+    Rcpp::traits::input_parameter< double >::type lam_z(lam_zSEXP);
+    Rcpp::traits::input_parameter< double >::type r_norm(r_normSEXP);
+    Rcpp::traits::input_parameter< double >::type s_norm(s_normSEXP);
+    Rcpp::traits::input_parameter< arma::sp_mat const& >::type D(DSEXP);
+    Rcpp::traits::input_parameter< arma::sp_mat const& >::type DD(DDSEXP);
+    Rcpp::traits::input_parameter< arma::sp_mat const& >::type Dt(DtSEXP);
+    Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
+    rcpp_result_gen = Rcpp::wrap(admm_gauss(M, n, y, w, theta, z, u, rho, lam_z, r_norm, s_norm, D, DD, Dt, tol));
+    return rcpp_result_gen;
+END_RCPP
+}
 // dptf
 arma::vec dptf(arma::vec y, double lam);
 RcppExport SEXP _rtestim_dptf(SEXP ySEXP, SEXP lamSEXP) {
@@ -75,11 +100,12 @@ BEGIN_RCPP
 END_RCPP
 }
 // rtestim_path
-List rtestim_path(arma::vec y, arma::vec x, arma::vec w, int korder, arma::vec lambda, double lambdamax, double lambdamin, int nsol, double rho, int maxiter, double tolerance, double lambda_min_ratio, int verbose);
-RcppExport SEXP _rtestim_rtestim_path(SEXP ySEXP, SEXP xSEXP, SEXP wSEXP, SEXP korderSEXP, SEXP lambdaSEXP, SEXP lambdamaxSEXP, SEXP lambdaminSEXP, SEXP nsolSEXP, SEXP rhoSEXP, SEXP maxiterSEXP, SEXP toleranceSEXP, SEXP lambda_min_ratioSEXP, SEXP verboseSEXP) {
+List rtestim_path(int algo, arma::vec y, arma::vec x, arma::vec w, int korder, arma::vec lambda, double lambdamax, double lambdamin, int nsol, double rho, int maxiter, double tolerance, double lambda_min_ratio, double ls_alpha, double ls_gamma, int verbose);
+RcppExport SEXP _rtestim_rtestim_path(SEXP algoSEXP, SEXP ySEXP, SEXP xSEXP, SEXP wSEXP, SEXP korderSEXP, SEXP lambdaSEXP, SEXP lambdamaxSEXP, SEXP lambdaminSEXP, SEXP nsolSEXP, SEXP rhoSEXP, SEXP maxiterSEXP, SEXP toleranceSEXP, SEXP lambda_min_ratioSEXP, SEXP ls_alphaSEXP, SEXP ls_gammaSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type algo(algoSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type y(ySEXP);
     Rcpp::traits::input_parameter< arma::vec >::type x(xSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type w(wSEXP);
@@ -92,8 +118,10 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type maxiter(maxiterSEXP);
     Rcpp::traits::input_parameter< double >::type tolerance(toleranceSEXP);
     Rcpp::traits::input_parameter< double >::type lambda_min_ratio(lambda_min_ratioSEXP);
+    Rcpp::traits::input_parameter< double >::type ls_alpha(ls_alphaSEXP);
+    Rcpp::traits::input_parameter< double >::type ls_gamma(ls_gammaSEXP);
     Rcpp::traits::input_parameter< int >::type verbose(verboseSEXP);
-    rcpp_result_gen = Rcpp::wrap(rtestim_path(y, x, w, korder, lambda, lambdamax, lambdamin, nsol, rho, maxiter, tolerance, lambda_min_ratio, verbose));
+    rcpp_result_gen = Rcpp::wrap(rtestim_path(algo, y, x, w, korder, lambda, lambdamax, lambdamin, nsol, rho, maxiter, tolerance, lambda_min_ratio, ls_alpha, ls_gamma, verbose));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -135,16 +163,55 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// fake_data
+arma::vec fake_data(arma::vec const& y, arma::vec const& w, arma::vec& theta);
+RcppExport SEXP _rtestim_fake_data(SEXP ySEXP, SEXP wSEXP, SEXP thetaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec const& >::type y(ySEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type w(wSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type theta(thetaSEXP);
+    rcpp_result_gen = Rcpp::wrap(fake_data(y, w, theta));
+    return rcpp_result_gen;
+END_RCPP
+}
+// line_search
+double line_search(double s, double lambda, double alpha, double gamma, arma::vec const& y, arma::vec const& w, int n, arma::vec& theta, arma::vec& theta_old, arma::vec& c1, arma::vec& c2, arma::sp_mat const& D, int M);
+RcppExport SEXP _rtestim_line_search(SEXP sSEXP, SEXP lambdaSEXP, SEXP alphaSEXP, SEXP gammaSEXP, SEXP ySEXP, SEXP wSEXP, SEXP nSEXP, SEXP thetaSEXP, SEXP theta_oldSEXP, SEXP c1SEXP, SEXP c2SEXP, SEXP DSEXP, SEXP MSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type s(sSEXP);
+    Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
+    Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
+    Rcpp::traits::input_parameter< double >::type gamma(gammaSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type y(ySEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type w(wSEXP);
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type theta_old(theta_oldSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type c1(c1SEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type c2(c2SEXP);
+    Rcpp::traits::input_parameter< arma::sp_mat const& >::type D(DSEXP);
+    Rcpp::traits::input_parameter< int >::type M(MSEXP);
+    rcpp_result_gen = Rcpp::wrap(line_search(s, lambda, alpha, gamma, y, w, n, theta, theta_old, c1, c2, D, M));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_rtestim_admm_testing", (DL_FUNC) &_rtestim_admm_testing, 14},
+    {"_rtestim_admm_gauss", (DL_FUNC) &_rtestim_admm_gauss, 15},
     {"_rtestim_dptf", (DL_FUNC) &_rtestim_dptf, 2},
     {"_rtestim_dptf_weight", (DL_FUNC) &_rtestim_dptf_weight, 3},
     {"_rtestim_dptf_past_weight", (DL_FUNC) &_rtestim_dptf_past_weight, 4},
-    {"_rtestim_rtestim_path", (DL_FUNC) &_rtestim_rtestim_path, 13},
+    {"_rtestim_rtestim_path", (DL_FUNC) &_rtestim_rtestim_path, 16},
     {"_rtestim_buildD", (DL_FUNC) &_rtestim_buildD, 2},
     {"_rtestim_buildDx", (DL_FUNC) &_rtestim_buildDx, 3},
     {"_rtestim_buildDx_tilde", (DL_FUNC) &_rtestim_buildDx_tilde, 3},
+    {"_rtestim_fake_data", (DL_FUNC) &_rtestim_fake_data, 3},
+    {"_rtestim_line_search", (DL_FUNC) &_rtestim_line_search, 13},
     {NULL, NULL, 0}
 };
 

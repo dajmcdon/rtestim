@@ -3,6 +3,7 @@
 #include "utils.h"
 
 using namespace Rcpp;
+using namespace arma;
 
 /**
  * Generate a (banded) divided difference matrix of an arbitrary order for
@@ -115,4 +116,85 @@ void create_lambda(arma::vec& lambda,
       lambda = arma::logspace(log10(lambdamin), log10(lambdamax), nsol);
     }
   }
+}
+
+/**
+ * define fake signals for gaussian tf
+ */
+// [[Rcpp::export]]
+arma::vec fake_data(arma::vec const& y, arma::vec const& w, arma::vec& theta) {
+  int n = y.size();
+  vec c(n);
+  for (int i = 0; i < n; i++) {
+    if (w[i] * exp(theta[i]) > 1e-3)
+      c[i] = y[i] * exp(-theta[i]) / w[i] - 1 + theta[i];
+    else {  // deal with overflow using approximation
+      c[i] = y[i] - exp(theta[i]) / w[i] + theta[i];
+    }
+  }
+  return c;
+}
+
+double pois_obj(arma::vec const& y,
+                arma::vec const& w,
+                arma::vec& theta,
+                double lambda,
+                arma::vec& Dv) {
+  vec v = -y % theta + w % exp(theta);
+  double obj = mean(v) + lambda * norm(Dv, 1);
+  return obj;
+}
+
+/**
+ * solve for step size of IRLS
+ * @param s step size
+ * @param alpha scale adjusting upper bound
+ * @param gamma scale adjusting step size
+ * @param y fake signals
+ */
+// [[Rcpp::export]]
+double line_search(double s,
+                   double lambda,
+                   double alpha,
+                   double gamma,
+                   arma::vec const& y,
+                   arma::vec const& w,
+                   int n,
+                   arma::vec& theta,
+                   arma::vec& theta_old,
+                   arma::vec& c1,
+                   arma::vec& c2,
+                   arma::sp_mat const& D,
+                   int M) {
+  vec gradient(n);
+  double grades;
+  vec dir = theta - theta_old;
+
+  // initialize upper bound
+  c1 = dir % (w % exp(theta) - y);
+  double bound = mean(c1);
+  c1.set_size(c2.size());
+  c1 = D * theta;
+  c2 = D * theta_old;
+  bound += lambda * (norm(c1, 1) - norm(c2, 1));
+
+  s = 1;
+  for (int i = 0; i < M; i++) {
+    // compute gradient/ grades
+    gradient = -s * dir % y + w % exp(theta_old + s * dir) - w % exp(theta_old);
+    if (i > 0)
+      c1 = c2 + s * D * dir;  // if s=1, c1 stays same
+    grades = mean(gradient) + lambda * (norm(c1, 1) - norm(c2, 1));
+
+    // adjust upper bound
+    bound *= alpha * s;
+
+    // check criteria
+    if (grades <= bound)
+      break;
+    else
+      s *= gamma;
+  }
+
+  return s;
 }
