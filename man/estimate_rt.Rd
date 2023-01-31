@@ -9,11 +9,14 @@ estimate_rt(
   degree = 3L,
   dist_gamma = c(2.5, 2.5),
   x = NULL,
+  algo = c("linear_admm", "irls_admm"),
   lambda = NULL,
   nsol = 100L,
-  lambdamin = NULL,
-  lambdamax = NULL,
+  lambdamin = -1,
+  lambdamax = 1,
   lambda_min_ratio = 1e-04,
+  alpha = 0.5,
+  gamma = 0.9,
   maxiter = 10000,
   init = NULL
 )
@@ -36,6 +39,10 @@ distribution with some shape and scale.}
 ideal case, we would observe data at regular intervals (e.g. daily or
 weekly) but this may not always be the case.}
 
+\item{algo}{the algorithm to be used in computation. `linear_admm`:
+linearized ADMM; `irls_admm`: iteratively reweighted least squares with
+standard ADMM.}
+
 \item{lambda}{Vector. A user supplied sequence of tuning parameters which
 determines the balance between data fidelity and
 smoothness of the estimated Rt; larger `lambda` results in a smoother
@@ -52,6 +59,12 @@ decreasing order.}
 be greater than zero.}
 
 \item{lambdamax}{Optional value for the largest `lambda` to use.}
+
+\item{alpha}{Double. A parameter adjusting upper bound in line search algorithm
+in `irls_admm` algorithm.}
+
+\item{gamma}{Double. A parameter adjusting step size in line search algorithm
+in `irls_admm` algorithm.}
 
 \item{maxiter}{Integer. Maximum number of iterations for the estimation
 algorithm.}
@@ -81,7 +94,7 @@ An object with S3 class `"poison_rt"`. Among the list components:
 }
 \description{
 The Effective Reproduction Number \eqn{R_t} of an infectious
-disease can be estimated by solving the smoothnesss penalized Poisson
+disease can be estimated by solving the smoothness penalized Poisson
 regression of the form:
 
 \eqn{R_t = argmin_{\theta} (\frac{1}{n} \sum_{i=1}^n e^{\theta_i} -
@@ -94,9 +107,9 @@ is the \eqn{(k+1)}-th order difference matrix.
 }
 \examples{
 y <- c(rev(seq(2, 6, by = 1)), seq(2, 6, by = 1))
-admm_solver(
-  observed_counts = y, weighted_past_counts = rep(1, 10), degree = 1,
-  init = admm_initializer(observed_counts = y,
-  weighted_past_counts = rep(1, 10), degree = 1)
+estimate_rt(
+  observed_counts = y, degree = 1, lambda = .1,
+  algo = "linear_admm",
+  init = rt_admm_configuration(y, degree = 1)
 )
 }

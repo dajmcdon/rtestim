@@ -5,6 +5,10 @@ admm_testing <- function(M, y, w, n, theta, z, u, lambda, rho, mu, DD, D, tol, i
     .Call(`_rtestim_admm_testing`, M, y, w, n, theta, z, u, lambda, rho, mu, DD, D, tol, iter)
 }
 
+admm_gauss <- function(M, n, y, w, theta, z, u, rho, lam_z, r_norm, s_norm, D, DD, Dt, tol) {
+    .Call(`_rtestim_admm_gauss`, M, n, y, w, theta, z, u, rho, lam_z, r_norm, s_norm, D, DD, Dt, tol)
+}
+
 dptf <- function(y, lam) {
     .Call(`_rtestim_dptf`, y, lam)
 }
@@ -17,8 +21,8 @@ dptf_past_weight <- function(y, lam, x, w) {
     .Call(`_rtestim_dptf_past_weight`, y, lam, x, w)
 }
 
-rtestim_path <- function(y, x, w, korder, lambda, lambdamax = -1, lambdamin = -1, nsol = 100L, rho = -1, maxiter = 1e5L, tolerance = 1e-3, lambda_min_ratio = 1e-4, verbose = 0L) {
-    .Call(`_rtestim_rtestim_path`, y, x, w, korder, lambda, lambdamax, lambdamin, nsol, rho, maxiter, tolerance, lambda_min_ratio, verbose)
+rtestim_path <- function(algo, y, x, w, korder, lambda, lambdamax = -1, lambdamin = -1, nsol = 100L, rho = -1, maxiter = 1e5L, tolerance = 1e-3, lambda_min_ratio = 1e-4, ls_alpha = 0.5, ls_gamma = 0.9, verbose = 0L) {
+    .Call(`_rtestim_rtestim_path`, algo, y, x, w, korder, lambda, lambdamax, lambdamin, nsol, rho, maxiter, tolerance, lambda_min_ratio, ls_alpha, ls_gamma, verbose)
 }
 
 buildD <- function(n, ord) {
@@ -31,5 +35,13 @@ buildDx <- function(n, ord, x) {
 
 buildDx_tilde <- function(n, ord, x) {
     .Call(`_rtestim_buildDx_tilde`, n, ord, x)
+}
+
+fake_data <- function(y, w, theta) {
+    .Call(`_rtestim_fake_data`, y, w, theta)
+}
+
+line_search <- function(s, lambda, alpha, gamma, y, w, n, theta, theta_old, c1, c2, D, M) {
+    .Call(`_rtestim_line_search`, s, lambda, alpha, gamma, y, w, n, theta, theta_old, c1, c2, D, M)
 }
 

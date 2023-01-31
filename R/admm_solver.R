@@ -2,7 +2,7 @@
 #'
 #' @description
 #' The Effective Reproduction Number \eqn{R_t} of an infectious
-#' disease can be estimated by solving the smoothnesss penalized Poisson
+#' disease can be estimated by solving the smoothness penalized Poisson
 #' regression of the form:
 #'
 #' \eqn{R_t = argmin_{\theta} (\frac{1}{n} \sum_{i=1}^n e^{\theta_i} -
@@ -41,6 +41,9 @@
 #' @param x a vector of positions at which the counts have been observed. In an
 #'   ideal case, we would observe data at regular intervals (e.g. daily or
 #'   weekly) but this may not always be the case.
+#' @param algo the algorithm to be used in computation. `linear_admm`:
+#' linearized ADMM; `irls_admm`: iteratively reweighted least squares with
+#' standard ADMM.
 #' @param nlambda Integer. The number of tuning parameters `lambda` at which to
 #'   compute Rt.
 #' @param lambdamin Optional value for the smallest `lambda` to use. This should
@@ -52,6 +55,10 @@
 #'   `lambda` sequence, where `lambdamin = lambdamin_ratio * lambdamax`.
 #'   A very small value will lead to the solution `Rt = log(observed_counts)`.
 #'   This argument has no effect if there is user-defined `lambda` sequence.
+#' @param alpha Double. A parameter adjusting upper bound in line search algorithm
+#' in `irls_admm` algorithm.
+#' @param gamma Double. A parameter adjusting step size in line search algorithm
+#' in `irls_admm` algorithm.
 #'
 #' @return An object with S3 class `"poison_rt"`. Among the list components:
 #' * `observed_counts` the observed daily infection counts
@@ -66,30 +73,33 @@
 #'
 #' @examples
 #' y <- c(rev(seq(2, 6, by = 1)), seq(2, 6, by = 1))
-#' admm_solver(
-#'   observed_counts = y, weighted_past_counts = rep(1, 10), degree = 1,
-#'   init = admm_initializer(observed_counts = y,
-#'   weighted_past_counts = rep(1, 10), degree = 1)
+#' estimate_rt(
+#'   observed_counts = y, degree = 2, lambda = .1,
+#'   algo = "linear_admm",
+#'   init = rt_admm_configuration(y, degree = 1)
 #' )
 estimate_rt <- function(observed_counts,
                         degree = 3L,
                         dist_gamma = c(2.5, 2.5),
                         x = NULL,
+                        algo = c("linear_admm", "irls_admm"),
                         lambda = NULL,
                         nsol = 100L,
-                        lambdamin = NULL,
-                        lambdamax = NULL,
+                        lambdamin = -1,
+                        lambdamax = 1,
                         lambda_min_ratio = 1e-4,
+                        alpha = 0.5,
+                        gamma = 0.9,
                         maxiter = 1e4,
                         init = NULL) {
   # create weighted past cases
   weighted_past_counts <- delay_calculator(observed_counts, x, dist_gamma)
   if (is.null(init))
-    init <- configure_rt_admm(observed_counts, degree, weighted_past_counts)
+    init <- rt_admm_configuration(observed_counts, degree, weighted_past_counts)
   if (!inherits(init, "rt_admm_configuration"))
-    cli::cli_abort("`init` must be created with `configure_rt_admm()`.")
+    cli::cli_abort("`init` must be created with `rt_admm_configuration()`.")
   if (is.null(init$primal_var)) {
-    init <- configure_rt_admm(
+    init <- rt_admm_configuration(
       observed_counts, init$degree, weighted_past_counts,
       auxi_var = init$auxi_var, dual_var = init$dual_var)
   }
@@ -98,10 +108,9 @@ estimate_rt <- function(observed_counts,
   n <- length(observed_counts)
 
   # (1) check that counts are non-negative, integer
-  if (any(counts < 0)) cli::cli_abort("`observed_counts` must be non-negative")
-  # if (!all(rlang::is_intergerish(observed_counts))) not required
+  if (any(observed_counts < 0)) cli::cli_abort("`observed_counts` must be non-negative")
+  # if (!all(rlang::is_integerish(observed_counts))) not required
   #  cli::cli_abort("`observed_counts` must be integers")
-
 
   # (2) checks on lambda, lambdamin, lambdamax
   lambda_size <- length(lambda)
@@ -119,15 +128,20 @@ estimate_rt <- function(observed_counts,
       cli::cli_abort("{msg} lambdamin must be < lambdamax.")
   }
 
-
   # (3) check that x is a double vector of length 0 or n
+  x = x %||% 1:n
   if (!is.numeric(x)) cli::cli_abort("x must be a numeric vector")
   if (!is.double(x)) x = as.double(x)
   if (!(length(x) == n | length(x) == 0))
     cli::cli_abort("x must be length 0 or n")
 
+  # (4) check algorithm
+  algo <- match.arg(algo)
+  algo <- match(algo, c("linear_admm", "irls_admm"))
+  algo <- as.integer(algo)
 
   mod <- rtestim_path(
+    algo,
     observed_counts,
     x,
     weighted_past_counts,
@@ -140,16 +154,19 @@ estimate_rt <- function(observed_counts,
     maxiter = maxiter,
     tolerance = init$tolerance,
     lambda_min_ratio = lambda_min_ratio,
+    ls_alpha = alpha,
+    ls_gamma = gamma,
     verbose = init$verbose)
 
   structure(
     list(
       observed_counts = observed_counts,
-      x = x %||% 1:n,
+      x = x,
       weighted_past_counts = weighted_past_counts,
       Rt = mod$Rt,
       lambda = mod$lambda,
       degree = mod$degree,
+      maxiter = maxiter,
       niter = mod$niter
     ),
     class = "poisson_rt"
@@ -243,7 +260,7 @@ rt_admm_configuration <- function(observed_counts,
       rho = rho,
       rho_adjust = rho_adjust,
       tolerance = tolerance,
-      verbose = verbose
+      verbose = as.integer(verbose)
     ),
     class = "rt_admm_configuration"
   )
