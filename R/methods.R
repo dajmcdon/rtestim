@@ -73,3 +73,80 @@ plot.summary.poisson_rt <- function(summary, ...){
   print(fig)
 }
 
+#' Summary of `cv_result` object
+#'
+#' @param object
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
+summary.cv_result <- function(object, ...) {
+  res <- list(
+    lambdas = object$lambda,
+    cv_scores = object$cv_scores,
+    optimal_Rt = object$optimal_Rt,
+    optimal_lambda = object$optimal_lambda,
+    x = object$x,
+    weighted_past_counts = object$weighted_past_counts,
+    observed_counts = object$observed_counts,
+    pois_mean = object$optimal_Rt*object$weighted_past_counts
+  )
+
+  class(res) = "summary.cv_result"
+
+  return(res)
+}
+
+#' Plot of `summary.cv_result` object
+#'
+#' @param cv_result
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
+plot.summary.cv_result <- function(cv_result, ...) {
+  lambda <- cv_result$lambdas
+  cv_scores <- cv_result$cv_scores
+  Rt <- cv_result$optimal_Rt
+  x <- cv_result$x
+  weighted_past_counts <- cv_result$weighted_past_counts
+  observed_counts <- cv_result$observed_counts
+  pois_mean <- cv_result$pois_mean
+
+  # Score plot
+  cv_scores_plot <- ggplot(data.frame(lambdas =lambda, scores = cv_scores),
+                           aes(x=lambdas))+
+    geom_line(aes(x = lambda, y = scores),col = "#08519C")+
+    labs(x = "Lambdas", y = "Cross Validation Scores",
+         title = "Cross validation scores") +
+    theme_bw()
+
+  # Rt plot
+  optimal_rt_plot <- ggplot(data.frame(x=x, Rt = Rt), aes(x=x, y = Rt))+
+    geom_line(col = "#08519C")+
+    labs(x = "Observation time point", y = "Rt",
+         title = "Optimal Rt from Cross Validation") +
+    geom_hline(yintercept=1, linetype="dashed", color = "red")+
+    theme_bw()
+
+  # True vs pred
+  truevspred<- ggplot(data.frame(x = x, true = observed_counts, pred=pois_mean),
+                      aes(x = x)) +
+    geom_point(aes(y = observed_counts), shape = 1) +
+    geom_line(aes(y = pois_mean), col = "#14754C") +
+    labs(x = "Time", y = "Daily infection counts (on dots)",
+         title = "The estimated piecewise polynomial curve (in line)") +
+    theme_bw()
+
+  fig <- ggpubr::ggarrange(cv_scores_plot,
+                           optimal_rt_plot,
+                           truevspred,
+                           ncol=3)
+
+  print(fig)
+}
+

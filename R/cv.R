@@ -122,7 +122,7 @@ cv_estimate_rt <- function(observed_counts,
 
 
   # Cross validation (copied from glmgen cv.trendfilter)
-  foldid = c(0,rep(seq(1,fold),n-2)[seq(1,n-2)],0)
+  foldid = fold_calculator(n, fold)
   if (length(x) == 0) x <- 1:n
   cvall <- matrix(0,fold,length(lambda))
 
@@ -153,14 +153,16 @@ cv_estimate_rt <- function(observed_counts,
       verbose = init$verbose)
 
     ### Predict training value ###
-    ilo <- which((seq(1,n)%in%(test_idx-1))[train_idx])
-    ihi <- which((seq(1,n)%in%(test_idx+1))[train_idx])
-    a <- (test_x - train_x[ilo])/(train_x[ihi] - train_x[ilo])
-    pred_rt <- mod$Rt[ilo,]*(1-a) + mod$Rt[ihi,]*a
+    pred_rt <- pred_kth_rt(mod$Rt,
+                           n = n,
+                           train_idx = train_idx,
+                           test_idx = test_idx,
+                           train_x = train_x,
+                           test_x = test_x)
 
     ### Calculate CV scores (Poisson loss) and store ###
     pred_observed_counts <- pred_rt*test_weighted_past_counts
-    # taking neg-log of density without the factorial term
+    # taking neg-log of density without the factorial term as score
     score <- -colMeans(test_observed_counts*log(pred_observed_counts)
                        - pred_observed_counts)
     cvall[f,] <- score # scores for all lambda for this left-out set
@@ -170,8 +172,9 @@ cv_estimate_rt <- function(observed_counts,
   ### for the particular fold
 
   ### Calculate CV scores
-  cv_scores <- rowMeans(cvall)
+  cv_scores <- colMeans(cvall)
   op_lambda <- lambda[which.min(cv_scores)]
+
 
 
   ### Re-train with optimal lambda from cv
@@ -189,11 +192,65 @@ cv_estimate_rt <- function(observed_counts,
 
   structure(
     list(
+      weighted_past_counts = weighted_past_counts,
+      observed_counts = observed_counts,
       cv_scores = cv_scores,
-      optimal_Rt = mod$Rt,
+      optimal_Rt = op_mod$Rt,
       optimal_lambda = op_lambda,
+      lambda = lambda,
+      x = x
     ),
     class = "cv_result"
   )
 }
+
+
+
+#' Helper function. Calculate the fold index for each `observed_counts`
+#'
+#' @param n Integer. Total number of `observed_counts`
+#' @param fold Integer. Number of folds for cross validation. In cross validation,
+#' data are distributed into folds. Each fold during cross-validation is left as
+#' the left-out data to be tested on after the model is fitted with the rest of
+#' the set.
+#'
+#' @return a vector of fold index at which the counts are distributed into folds
+#' @export
+#'
+#' @examples
+fold_calculator <- function(n, fold) {
+  c(0,rep(seq(1,fold),n-2)[seq(1,n-2)],0)
+}
+
+
+#' Helper function. Calculate Rt at hold-out fold
+#'
+#' @param rt an nlambda by (n-n_holdout) matrix. Rt estimated based on all lambdas for a
+#' particular fold.
+#' @param n
+#' @param train_idx
+#' @param test_idx
+#' @param train_x
+#' @param test_x
+#'
+#' @return
+#' @export
+#'
+#' @examples
+pred_kth_rt <- function(rt, n, train_idx, test_idx, train_x, test_x) {
+  ilo <- which((seq(1,n)%in%(test_idx-1))[train_idx])
+  ihi <- which((seq(1,n)%in%(test_idx+1))[train_idx])
+  a <- (test_x - train_x[ilo])/(train_x[ihi] - train_x[ilo])
+  rt[ilo,]*(1-a) + rt[ihi,]*a
+}
+
+
+
+
+
+
+
+
+
+
 
