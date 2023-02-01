@@ -29,43 +29,50 @@ double update_pois(double c, double mu, int n) {
 
 void admm(int M,
           arma::vec const& y,
+          arma::vec const& x,
           arma::vec const& w,
           int n,
+          int ord,
           arma::vec& theta,
           arma::vec& z,
           arma::vec& u,
           double lambda,
           double rho,
           double mu,
-          arma::sp_mat const& DD,
-          arma::sp_mat const& D,
           double tol,
           int& iter) {
   double r_norm, s_norm;
   vec z_old = z;
-  sp_mat Dt = D.t();
   double lam_z = lambda / rho;
-  vec c;  // a buffer
+  vec c(n);  // a buffer
+  vec c2(n);
+  vec c3(n);
+  vec c4(z.size());
 
   // start of iteration:
   for (iter = 0; iter < M; iter++) {
     if (iter % 1000 == 0)
       Rcpp::checkUserInterrupt();
     // update primal variable:
-    c = y / n - rho * DD * theta + rho * Dt * (z - u) + mu * theta;
+    calcDTDvline(n, ord, x, theta, c2);  // c2 = DD * theta
+    z -= u;
+    calcDTvline(n, ord, x, z, c3);  // c3 = Dt * (z - u)
+    c = y / n - rho * c2 + rho * c3 + mu * theta;
     c = c / mu + log(w);
     c.transform([&](double c) { return update_pois(c, mu, n); });
     theta = c - log(w);
 
     // update alternating variable:
-    c = D * theta + u;
-    z = dptf(c, lam_z);
+    calcDvline(n, ord, x, theta, c4);
+    c4 += u;  // c4 = D * theta + u;
+    z = dptf(c4, lam_z);
 
     // update dual variable:
-    u += D * theta - z;
+    calcDvline(n, ord, x, theta, c4);  // c4 = D * theta
+    u += c4 - z;
 
     // stopping criteria check:
-    r_norm = sqrt(mean(square(D * theta - z)));
+    r_norm = sqrt(mean(square(c4 - z)));
     // dual residuals:
     s_norm = rho * sqrt(mean(square(z_old - z)));
 
@@ -81,19 +88,19 @@ void admm(int M,
 // [[Rcpp::export]]
 List admm_testing(int M,
                   arma::vec const& y,
+                  arma::vec const& x,
                   arma::vec const& w,
                   int n,
+                  int ord,
                   arma::vec theta,
                   arma::vec z,
                   arma::vec u,
                   double lambda,
                   double rho,
                   double mu,
-                  arma::sp_mat const& DD,
-                  arma::sp_mat const& D,
                   double tol,
                   int iter) {
-  admm(M, y, w, n, theta, z, u, lambda, rho, mu, DD, D, tol, iter);
+  admm(M, y, x, w, n, ord, theta, z, u, lambda, rho, mu, tol, iter);
   List out =
       List::create(Named("y") = y, Named("n") = n, Named("lambda") = lambda,
                    Named("theta") = exp(theta), Named("z") = z, Named("u") = u,
@@ -104,7 +111,9 @@ List admm_testing(int M,
 // [[Rcpp::export]]
 arma::vec admm_gauss(int M,
                      int n,
+                     int ord,
                      arma::vec const& y,
+                     arma::vec const& x,
                      arma::vec const& w,
                      arma::vec& theta,
                      arma::vec& z,
@@ -113,9 +122,7 @@ arma::vec admm_gauss(int M,
                      double lam_z,
                      double r_norm,
                      double s_norm,
-                     arma::sp_mat const& D,
                      arma::sp_mat const& DD,
-                     arma::sp_mat const& Dt,
                      double tol) {
   mat dDD(DD);
   dDD *= n * rho;
@@ -130,17 +137,22 @@ arma::vec admm_gauss(int M,
     // solve for primal variable - theta:
     W = dDD;
     W.diag() += exp(theta);
-    theta = solve(W, exp(theta) % y + n * rho * Dt * (z - u));
+    z -= u;
+    calcDTvline(n, ord, x, z, c);  // c = Dt * (z - u)
+    theta = solve(W, exp(theta) % y + n * rho * c);
     // solve for alternating variable - z:
-    c2 = D * theta + u;
+    calcDvline(n, ord, x, theta, c2);
+    c2 += u;  // c2 = D * theta + u;
     z = dptf(c2, lam_z);
     // update dual variable - u:
-    u += D * theta - z;
+    calcDvline(n, ord, x, theta, c2);
+    u += c2 - z;  // u += D * theta - z;
 
     // primal residuals:
-    r_norm = sqrt(mean(square(D * theta - z)));
+    r_norm = sqrt(mean(square(c2 - z)));
     // dual residuals:
-    c = Dt * (z_old - z);
+    z_old -= z;
+    calcDTvline(n, ord, x, z_old, c);  // c = Dt * (z_old - z);
     s_norm = rho * sqrt(mean(square(c)));
     // stopping criteria check:
     if (r_norm < tol && s_norm < tol)
@@ -154,7 +166,9 @@ arma::vec admm_gauss(int M,
 
 void irls_admm(int M,
                int n,
+               int ord,
                arma::vec const& y,
+               arma::vec const& x,
                arma::vec const& w,
                arma::vec& theta,
                arma::vec& z,
@@ -172,8 +186,7 @@ void irls_admm(int M,
   double obj = 1e4;     // initialize it to be large
   vec theta_old(n);     // a buffer for line search
   double lam_z = lambda / rho;
-  sp_mat const Dt = D.t();
-  sp_mat const DD = Dt * D;
+  sp_mat const DD = D.t() * D;
   int m = z.size();
   vec c1(n);  // a buffer
   vec c2(m);  // a buffer
@@ -194,12 +207,12 @@ void irls_admm(int M,
     // define new(fake) data for least squares problem
     c1 = fake_data(y, w, theta);
     // solve least squares problem (Gaussian TF)
-    theta = admm_gauss(M, n, c1, w, theta, z, u, rho, lam_z, r_norm, s_norm, D,
-                       DD, Dt, tol);
+    theta = admm_gauss(M, n, ord, c1, x, w, theta, z, u, rho, lam_z, r_norm,
+                       s_norm, DD, tol);
 
     // line search for step size
-    s = line_search(s, lambda, alpha, gamma, y, w, n, theta, theta_old, c1, c2,
-                    D, M);
+    s = line_search(s, lambda, alpha, gamma, y, x, w, n, ord, theta, theta_old,
+                    c1, c2, M);
     if (s < 0)
       break;
     // update theta

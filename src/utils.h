@@ -20,13 +20,40 @@ double line_search(double s,
                    double alpha,
                    double gamma,
                    arma::vec const& y,
+                   arma::vec const& x,
                    arma::vec const& w,
                    int n,
+                   int ord,
                    arma::vec& theta,
                    arma::vec& theta_old,
                    arma::vec& c1,
                    arma::vec& c2,
-                   arma::sp_mat const& D,
                    int M);
+void calcDvline(int n, int ord, arma::vec const& x, arma::vec& v, arma::vec& b);
+arma::vec calcDvline_slow(int n,
+                          int ord,
+                          arma::vec const& x,
+                          arma::vec& v,
+                          arma::vec& b);
+void calcDTvline(int n,
+                 int ord,
+                 arma::vec const& x,
+                 arma::vec& v,
+                 arma::vec& b);
+arma::vec calcDTvline_slow(int n,
+                           int ord,
+                           arma::vec const& x,
+                           arma::vec& v,
+                           arma::vec& b);
+void calcDTDvline(int n,
+                  int ord,
+                  arma::vec const& x,
+                  arma::vec& v,
+                  arma::vec& b);
+arma::vec calcDTDvline_slow(int n,
+                            int ord,
+                            arma::vec const& x,
+                            arma::vec& v,
+                            arma::vec& b);
 
 #endif

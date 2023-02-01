@@ -158,13 +158,14 @@ double line_search(double s,
                    double alpha,
                    double gamma,
                    arma::vec const& y,
+                   arma::vec const& x,
                    arma::vec const& w,
                    int n,
+                   int ord,
                    arma::vec& theta,
                    arma::vec& theta_old,
                    arma::vec& c1,
                    arma::vec& c2,
-                   arma::sp_mat const& D,
                    int M) {
   vec gradient(n);
   double grades;
@@ -174,16 +175,19 @@ double line_search(double s,
   c1 = dir % (w % exp(theta) - y);
   double bound = mean(c1);
   c1.set_size(c2.size());
-  c1 = D * theta;
-  c2 = D * theta_old;
+  calcDvline(n, ord, x, theta, c1);      // c1 = D * theta
+  calcDvline(n, ord, x, theta_old, c2);  // c2 = D * theta_old
   bound += lambda * (norm(c1, 1) - norm(c2, 1));
 
   s = 1;
   for (int i = 0; i < M; i++) {
     // compute gradient/ grades
     gradient = -s * dir % y + w % exp(theta_old + s * dir) - w % exp(theta_old);
-    if (i > 0)
-      c1 = c2 + s * D * dir;  // if s=1, c1 stays same
+    if (i > 0) {
+      calcDvline(n, ord, x, dir, c1);  // c1 = D * dir;
+      c1 *= s;
+      c1 += c2;  // if s=1, c1 stays same
+    }
     grades = mean(gradient) + lambda * (norm(c1, 1) - norm(c2, 1));
 
     // adjust upper bound
@@ -197,4 +201,122 @@ double line_search(double s,
   }
 
   return s;
+}
+
+/*
+ * calculate b = D * v in place
+ * @param v vec of size n
+ * @param b vec of size (n - ord)
+ */
+void calcDvline(int n,
+                int ord,
+                arma::vec const& x,
+                arma::vec& v,
+                arma::vec& b) {
+  vec c(n);
+  c = v;
+  int fct = 1;
+  for (int i = 0; i < ord; i++) {
+    if (i != 0) {
+      c /= (x.tail(n - i) - x.head(n - i));
+    }
+    c = c.tail(n - i - 1) - c.head(n - i - 1);
+    c.resize(n - i - 1);
+  }
+  for (int i = 2; i < ord; i++) {
+    fct *= i;
+  }
+  c *= fct;
+  b = c;
+}
+// [[Rcpp::export]]
+arma::vec calcDvline_slow(int n,
+                          int ord,
+                          arma::vec const& x,
+                          arma::vec& v,
+                          arma::vec& b) {
+  arma::sp_mat D = buildDx_tilde(n, ord, x);
+  b = D * v;
+  return b;
+}
+
+/*
+ * calculate b = D^T * v in place
+ * @param b vec of length n
+ */
+void calcDTvline(int n,
+                 int ord,
+                 arma::vec const& x,
+                 arma::vec& v,
+                 arma::vec& b) {
+  b.head(n - ord) = v;
+  int fct = 1;
+
+  for (int i = ord; i > 0; i--) {
+    b[n - i] = b[n - i - 1];
+    for (int j = n - i - 1; j > 0; j--) {
+      b[j] = b[j - 1] - b[j];
+    }
+    b[0] = -b[0];
+    if (i != 1) {
+      b /= (x.tail(n - i + 1) - x.head(n - i + 1));
+    }
+  }
+  for (int i = 2; i < ord; i++) {
+    fct *= i;
+  }
+  b *= fct;
+}
+// [[Rcpp::export]]
+arma::vec calcDTvline_slow(int n,
+                           int ord,
+                           arma::vec const& x,
+                           arma::vec& v,
+                           arma::vec& b) {
+  arma::sp_mat D = buildDx_tilde(n, ord, x);
+  b = D.t() * v;
+  return b;
+}
+/*
+ * calculate b = D^T * D * v in place
+ * @param v vec of length n
+ * @param b vec of length n
+ */
+void calcDTDvline(int n,
+                  int ord,
+                  arma::vec const& x,
+                  arma::vec& v,
+                  arma::vec& b) {
+  b = v;
+  int fct = 1;
+  for (int i = 0; i < ord; i++) {
+    if (i != 0) {
+      b /= (x.tail(n - i) - x.head(n - i));
+    }
+    b.head(n - i - 1) = b.tail(n - i - 1) - b.head(n - i - 1);
+  }
+  for (int i = ord; i > 0; i--) {
+    b[n - i] = b[n - i - 1];
+    for (int j = n - i - 1; j > 0; j--) {
+      b[j] = b[j - 1] - b[j];
+    }
+    b[0] = -b[0];
+    if (i != 1) {
+      b /= (x.tail(n - i + 1) - x.head(n - i + 1));
+    }
+  }
+  for (int i = 2; i < ord; i++) {
+    fct *= i * i;
+  }
+  b *= fct;
+}
+// [[Rcpp::export]]
+arma::vec calcDTDvline_slow(int n,
+                            int ord,
+                            arma::vec const& x,
+                            arma::vec& v,
+                            arma::vec& b) {
+  arma::sp_mat D = buildDx_tilde(n, ord, x);
+  b = D.t() * D * v;
+  return b;
 }

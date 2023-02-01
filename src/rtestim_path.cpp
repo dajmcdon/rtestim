@@ -77,11 +77,11 @@ List rtestim_path(int algo,
 
     switch (algo) {
       case 1:
-        admm(maxiter, y, w, n, beta, alpha, u, lambda(i), _rho, mu * lambda(i),
-             DkDk, Dk, tolerance, iters);  // add rho_adjust?
+        admm(maxiter, y, x, w, n, korder, beta, alpha, u, lambda(i), _rho,
+             mu * lambda(i), tolerance, iters);  // add rho_adjust?
         break;
       case 2:
-        irls_admm(maxiter, n, y, w, beta, alpha, u, lambda(i), _rho,
+        irls_admm(maxiter, n, korder, y, x, w, beta, alpha, u, lambda(i), _rho,
                   mu * lambda(i), ls_alpha, ls_gamma, Dk, tolerance, iters);
         break;
     }
