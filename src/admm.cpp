@@ -51,8 +51,7 @@ void admm(int M,
 
   // start of iteration:
   for (iter = 0; iter < M; iter++) {
-    if (iter % 1000 == 0)
-      Rcpp::checkUserInterrupt();
+    if (iter % 1000 == 0) Rcpp::checkUserInterrupt();
     // update primal variable:
     calcDTDvline(n, ord, x, theta, c2);  // c2 = DD * theta
     z -= u;
@@ -76,9 +75,7 @@ void admm(int M,
     // dual residuals:
     s_norm = rho * sqrt(mean(square(z_old - z)));
 
-    if ((r_norm < tol) && (s_norm < tol)) {
-      break;
-    }
+    if ((r_norm < tol) && (s_norm < tol)) break;
     // auxiliary variables update:
     z_old = z;
   }
@@ -101,10 +98,13 @@ List admm_testing(int M,
                   double tol,
                   int iter) {
   admm(M, y, x, w, n, ord, theta, z, u, lambda, rho, mu, tol, iter);
-  List out =
-      List::create(Named("y") = y, Named("n") = n, Named("lambda") = lambda,
-                   Named("theta") = exp(theta), Named("z") = z, Named("u") = u,
-                   Named("niter") = iter + 1);
+  List out = List::create(
+    Named("y") = y,
+    Named("n") = n,
+    Named("lambda") = lambda,
+    Named("theta") = exp(theta),
+    Named("z") = z, Named("u") = u,
+    Named("niter") = iter + 1);
   return out;
 }
 
@@ -132,8 +132,7 @@ arma::vec admm_gauss(int M,
   vec z_old(z);
 
   for (int iter = 0; iter < M; iter++) {
-    if (iter % 1000 == 0)
-      Rcpp::checkUserInterrupt();
+    if (iter % 1000 == 0) Rcpp::checkUserInterrupt();
     // solve for primal variable - theta:
     W = dDD;
     W.diag() += exp(theta);
@@ -155,8 +154,7 @@ arma::vec admm_gauss(int M,
     calcDTvline(n, ord, x, z_old, c);  // c = Dt * (z_old - z);
     s_norm = rho * sqrt(mean(square(c)));
     // stopping criteria check:
-    if (r_norm < tol && s_norm < tol)
-      break;
+    if (r_norm < tol && s_norm < tol) break;
 
     // auxiliary variables update:
     z_old = z;
@@ -199,8 +197,7 @@ void irls_admm(int M,
   int iter_best = 0;
 
   for (iter = 0; iter < M; iter++) {
-    if (iter % 1000 == 0)
-      Rcpp::checkUserInterrupt();
+    if (iter % 1000 == 0) Rcpp::checkUserInterrupt();
 
     theta_old = theta;
 
@@ -213,8 +210,7 @@ void irls_admm(int M,
     // line search for step size
     s = line_search(s, lambda, alpha, gamma, y, x, w, n, ord, theta, theta_old,
                     c1, c2, M);
-    if (s < 0)
-      break;
+    if (s < 0) break;
     // update theta
     theta *= s;
     theta += (1 - s) * theta_old;
