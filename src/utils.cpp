@@ -15,6 +15,8 @@ using namespace arma;
  */
 // [[Rcpp::export]]
 arma::sp_mat buildD(int n, int ord) {
+  if (ord < 0) stop("ord must be non-negative.");
+  if (n <= ord + 1) stop("n must be larger than ord + 1.");
   // stop if not: n > ord + 1; ord + 2 > 0 (; n > 0)
   int c1 = ord + 1;
   int m = n - c1;
@@ -126,9 +128,9 @@ arma::vec fake_data(arma::vec const& y, arma::vec const& w, arma::vec& theta) {
   int n = y.size();
   vec c(n);
   for (int i = 0; i < n; i++) {
-    if (w[i] * exp(theta[i]) > 1e-3)
+    if (w[i] * exp(theta[i]) > 1e-3) {
       c[i] = y[i] * exp(-theta[i]) / w[i] - 1 + theta[i];
-    else {  // deal with overflow using approximation
+    } else {  // deal with overflow using approximation
       c[i] = y[i] - exp(theta[i]) / w[i] + theta[i];
     }
   }
@@ -194,12 +196,9 @@ double line_search(double s,
     bound *= alpha * s;
 
     // check criteria
-    if (grades <= bound)
-      break;
-    else
-      s *= gamma;
+    if (grades <= bound) break;
+    else s *= gamma;
   }
-
   return s;
 }
 
@@ -217,15 +216,11 @@ void calcDvline(int n,
   c = v;
   int fct = 1;
   for (int i = 0; i < ord; i++) {
-    if (i != 0) {
-      c /= (x.tail(n - i) - x.head(n - i));
-    }
+    if (i != 0) c /= (x.tail(n - i) - x.head(n - i));
     c = c.tail(n - i - 1) - c.head(n - i - 1);
     c.resize(n - i - 1);
   }
-  for (int i = 2; i < ord; i++) {
-    fct *= i;
-  }
+  for (int i = 2; i < ord; i++) fct *= i;
   c *= fct;
   b = c;
 }
