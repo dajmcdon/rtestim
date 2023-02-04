@@ -25,8 +25,7 @@ List rtestim_path(int algo,
                   double ls_gamma = 0.9,
                   int verbose = 0) {
   int n = y.n_elem;
-  if (lambda.size() > 0)
-    nsol = lambda.size();
+  if (lambda.size() > 0) nsol = lambda.size();
 
   // Placeholders for solutions
   arma::mat theta(n, nsol);
@@ -68,11 +67,8 @@ List rtestim_path(int algo,
       break;
     }
 
-    if (i > 0) {
-      _rho = (rho < 0) ? lambda(i) : rho;
-    }
-    if (verbose > 0)
-      Rcout << ".";
+    if (i > 0) _rho = (rho < 0) ? lambda(i) : rho;
+    if (verbose > 0) Rcout << ".";
     Rcpp::checkUserInterrupt();
 
     switch (algo) {
@@ -91,16 +87,16 @@ List rtestim_path(int algo,
     niter(i) = iters + 1;
 
     // Verbose handlers
-    if (verbose > 1)
-      Rcout << niter(i);
-    if (verbose > 2)
-      Rcout << "(" << lambda(i) << ")";
-    if (verbose > 0)
-      Rcout << std::endl;
+    if (verbose > 1) Rcout << niter(i);
+    if (verbose > 2) Rcout << "(" << lambda(i) << ")";
+    if (verbose > 0) Rcout << std::endl;
   }
 
   // Return
-  List out = List::create(Named("Rt") = theta, Named("lambda") = lambda,
-                          Named("degree") = korder, Named("niter") = niter);
+  List out = List::create(
+    Named("Rt") = theta,
+    Named("lambda") = lambda,
+    Named("degree") = korder,
+    Named("niter") = niter);
   return out;
 }
