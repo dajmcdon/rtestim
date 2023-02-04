@@ -188,7 +188,8 @@ void irls_admm(int M,
   int m = z.size();
   vec c1(n);  // a buffer
   vec c2(m);  // a buffer
-  double r_norm, s_norm;
+  double r_norm = 0.0;
+  double s_norm = 0.0;
 
   // initialize objective
   vec Dv(m);

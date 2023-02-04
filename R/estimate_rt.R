@@ -55,10 +55,7 @@
 #'   `lambda` sequence, where `lambdamin = lambdamin_ratio * lambdamax`.
 #'   A very small value will lead to the solution `Rt = log(observed_counts)`.
 #'   This argument has no effect if there is user-defined `lambda` sequence.
-#' @param alpha Double. A parameter adjusting upper bound in line search algorithm
-#' in `irls_admm` algorithm.
-#' @param gamma Double. A parameter adjusting step size in line search algorithm
-#' in `irls_admm` algorithm.
+
 #'
 #' @return An object with S3 class `"poison_rt"`. Among the list components:
 #' * `observed_counts` the observed daily infection counts
@@ -88,8 +85,6 @@ estimate_rt <- function(observed_counts,
                         lambdamin = -1,
                         lambdamax = 1,
                         lambda_min_ratio = 1e-4,
-                        alpha = 0.5,
-                        gamma = 0.9,
                         maxiter = 1e4,
                         init = NULL) {
   # create weighted past cases
@@ -154,8 +149,8 @@ estimate_rt <- function(observed_counts,
     maxiter = maxiter,
     tolerance = init$tolerance,
     lambda_min_ratio = lambda_min_ratio,
-    ls_alpha = alpha,
-    ls_gamma = gamma,
+    ls_alpha = init$alpha,
+    ls_gamma = init$gamma,
     verbose = init$verbose)
 
   structure(
@@ -179,15 +174,17 @@ estimate_rt <- function(observed_counts,
 #' We should convert this into an S3 method so that we can pass in a
 #' vector of counts or an admm_initializer object (and overwrite)
 #'
-#' @param observed_counts vector of daily infections
+#' @inheritParams estimate_rt
 #' @param weighted_past_counts the weighted sum of past infections counts with
 #'   corresponding serial interval functions (or its Gamma approximation) as
 #'   weights
-#' @param degree degree of the piecewise polynomial curves to be fitted,
-#'   e.g., degree = 0 corresponds to piecewise constant curves
 #' @param primal_var initial values of log(Rt)
 #' @param auxi_var auxiliary variable in the ADMM algorithm
 #' @param dual_var dual variable in the ADMM algorithm
+#' @param alpha Double. A parameter adjusting upper bound in line search algorithm
+#' in `irls_admm` algorithm.
+#' @param gamma Double. A parameter adjusting step size in line search algorithm
+#' in `irls_admm` algorithm.
 #'
 #' @return a list of model parameters with class `admm_initializer`
 #'
@@ -200,28 +197,34 @@ rt_admm_configuration <- function(observed_counts,
                                   dual_var = NULL,
                                   rho = -1,
                                   rho_adjust = -1,
+                                  alpha = 0.5,
+                                  gamma = 0.9,
                                   tolerance = 1e-4,
                                   verbose = 0) {
   n <- length(observed_counts)
   degree <- as.integer(degree)
+  if (!rlang::is_scalar_double(alpha) || alpha > 1 - 1e-4 || alpha < 0 + 1e-4)
+    cli::cli_abort("alpha must be in (0, 1).")
+  if (!rlang::is_scalar_double(gamma) || gamma > 1 - 1e-4 || gamma < 0 + 1e-4)
+    cli::cli_abort("gamma must be in (0, 1).")
 
   if (degree < 0) cli::cli_abort("`degree` must be non-negative. ")
-  if (length(rho) != 1 || !is.numeric(rho)) {
+  if (!rlang::is_scalar_double(rho)) {
     cli::cli_warn(c("`rho` must be a numeric scalar.",
                     i = "Resetting to default value."))
     rho = -1
   }
-  if (length(rho_adjust) != 1 || !is.numeric(rho_adjust)) {
+  if (!rlang::is_scalar_double(rho_adjust)) {
     cli::cli_warn(c("`rho_adjust` must be a numeric scalar.",
                     i = "Resetting to default value."))
     rho_adjust = -1
   }
-  if (length(tolerance) != 1 || !is.numeric(tolerance) || tolerance <= 0) {
+  if (!rlang::is_scalar_double(tolerance) || tolerance <= 0) {
     cli::cli_warn(c("`tolerance` must be a positive scalar.",
                     i = "Resetting to default value."))
     tolerance = 1e-4
   }
-  if (length(verbose) != 1 || !is.numeric(verbose) || verbose < 0) {
+  if (!rlang::is_scalar(verbose) || !is.numeric(verbose) || verbose < 0) {
     cli::cli_warn(c("`verbose` must be a non-negative scalar.",
                     i = "Resetting to default value."))
     verbose = 0L
@@ -260,6 +263,8 @@ rt_admm_configuration <- function(observed_counts,
       rho = rho,
       rho_adjust = rho_adjust,
       tolerance = tolerance,
+      alpha = alpha,
+      gamma = gamma,
       verbose = as.integer(verbose)
     ),
     class = "rt_admm_configuration"
