@@ -35,7 +35,7 @@ distribution with some shape and scale.}
 cross validation. For leave-kth-out cross validation, every kth
 observed_counts and their corresponding position (evenly or unevenly
 spaced) are placed into the same fold. The first and last observed_counts are
-not assigned to any folds. Smallest allowable value if `fold = 2`. It is not
+not assigned to any folds. Smallest allowable value if `fold = 2`. It is
 generally not recommended to set `fold` to a large number}
 
 \item{x}{a vector of positions at which the counts have been observed. In an
@@ -68,8 +68,9 @@ This argument has no effect if there is user-defined `lambda` sequence.}
 }
 \value{
 An object with S3 class `"cv_result"`. Among the list components:
-* `cv_scores` leave-kth-out cross validation score
-* `optimal_lambda` optimal lambda chosen from the cross validation
+* `cv_scores` leave-kth-out cross validation scores
+* `optimal_lambda` lambda which achieved the optimal cv_scores from  cross
+validation
 * `optimal_Rt` the estimated effective reproduction rate, estimated with the
 optimal lambda
 * `observed_counts` vector of the observed daily infection counts

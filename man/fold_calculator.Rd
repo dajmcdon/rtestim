@@ -11,7 +11,7 @@ fold_calculator(n, fold)
 cross validation. For leave-kth-out cross validation, every kth
 observed_counts and their corresponding position (evenly or unevenly
 spaced) are placed into the same fold. The first and last observed_counts are
-not assigned to any folds. Smallest allowable value if `fold = 2`. It is not
+not assigned to any folds. Smallest allowable value if `fold = 2`. It is
 generally not recommended to set `fold` to a large number}
 }
 \value{

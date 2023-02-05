@@ -9,8 +9,9 @@
 #' generally not recommended to set `fold` to a large number
 
 #' @return An object with S3 class `"cv_result"`. Among the list components:
-#' * `cv_scores` leave-kth-out cross validation score
-#' * `optimal_lambda` optimal lambda chosen from the cross validation
+#' * `cv_scores` leave-kth-out cross validation scores
+#' * `optimal_lambda` lambda which achieved the optimal cv_scores from  cross
+#' validation
 #' * `optimal_Rt` the estimated effective reproduction rate, estimated with the
 #' optimal lambda
 #' * `observed_counts` vector of the observed daily infection counts
@@ -173,7 +174,7 @@ fold_calculator <- function(n, fold) {
 #' test_x <- x[test_idx]
 #' rt <- matrix(c(1.1, 1.3, 1.5, 1.7, 1.9, 2.0), nrow=6)
 #'
-#' pred_kth_rt(rt, n, train_idx, test_idx, train_x, test_x)
+#' pred_kth_rt(rt, n, train_idx, test_idx, train_x, test_x
 #' # Should equal to c(1.2, 1.4, 1.6, 1.8)
 pred_kth_rt <- function(rt, n, train_idx, test_idx, train_x, test_x) {
   ilo <- which((seq(1,n)%in%(test_idx-1))[train_idx])
