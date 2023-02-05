@@ -33,9 +33,10 @@ distribution with some shape and scale.}
 
 \item{fold}{Integer. This the number of folds to conduct the leave-kth-out
 cross validation. For leave-kth-out cross validation, every kth
-observed_counts and their corresponding position (can be evenly or unevenly
+observed_counts and their corresponding position (evenly or unevenly
 spaced) are placed into the same fold. The first and last observed_counts are
-not assigned to any folds.}
+not assigned to any folds. Smallest allowable value if `fold = 2`. It is not
+generally not recommended to set `fold` to a large number}
 
 \item{x}{a vector of positions at which the counts have been observed. In an
 ideal case, we would observe data at regular intervals (e.g. daily or

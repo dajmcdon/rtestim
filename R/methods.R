@@ -10,7 +10,7 @@
 #' the estimated reproduction rate (R_rate), and the estimated Poisson mean
 #' parameter (pois_mean)
 #'
-#' @export
+#' @exportS3Method
 #'
 #' @examples
 #' y <- c(rev(seq(2, 6, by = 1)), seq(2, 6, by = 1))
@@ -40,7 +40,7 @@ summary.poisson_rt <- function(object, ...){
 #' @return Panel with two figures. Left figure shows the predicted observed_counts
 #' calculated from \eqn{weighted_past_count * R} against the true observed_counts.
 #' Right figure shows the estimated Rt across observation time
-#' @export
+#' @exportS3Method
 #'
 #' @examples
 #' y <- c(rev(seq(2, 6, by = 1)), seq(2, 6, by = 1))
