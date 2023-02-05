@@ -69,7 +69,7 @@ This argument has no effect if there is user-defined `lambda` sequence.}
 algorithm.}
 
 \item{init}{a list of internal configuration parameters of class
-`rt_admm_configuration`.}
+`configure_rt_admm`.}
 
 \item{nlambda}{Integer. The number of tuning parameters `lambda` at which to
 compute Rt.}

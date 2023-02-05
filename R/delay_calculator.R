@@ -36,11 +36,10 @@ delay_calculator <- function(observed_counts, x = NULL,
   w <- discretize_gamma(x, dist_gamma[1], dist_gamma[2])
   cw <- cumsum(w)
   regular <- vctrs::vec_unique_count(diff(x)) == 1L
-  if (regular) {
-    convolved_seq <- convolve(observed_counts, rev(w), type = "open")[1:n] / cw
-    return(c(convolved_seq[1], convolved_seq[1:(n - 1)]))
-  } else {
+
+  if (!regular)
     cli::cli_abort("Uh oh. We don't support irregular x yet...")
-  }
-  return(c(convolved_seq[1], convolved_seq[1:(n - 1)]))
+
+  convolved_seq <- convolve(observed_counts, rev(w), type = "open")[1:n] / cw
+  c(convolved_seq[1], convolved_seq[1:(n - 1)])
 }

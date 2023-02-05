@@ -3,9 +3,10 @@
 #' @inheritParams estimate_rt
 #' @param fold Integer. This the number of folds to conduct the leave-kth-out
 #' cross validation. For leave-kth-out cross validation, every kth
-#' observed_counts and their corresponding position (can be evenly or unevenly
+#' observed_counts and their corresponding position (evenly or unevenly
 #' spaced) are placed into the same fold. The first and last observed_counts are
-#' not assigned to any folds.
+#' not assigned to any folds. Smallest allowable value if `fold = 2`. It is not
+#' generally not recommended to set `fold` to a large number
 
 #' @return An object with S3 class `"cv_result"`. Among the list components:
 #' * `cv_scores` leave-kth-out cross validation score

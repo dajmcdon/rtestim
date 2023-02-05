@@ -34,7 +34,7 @@
 #' @param maxiter Integer. Maximum number of iterations for the estimation
 #'   algorithm.
 #' @param init a list of internal configuration parameters of class
-#'   `rt_admm_configuration`.
+#'   `configure_rt_admm`.
 #' @param dist_gamma Vector of length 2. These are the shape and scale for the
 #'   assumed serial interval distribution. Roughly, this distribution describes
 #'   the probability of an infectious individual infecting someone else after
@@ -91,11 +91,11 @@ estimate_rt <- function(observed_counts,
   if (is.null(weighted_past_counts))
     weighted_past_counts <- delay_calculator(observed_counts, x, dist_gamma)
   if (is.null(init))
-    init <- rt_admm_configuration(observed_counts, degree, weighted_past_counts)
-  if (!inherits(init, "rt_admm_configuration"))
-    cli::cli_abort("`init` must be created with `rt_admm_configuration()`.")
+    init <- configure_rt_admm(observed_counts, degree, weighted_past_counts)
+  if (!inherits(init, "configure_rt_admm"))
+    cli::cli_abort("`init` must be created with `configure_rt_admm()`.")
   if (is.null(init$primal_var)) {
-    init <- rt_admm_configuration(
+    init <- configure_rt_admm(
       observed_counts, init$degree, weighted_past_counts,
       auxi_var = init$auxi_var, dual_var = init$dual_var)
   }
@@ -106,8 +106,6 @@ estimate_rt <- function(observed_counts,
   # (1) check that counts are non-negative, integer, vector
   if (any(observed_counts < 0)) cli::cli_abort("`observed_counts` must be non-negative")
   if (!is.vector(observed_counts)) cli::cli_abort("observed_counts must be a vector")
-  # if (!all(rlang::is_intergerish(observed_counts))) not required
-  #  cli::cli_abort("`observed_counts` must be integers")
 
 
   # (2) checks on lambda, lambdamin, lambdamax
@@ -185,7 +183,7 @@ estimate_rt <- function(observed_counts,
 #' @return a list of model parameters with class `admm_initializer`
 #'
 #' @export
-rt_admm_configuration <- function(observed_counts,
+configure_rt_admm <- function(observed_counts,
                                   degree,
                                   weighted_past_counts = NULL,
                                   primal_var = NULL,
@@ -255,6 +253,6 @@ rt_admm_configuration <- function(observed_counts,
       tolerance = tolerance,
       verbose = verbose
     ),
-    class = "rt_admm_configuration"
+    class = "configure_rt_admm"
   )
 }

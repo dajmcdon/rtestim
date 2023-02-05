@@ -12,9 +12,9 @@
 \item{...}{.}
 }
 \value{
-Figure with two panels. Top panel shows the predicted observed_counts
-calculated from \eqn{weighted_count * Rt_estim} against the true observed_counts.
-Bottom panel shows the estimated Rt through observation time
+Panel with two figures. Left figure shows the predicted observed_counts
+calculated from \eqn{weighted_past_count * R} against the true observed_counts.
+Right figure shows the estimated Rt across observation time
 }
 \description{
 Plot predicted observed_count and estimated Rt from `summary(poisson_rt)` object

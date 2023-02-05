@@ -109,7 +109,7 @@ summary.cv_result <- function(object, ...) {
 #' @param ...
 #'
 #' @return Generates three figures. First figure shows the cross validation scores
-#' of each lambda. Second figure shows the estimated Rt, which is estimated with
+#' of each lambda. Second figure shows the optimal Rt, estimated with
 #' the optimal lambda from cross validation, across observed time point. Third
 #' figure shows the predicted observed case counts calculated by
 #' \eqn{weighted_past_count * optimal_Rt}, against the true observed_counts
