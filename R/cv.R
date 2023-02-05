@@ -5,7 +5,7 @@
 #' cross validation. For leave-kth-out cross validation, every kth
 #' observed_counts and their corresponding position (evenly or unevenly
 #' spaced) are placed into the same fold. The first and last observed_counts are
-#' not assigned to any folds. Smallest allowable value if `fold = 2`. It is not
+#' not assigned to any folds. Smallest allowable value if `fold = 2`. It is
 #' generally not recommended to set `fold` to a large number
 
 #' @return An object with S3 class `"cv_result"`. Among the list components:
@@ -76,6 +76,9 @@ cv_estimate_rt <- function(observed_counts,
       x = train_x,
       degree = degree,
       lambda = lambda,
+      lambdamin = lambdamin,
+      lambdamax = lambdamax,
+      lambda_min_ratio = lambda_min_ratio,
       ...)
 
 
@@ -110,6 +113,9 @@ cv_estimate_rt <- function(observed_counts,
     x = x,
     degree = degree,
     lambda = op_lambda,
+    lambdamin = lambdamin,
+    lambdamax = lambdamax,
+    lambda_min_ratio = lambda_min_ratio,
     ...)
 
 
