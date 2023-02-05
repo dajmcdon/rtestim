@@ -7,16 +7,18 @@
 fold_calculator(n, fold)
 }
 \arguments{
-\item{n}{Integer. Total number of `observed_counts`}
-
-\item{fold}{Integer. Number of folds for cross validation. In cross validation,
-data are distributed into folds. Each fold during cross-validation is left as
-the left-out data to be tested on after the model is fitted with the rest of
-the set.}
+\item{fold}{Integer. This the number of folds to conduct the leave-kth-out
+cross validation. For leave-kth-out cross validation, every kth
+observed_counts and their corresponding position (can be evenly or unevenly
+spaced) are placed into the same fold. The first and last observed_counts are
+not assigned to any folds.}
 }
 \value{
 a vector of fold index at which the counts are distributed into folds
 }
 \description{
 Helper function. Calculate the fold index for each `observed_counts`
+}
+\examples{
+fold_calculator(20, 3)
 }

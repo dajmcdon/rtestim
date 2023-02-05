@@ -14,6 +14,9 @@
 #' is the \eqn{(k+1)}-th order difference matrix.
 #'
 #' @param observed_counts vector of the observed daily infection counts
+#' @param weighted_past_counts the weighted sum of past infections counts with
+#'   corresponding serial interval functions (or its Gamma approximation) as
+#'   weights
 #' @param degree Integer. Degree of the piecewise polynomial curve to be
 #'   estimated. Ror example, `degree = 0` corresponds to a piecewise constant
 #'   curve.
@@ -72,6 +75,7 @@
 #'   weighted_past_counts = rep(1, 10), degree = 1)
 #' )
 estimate_rt <- function(observed_counts,
+                        weighted_past_counts = NULL, # for cv, can omit later
                         degree = 3L,
                         dist_gamma = c(2.5, 2.5),
                         x = NULL,
@@ -84,7 +88,8 @@ estimate_rt <- function(observed_counts,
                         init = NULL) {
 
   # create weighted past cases
-  weighted_past_counts <- delay_calculator(observed_counts, x, dist_gamma)
+  if (is.null(weighted_past_counts))
+    weighted_past_counts <- delay_calculator(observed_counts, x, dist_gamma)
   if (is.null(init))
     init <- rt_admm_configuration(observed_counts, degree, weighted_past_counts)
   if (!inherits(init, "rt_admm_configuration"))
@@ -108,9 +113,9 @@ estimate_rt <- function(observed_counts,
   # (2) checks on lambda, lambdamin, lambdamax
   lambda_size <- length(lambda)
   if (lambda_size > 0) {
-    nsol <- lambda_size
     lambdamin <- min(lambda)
     lambdamax <- max(lambda)
+    nsol <- length(lambda)
   } else {
     msg <- "If lambda is not specified,"
     if (is.null(lambdamax))

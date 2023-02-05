@@ -7,8 +7,24 @@
 \method{plot}{summary.cv_result}(cv_result, ...)
 }
 \arguments{
+\item{cv_result}{summary of the function `cv_estimate_rt` with class
+`summary.cv_result`}
+
 \item{...}{}
+}
+\value{
+Generates three figures. First figure shows the cross validation scores
+of each lambda. Second figure shows the estimated Rt, which is estimated with
+the optimal lambda from cross validation, across observed time point. Third
+figure shows the predicted observed case counts calculated by
+\eqn{weighted_past_count * optimal_Rt}, against the true observed_counts
 }
 \description{
 Plot of `summary.cv_result` object
+}
+\examples{
+y <- c(rev(seq(2, 6, by = 1)), seq(2, 6, by = 1))
+mod <- cv_estimate_rt(observed_counts = y, degree = 1,
+lambda = log(seq(1.01, 5, 0.05)))
+plot(summary(mod))
 }

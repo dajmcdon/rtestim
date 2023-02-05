@@ -7,7 +7,7 @@
 \method{summary}{poisson_rt}(object, ...)
 }
 \arguments{
-\item{object}{a fitted model of class `poisson_rt`}
+\item{object}{output of `estimate_rt` function with class `poisson_rt`}
 
 \item{...}{.}
 }
@@ -21,12 +21,7 @@ parameter (pois_mean)
 Summarize results of a poisson_rt model
 }
 \examples{
-TODO: Need to change example
 y <- c(rev(seq(2, 6, by = 1)), seq(2, 6, by = 1))
-mod = admm_solver(
-  current_counts = y, weighted_past_counts = rep(1, 10), degree = 1,
-  init = admm_initializer(current_counts = y,
-  weighted_past_counts = rep(1, 10), degree = 1)
-)
+mod = estiamte_rt(observed_counts = y, degree = 1, lambda = 0.001)
 summary(mod)
 }

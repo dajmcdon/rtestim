@@ -11,12 +11,10 @@ cv_estimate_rt(
   fold = 3,
   x = NULL,
   lambda = NULL,
-  nlambda = 100L,
   lambdamin = NULL,
   lambdamax = NULL,
   lambda_min_ratio = 1e-04,
-  maxiter = 10000,
-  init = NULL
+  ...
 )
 }
 \arguments{
@@ -55,9 +53,6 @@ decreasing sequence of `lambda` values than a single (small) value. If
 supplied, the user-defined `lambda` sequence is automatically sorted in
 decreasing order.}
 
-\item{nlambda}{Integer. The number of tuning parameters `lambda` at which to
-compute Rt.}
-
 \item{lambdamin}{Optional value for the smallest `lambda` to use. This should
 be greater than zero.}
 
@@ -69,12 +64,6 @@ A multiplicative factor for the minimal lambda in the
 `lambda` sequence, where `lambdamin = lambdamin_ratio * lambdamax`.
 A very small value will lead to the solution `Rt = log(observed_counts)`.
 This argument has no effect if there is user-defined `lambda` sequence.}
-
-\item{maxiter}{Integer. Maximum number of iterations for the estimation
-algorithm.}
-
-\item{init}{a list of internal configuration parameters of class
-`rt_admm_configuration`.}
 }
 \value{
 An object with S3 class `"cv_result"`. Among the list components:
@@ -82,10 +71,14 @@ An object with S3 class `"cv_result"`. Among the list components:
 * `optimal_lambda` optimal lambda chosen from the cross validation
 * `optimal_Rt` the estimated effective reproduction rate, estimated with the
 optimal lambda
+* `observed_counts` vector of the observed daily infection counts
+* `weighted_past_counts` the weighted sum of past infections counts with
+  corresponding serial interval functions (or its Gamma approximation) as
+  weights
 }
 \description{
 Leave-kth-out cross validation for choosing a optimal parameter lambda
 }
 \examples{
-TODO: add this later
+cv_estimate_rt(c(1:20), degree = 2, fold = 2, lambda = c(1:4))
 }

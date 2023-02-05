@@ -7,21 +7,20 @@
 \method{plot}{summary.poisson_rt}(summary, ...)
 }
 \arguments{
-\item{...}{.}
+\item{summary}{summary of `poisson_rt` models, of class `summary.poisson_rt`}
 
-\item{x}{summary of `poisson_rt` models}
+\item{...}{.}
 }
 \value{
 Figure with two panels. Top panel shows the predicted observed_counts
-calculated from \eqn{weighted_count * Rt_estim}
+calculated from \eqn{weighted_count * Rt_estim} against the true observed_counts.
+Bottom panel shows the estimated Rt through observation time
 }
 \description{
 Plot predicted observed_count and estimated Rt from `summary(poisson_rt)` object
 }
 \examples{
-TODO: change this example
 y <- c(rev(seq(2, 6, by = 1)), seq(2, 6, by = 1))
-mod <- estimate_rt(
-  observed_counts = y, degree = 1, lambda = 1)
+mod <- estimate_rt(observed_counts = y, degree = 1, lambda = 0.001)
 plot(summary(mod))
 }

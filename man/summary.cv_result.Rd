@@ -7,8 +7,22 @@
 \method{summary}{cv_result}(object, ...)
 }
 \arguments{
-\item{...}{}
+\item{object}{output of `cv_estimate_rt` function with class `cv_result`}
+
+\item{...}{.}
+}
+\value{
+a data table containing `weighted_past_counts`, `observed_counts`,
+`lambda` and `x` which are used to find the optimal lambda from cross
+validation; `cv_scores`, `optimal_Rt`, `optimal_lambda`, `pois_mean` are the
+results of the cross validation
 }
 \description{
 Summary of `cv_result` object
+}
+\examples{
+y <- c(rev(seq(2, 6, by = 1)), seq(2, 6, by = 1))
+mod <- cv_estimate_rt(observed_counts = y, degree = 1,
+lambda = log(seq(1.01, 5, 0.05)))
+summary(mod)
 }

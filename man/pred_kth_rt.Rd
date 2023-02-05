@@ -2,16 +2,43 @@
 % Please edit documentation in R/cv.R
 \name{pred_kth_rt}
 \alias{pred_kth_rt}
-\title{Helper function. Calculate Rt at hold-out fold}
+\title{Helper function. Calculate Rt at hold-out set}
 \usage{
 pred_kth_rt(rt, n, train_idx, test_idx, train_x, test_x)
 }
 \arguments{
-\item{rt}{an nlambda by (n-n_holdout) matrix. Rt estimated based on all lambdas for a
-particular fold.}
+\item{rt}{Matrix. Rt estimation at observed time points in training set
+for all values of lambdas}
 
-\item{test_x}{}
+\item{n}{Integer. Number of total observations}
+
+\item{train_idx}{vector of Integers. Index of `observed_counts` and `x` to be
+assigned to the training set}
+
+\item{test_idx}{vector of Integers. Index of `observed_counts` and `x` to be
+assigned to the testing set}
+
+\item{train_x}{vector of Integers. Location of the `observed_counts` in the
+training set}
+
+\item{test_x}{vector of Integers. Location of the `observed_counts` in the
+testing set}
+}
+\value{
+Predicted Rt at the hold-out set
 }
 \description{
-Helper function. Calculate Rt at hold-out fold
+Helper function. Calculate Rt at hold-out set
+}
+\examples{
+n <- 10
+x <- 1:10
+train_idx <- c(1, 3, 5, 7, 9, 10)
+test_idx <- c(2, 4, 6, 8)
+train_x <- x[train_idx]
+test_x <- x[test_idx]
+rt <- c(1.1, 1.3, 1.5, 1.7, 1.9, 2.0)
+
+pred_kth_rt(rt, n, train_idx, test_idx, train_x, test_x)
+# Should equal to c(1.2, 1.4, 1.6, 1.8)
 }

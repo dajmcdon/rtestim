@@ -6,6 +6,7 @@
 \usage{
 estimate_rt(
   observed_counts,
+  weighted_past_counts = NULL,
   degree = 3L,
   dist_gamma = c(2.5, 2.5),
   x = NULL,
@@ -20,6 +21,10 @@ estimate_rt(
 }
 \arguments{
 \item{observed_counts}{vector of the observed daily infection counts}
+
+\item{weighted_past_counts}{the weighted sum of past infections counts with
+corresponding serial interval functions (or its Gamma approximation) as
+weights}
 
 \item{degree}{Integer. Degree of the piecewise polynomial curve to be
 estimated. Ror example, `degree = 0` corresponds to a piecewise constant

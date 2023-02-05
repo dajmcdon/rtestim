@@ -2,7 +2,7 @@
 #'
 #' @method summary poisson_rt
 #'
-#' @param object a fitted model of class `poisson_rt`
+#' @param object output of `estimate_rt` function with class `poisson_rt`
 #' @param ... .
 #'
 #' @return a data table of estimates and a logical value of convergence.
@@ -13,13 +13,8 @@
 #' @export
 #'
 #' @examples
-#' TODO: Need to change example
 #' y <- c(rev(seq(2, 6, by = 1)), seq(2, 6, by = 1))
-#' mod = admm_solver(
-#'   current_counts = y, weighted_past_counts = rep(1, 10), degree = 1,
-#'   init = admm_initializer(current_counts = y,
-#'   weighted_past_counts = rep(1, 10), degree = 1)
-#' )
+#' mod = estiamte_rt(observed_counts = y, degree = 1, lambda = 0.001)
 #' summary(mod)
 summary.poisson_rt <- function(object, ...){
   n = length(object$observed_counts)
@@ -39,18 +34,17 @@ summary.poisson_rt <- function(object, ...){
 #' Plot predicted observed_count and estimated Rt from `summary(poisson_rt)` object
 #'
 #' @method plot summary.poisson_rt
-#' @param x summary of `poisson_rt` models
+#' @param summary summary of `poisson_rt` models, of class `summary.poisson_rt`
 #' @param ... .
 #'
-#' @return Figure with two panels. Top panel shows the predicted observed_counts
-#' calculated from \eqn{weighted_count * Rt_estim}
+#' @return Panel with two figures. Left figure shows the predicted observed_counts
+#' calculated from \eqn{weighted_past_count * R} against the true observed_counts.
+#' Right figure shows the estimated Rt across observation time
 #' @export
 #'
 #' @examples
-#' TODO: change this example
 #' y <- c(rev(seq(2, 6, by = 1)), seq(2, 6, by = 1))
-#' mod <- estimate_rt(
-#'   observed_counts = y, degree = 1, lambda = 1)
+#' mod <- estimate_rt(observed_counts = y, degree = 1, lambda = 0.001)
 #' plot(summary(mod))
 plot.summary.poisson_rt <- function(summary, ...){
   fig_cases <- summary$Results %>%
@@ -64,6 +58,8 @@ plot.summary.poisson_rt <- function(summary, ...){
   fig_rt <- summary$Results %>%
     ggplot(aes(x = .data$Time)) +
     geom_line(aes(y = .data$R_rate), col = "#14754C") +
+    ylim(0, 10)+
+    geom_hline(yintercept=1, linetype="dashed", color = "red")+
     labs(x = "Time", y = "Estimated Rt",
          title = "The estimated Rt") +
     theme_bw()
@@ -75,13 +71,20 @@ plot.summary.poisson_rt <- function(summary, ...){
 
 #' Summary of `cv_result` object
 #'
-#' @param object
-#' @param ...
+#' @param object output of `cv_estimate_rt` function with class `cv_result`
+#' @param ... .
 #'
-#' @return
-#' @export
+#' @return a data table containing `weighted_past_counts`, `observed_counts`,
+#' `lambda` and `x` which are used to find the optimal lambda from cross
+#' validation; `cv_scores`, `optimal_Rt`, `optimal_lambda`, `pois_mean` are the
+#' results of the cross validation
+#' @exportS3Method
 #'
 #' @examples
+#' y <- c(rev(seq(2, 6, by = 1)), seq(2, 6, by = 1))
+#' mod <- cv_estimate_rt(observed_counts = y, degree = 1,
+#' lambda = log(seq(1.01, 5, 0.05)))
+#' summary(mod)
 summary.cv_result <- function(object, ...) {
   res <- list(
     lambdas = object$lambda,
@@ -101,13 +104,22 @@ summary.cv_result <- function(object, ...) {
 
 #' Plot of `summary.cv_result` object
 #'
-#' @param cv_result
+#' @param cv_result summary of the function `cv_estimate_rt` with class
+#' `summary.cv_result`
 #' @param ...
 #'
-#' @return
-#' @export
+#' @return Generates three figures. First figure shows the cross validation scores
+#' of each lambda. Second figure shows the estimated Rt, which is estimated with
+#' the optimal lambda from cross validation, across observed time point. Third
+#' figure shows the predicted observed case counts calculated by
+#' \eqn{weighted_past_count * optimal_Rt}, against the true observed_counts
+#' @exportS3Method
 #'
 #' @examples
+#' y <- c(rev(seq(2, 6, by = 1)), seq(2, 6, by = 1))
+#' mod <- cv_estimate_rt(observed_counts = y, degree = 1,
+#' lambda = log(seq(1.01, 5, 0.05)))
+#' plot(summary(mod))
 plot.summary.cv_result <- function(cv_result, ...) {
   lambda <- cv_result$lambdas
   cv_scores <- cv_result$cv_scores
@@ -116,6 +128,7 @@ plot.summary.cv_result <- function(cv_result, ...) {
   weighted_past_counts <- cv_result$weighted_past_counts
   observed_counts <- cv_result$observed_counts
   pois_mean <- cv_result$pois_mean
+
 
   # Score plot
   cv_scores_plot <- ggplot(data.frame(lambdas =lambda, scores = cv_scores),
@@ -142,10 +155,10 @@ plot.summary.cv_result <- function(cv_result, ...) {
          title = "The estimated piecewise polynomial curve (in line)") +
     theme_bw()
 
-  fig <- ggpubr::ggarrange(cv_scores_plot,
-                           optimal_rt_plot,
+  fig <- ggpubr::ggarrange(optimal_rt_plot,
+                           cv_scores_plot,
                            truevspred,
-                           ncol=3)
+                           ncol=2, nrow=2)
 
   print(fig)
 }
