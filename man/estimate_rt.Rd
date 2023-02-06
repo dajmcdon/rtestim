@@ -12,8 +12,8 @@ estimate_rt(
   algo = c("linear_admm", "irls_admm"),
   lambda = NULL,
   nsol = 100L,
-  lambdamin = -1,
-  lambdamax = 1,
+  lambdamin = NULL,
+  lambdamax = NULL,
   lambda_min_ratio = 1e-04,
   maxiter = 10000,
   init = NULL

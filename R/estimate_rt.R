@@ -82,12 +82,22 @@ estimate_rt <- function(observed_counts,
                         algo = c("linear_admm", "irls_admm"),
                         lambda = NULL,
                         nsol = 100L,
-                        lambdamin = -1,
-                        lambdamax = 1,
+                        lambdamin = NULL,
+                        lambdamax = NULL,
                         lambda_min_ratio = 1e-4,
                         maxiter = 1e4,
                         init = NULL) {
-  # create weighted past cases
+
+  arg_is_nonneg_int(degree)
+  arg_is_pos_int(nsol, maxiter)
+  arg_is_scalar(degree, nsol, lambda_min_ratio)
+  arg_is_scalar(lambdamin, lambdamax, allow_null = TRUE)
+  arg_is_positive(lambdamin, lambdamax, allow_null = TRUE)
+  arg_is_positive(lambda_min_ratio, dist_gamma)
+  arg_is_length(2, dist_gamma)
+  algo <- match.arg(algo)
+
+  # create weighted past cases, do setup
   weighted_past_counts <- delay_calculator(observed_counts, x, dist_gamma)
   if (is.null(init))
     init <- rt_admm_configuration(observed_counts, degree, weighted_past_counts)
@@ -98,40 +108,34 @@ estimate_rt <- function(observed_counts,
       observed_counts, init$degree, weighted_past_counts,
       auxi_var = init$auxi_var, dual_var = init$dual_var)
   }
-  # validate maxiter
-  maxiter <- as.integer(maxiter)
+
   n <- length(observed_counts)
 
   # (1) check that counts are non-negative, integer
-  if (any(observed_counts < 0)) cli::cli_abort("`observed_counts` must be non-negative")
-  # if (!all(rlang::is_integerish(observed_counts))) not required
-  #  cli::cli_abort("`observed_counts` must be integers")
+  if (any(observed_counts < 0))
+    cli::cli_abort("`observed_counts` must be non-negative")
+
 
   # (2) checks on lambda, lambdamin, lambdamax
-  lambda_size <- length(lambda)
-  if (lambda_size > 0) {
-    nsol <- lambda_size
-  } else {
+  if (is.null(lambda)) lambda <- double(0) # prep for create_lambda
+  if (is.null(lambdamin)) lambdamin <- -1.0
+  if (is.null(lambdamax)) lambdamax <- -1.0
+  if (length(lambda) == 0) {
     msg <- "If lambda is not specified,"
-    if (lambda_min_ratio < 0 || lambda_min_ratio > 1)
-      cli::cli_abort("{msg} lambda_min_ratio must be in [0,1]")
-    if (lambdamax < 0)
-      cli::cli_abort("{msg} lambdamax must be positive.")
-    if (lambdamin < 0)
-      cli::cli_abort("{msg} lambdamin must be positive.")
-    if (lambdamin >= lambdamax)
+    if (lambda_min_ratio >= 1)
+      cli::cli_abort("{msg} lambda_min_ratio must be in [0,1)")
+    if (lambdamin > 0 && lambdamax > 0 && lambdamin >= lambdamax)
       cli::cli_abort("{msg} lambdamin must be < lambdamax.")
   }
 
   # (3) check that x is a double vector of length 0 or n
-  x = x %||% 1:n
+  x <- x %||% 1:n
   if (!is.numeric(x)) cli::cli_abort("x must be a numeric vector")
-  if (!is.double(x)) x = as.double(x)
+  x <- as.double(x)
   if (!(length(x) == n | length(x) == 0))
     cli::cli_abort("x must be length 0 or n")
 
   # (4) check algorithm
-  algo <- match.arg(algo)
   algo <- match(algo, c("linear_admm", "irls_admm"))
   algo <- as.integer(algo)
 
@@ -182,9 +186,9 @@ estimate_rt <- function(observed_counts,
 #' @param auxi_var auxiliary variable in the ADMM algorithm
 #' @param dual_var dual variable in the ADMM algorithm
 #' @param alpha Double. A parameter adjusting upper bound in line search algorithm
-#' in `irls_admm` algorithm.
+#'   in `irls_admm` algorithm.
 #' @param gamma Double. A parameter adjusting step size in line search algorithm
-#' in `irls_admm` algorithm.
+#'   in `irls_admm` algorithm.
 #'
 #' @return a list of model parameters with class `admm_initializer`
 #'

@@ -2,11 +2,13 @@
 
 S3method(plot,summary.poisson_rt)
 S3method(summary,poisson_rt)
+export("%>%")
 export(delay_calculator)
 export(discretize_gamma)
 export(estimate_rt)
 export(rt_admm_configuration)
 importFrom(Rcpp,sourceCpp)
+importFrom(cli,cli_abort)
 importFrom(ggplot2,aes)
 importFrom(ggplot2,geom_line)
 importFrom(ggplot2,geom_point)
