@@ -41,9 +41,6 @@
 #' @param x a vector of positions at which the counts have been observed. In an
 #'   ideal case, we would observe data at regular intervals (e.g. daily or
 #'   weekly) but this may not always be the case.
-#' @param algo the algorithm to be used in computation. `linear_admm`:
-#' linearized ADMM; `irls_admm`: iteratively reweighted least squares with
-#' standard ADMM.
 #' @param nlambda Integer. The number of tuning parameters `lambda` at which to
 #'   compute Rt.
 #' @param lambdamin Optional value for the smallest `lambda` to use. This should
@@ -55,10 +52,9 @@
 #'   `lambda` sequence, where `lambdamin = lambdamin_ratio * lambdamax`.
 #'   A very small value will lead to the solution `Rt = log(observed_counts)`.
 #'   This argument has no effect if there is user-defined `lambda` sequence.
-#' @param alpha Double. A parameter adjusting upper bound in line search algorithm
-#' in `irls_admm` algorithm.
-#' @param gamma Double. A parameter adjusting step size in line search algorithm
-#' in `irls_admm` algorithm.
+#' @param algo the algorithm to be used in computation. `linear_admm`:
+#'   linearized ADMM; `irls_admm`: iteratively reweighted least squares with
+#'   standard ADMM.
 #'
 #' @return An object with S3 class `"poison_rt"`. Among the list components:
 #' * `observed_counts` the observed daily infection counts
@@ -82,14 +78,12 @@ estimate_rt <- function(observed_counts,
                         degree = 3L,
                         dist_gamma = c(2.5, 2.5),
                         x = NULL,
-                        algo = c("linear_admm", "irls_admm"),
                         lambda = NULL,
                         nsol = 100L,
                         lambdamin = -1,
                         lambdamax = 1,
                         lambda_min_ratio = 1e-4,
-                        alpha = 0.5,
-                        gamma = 0.9,
+                        algo = c("linear_admm", "irls_admm"),
                         maxiter = 1e4,
                         init = NULL) {
   # create weighted past cases
@@ -108,7 +102,8 @@ estimate_rt <- function(observed_counts,
   n <- length(observed_counts)
 
   # (1) check that counts are non-negative, integer
-  if (any(observed_counts < 0)) cli::cli_abort("`observed_counts` must be non-negative")
+  if (any(observed_counts < 0))
+    cli::cli_abort("`observed_counts` must be non-negative")
   # if (!all(rlang::is_integerish(observed_counts))) not required
   #  cli::cli_abort("`observed_counts` must be integers")
 
@@ -135,9 +130,7 @@ estimate_rt <- function(observed_counts,
   if (!(length(x) == n | length(x) == 0))
     cli::cli_abort("x must be length 0 or n")
 
-  # (4) check algorithm
-  algo <- match.arg(algo)
-  algo <- match(algo, c("linear_admm", "irls_admm"))
+  algo <- match.arg(algorithm)
   algo <- as.integer(algo)
 
   mod <- rtestim_path(
@@ -154,8 +147,8 @@ estimate_rt <- function(observed_counts,
     maxiter = maxiter,
     tolerance = init$tolerance,
     lambda_min_ratio = lambda_min_ratio,
-    ls_alpha = alpha,
-    ls_gamma = gamma,
+    ls_alpha = init$alpha,
+    ls_gamma = init$gamma,
     verbose = init$verbose)
 
   structure(
@@ -188,6 +181,11 @@ estimate_rt <- function(observed_counts,
 #' @param primal_var initial values of log(Rt)
 #' @param auxi_var auxiliary variable in the ADMM algorithm
 #' @param dual_var dual variable in the ADMM algorithm
+#' @param alpha Double. A parameter adjusting upper bound in line search algorithm
+#'   in `irls_admm` algorithm.
+#' @param gamma Double. A parameter adjusting step size in line search algorithm
+#'   in `irls_admm` algorithm.
+
 #'
 #' @return a list of model parameters with class `admm_initializer`
 #'
@@ -200,10 +198,13 @@ rt_admm_configuration <- function(observed_counts,
                                   dual_var = NULL,
                                   rho = -1,
                                   rho_adjust = -1,
+                                  alpha = 0.5,
+                                  gamma = 0.9,
                                   tolerance = 1e-4,
                                   verbose = 0) {
   n <- length(observed_counts)
   degree <- as.integer(degree)
+  # check alpha/gamma here
 
   if (degree < 0) cli::cli_abort("`degree` must be non-negative. ")
   if (length(rho) != 1 || !is.numeric(rho)) {
