@@ -44,12 +44,12 @@
 #' @param algo the algorithm to be used in computation. `linear_admm`:
 #' linearized ADMM; `irls_admm`: iteratively reweighted least squares with
 #' standard ADMM.
-#' @param nlambda Integer. The number of tuning parameters `lambda` at which to
+#' @param nsol Integer. The number of tuning parameters `lambda` at which to
 #'   compute Rt.
 #' @param lambdamin Optional value for the smallest `lambda` to use. This should
 #'   be greater than zero.
 #' @param lambdamax Optional value for the largest `lambda` to use.
-#' @param lambdamin_ratio If neither `lambda` nor `lambdamin` is specified, the
+#' @param lambda_min_ratio If neither `lambda` nor `lambdamin` is specified, the
 #'   program will generate a lambdamin by lambdamax * lambda_min_ratio
 #'   A multiplicative factor for the minimal lambda in the
 #'   `lambda` sequence, where `lambdamin = lambdamin_ratio * lambdamax`.

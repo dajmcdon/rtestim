@@ -53,26 +53,26 @@ decreasing sequence of `lambda` values than a single (small) value. If
 supplied, the user-defined `lambda` sequence is automatically sorted in
 decreasing order.}
 
+\item{nsol}{Integer. The number of tuning parameters `lambda` at which to
+compute Rt.}
+
 \item{lambdamin}{Optional value for the smallest `lambda` to use. This should
 be greater than zero.}
 
 \item{lambdamax}{Optional value for the largest `lambda` to use.}
+
+\item{lambda_min_ratio}{If neither `lambda` nor `lambdamin` is specified, the
+program will generate a lambdamin by lambdamax * lambda_min_ratio
+A multiplicative factor for the minimal lambda in the
+`lambda` sequence, where `lambdamin = lambdamin_ratio * lambdamax`.
+A very small value will lead to the solution `Rt = log(observed_counts)`.
+This argument has no effect if there is user-defined `lambda` sequence.}
 
 \item{maxiter}{Integer. Maximum number of iterations for the estimation
 algorithm.}
 
 \item{init}{a list of internal configuration parameters of class
 `rt_admm_configuration`.}
-
-\item{nlambda}{Integer. The number of tuning parameters `lambda` at which to
-compute Rt.}
-
-\item{lambdamin_ratio}{If neither `lambda` nor `lambdamin` is specified, the
-program will generate a lambdamin by lambdamax * lambda_min_ratio
-A multiplicative factor for the minimal lambda in the
-`lambda` sequence, where `lambdamin = lambdamin_ratio * lambdamax`.
-A very small value will lead to the solution `Rt = log(observed_counts)`.
-This argument has no effect if there is user-defined `lambda` sequence.}
 }
 \value{
 An object with S3 class `"poison_rt"`. Among the list components:
