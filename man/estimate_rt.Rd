@@ -9,12 +9,12 @@ estimate_rt(
   degree = 3L,
   dist_gamma = c(2.5, 2.5),
   x = NULL,
-  algo = c("linear_admm", "irls_admm"),
   lambda = NULL,
   nsol = 100L,
   lambdamin = NULL,
   lambdamax = NULL,
   lambda_min_ratio = 1e-04,
+  algo = c("linear_admm", "irls_admm"),
   maxiter = 10000,
   init = NULL
 )
@@ -36,10 +36,6 @@ distribution with some shape and scale.}
 \item{x}{a vector of positions at which the counts have been observed. In an
 ideal case, we would observe data at regular intervals (e.g. daily or
 weekly) but this may not always be the case.}
-
-\item{algo}{the algorithm to be used in computation. `linear_admm`:
-linearized ADMM; `irls_admm`: iteratively reweighted least squares with
-standard ADMM.}
 
 \item{lambda}{Vector. A user supplied sequence of tuning parameters which
 determines the balance between data fidelity and
@@ -67,6 +63,10 @@ A multiplicative factor for the minimal lambda in the
 `lambda` sequence, where `lambdamin = lambdamin_ratio * lambdamax`.
 A very small value will lead to the solution `Rt = log(observed_counts)`.
 This argument has no effect if there is user-defined `lambda` sequence.}
+
+\item{algo}{the algorithm to be used in computation. `linear_admm`:
+linearized ADMM; `irls_admm`: iteratively reweighted least squares with
+standard ADMM.}
 
 \item{maxiter}{Integer. Maximum number of iterations for the estimation
 algorithm.}

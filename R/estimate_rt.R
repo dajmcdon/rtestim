@@ -79,12 +79,12 @@ estimate_rt <- function(observed_counts,
                         degree = 3L,
                         dist_gamma = c(2.5, 2.5),
                         x = NULL,
-                        algo = c("linear_admm", "irls_admm"),
                         lambda = NULL,
                         nsol = 100L,
                         lambdamin = NULL,
                         lambdamax = NULL,
                         lambda_min_ratio = 1e-4,
+                        algo = c("linear_admm", "irls_admm"),
                         maxiter = 1e4,
                         init = NULL) {
 
