@@ -43,7 +43,7 @@ in `irls_admm` algorithm.}
 in `irls_admm` algorithm.}
 }
 \value{
-a list of model parameters with class `admm_initializer`
+a list of model parameters with class `rt_admm_configuration`
 }
 \description{
 We should convert this into an S3 method so that we can pass in a

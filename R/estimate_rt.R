@@ -41,9 +41,6 @@
 #' @param x a vector of positions at which the counts have been observed. In an
 #'   ideal case, we would observe data at regular intervals (e.g. daily or
 #'   weekly) but this may not always be the case.
-#' @param algo the algorithm to be used in computation. `linear_admm`:
-#' linearized ADMM; `irls_admm`: iteratively reweighted least squares with
-#' standard ADMM.
 #' @param nsol Integer. The number of tuning parameters `lambda` at which to
 #'   compute Rt.
 #' @param lambdamin Optional value for the smallest `lambda` to use. This should
@@ -55,7 +52,9 @@
 #'   `lambda` sequence, where `lambdamin = lambdamin_ratio * lambdamax`.
 #'   A very small value will lead to the solution `Rt = log(observed_counts)`.
 #'   This argument has no effect if there is user-defined `lambda` sequence.
-
+#' @param algo the algorithm to be used in computation. `linear_admm`:
+#'   linearized ADMM; `irls_admm`: iteratively reweighted least squares with
+#'   standard ADMM.
 #'
 #' @return An object with S3 class `"poison_rt"`. Among the list components:
 #' * `observed_counts` the observed daily infection counts
@@ -114,7 +113,6 @@ estimate_rt <- function(observed_counts,
   # (1) check that counts are non-negative, integer
   if (any(observed_counts < 0))
     cli::cli_abort("`observed_counts` must be non-negative")
-
 
   # (2) checks on lambda, lambdamin, lambdamax
   if (is.null(lambda)) lambda <- double(0) # prep for create_lambda
@@ -190,7 +188,7 @@ estimate_rt <- function(observed_counts,
 #' @param gamma Double. A parameter adjusting step size in line search algorithm
 #'   in `irls_admm` algorithm.
 #'
-#' @return a list of model parameters with class `admm_initializer`
+#' @return a list of model parameters with class `rt_admm_configuration`
 #'
 #' @export
 rt_admm_configuration <- function(observed_counts,
@@ -206,57 +204,23 @@ rt_admm_configuration <- function(observed_counts,
                                   tolerance = 1e-4,
                                   verbose = 0) {
   n <- length(observed_counts)
-  degree <- as.integer(degree)
-  if (!rlang::is_scalar_double(alpha) || alpha > 1 - 1e-4 || alpha < 0 + 1e-4)
-    cli::cli_abort("alpha must be in (0, 1).")
-  if (!rlang::is_scalar_double(gamma) || gamma > 1 - 1e-4 || gamma < 0 + 1e-4)
-    cli::cli_abort("gamma must be in (0, 1).")
-
-  if (degree < 0) cli::cli_abort("`degree` must be non-negative. ")
-  if (!rlang::is_scalar_double(rho)) {
-    cli::cli_warn(c("`rho` must be a numeric scalar.",
-                    i = "Resetting to default value."))
-    rho = -1
-  }
-  if (!rlang::is_scalar_double(rho_adjust)) {
-    cli::cli_warn(c("`rho_adjust` must be a numeric scalar.",
-                    i = "Resetting to default value."))
-    rho_adjust = -1
-  }
-  if (!rlang::is_scalar_double(tolerance) || tolerance <= 0) {
-    cli::cli_warn(c("`tolerance` must be a positive scalar.",
-                    i = "Resetting to default value."))
-    tolerance = 1e-4
-  }
-  if (!rlang::is_scalar(verbose) || !is.numeric(verbose) || verbose < 0) {
-    cli::cli_warn(c("`verbose` must be a non-negative scalar.",
-                    i = "Resetting to default value."))
-    verbose = 0L
-  }
+  arg_is_scalar(degree, rho, rho_adjust, alpha, gamma, tolerance, verbose)
+  arg_is_positive(alpha, gamma, verbose, tolerance)
+  arg_is_numeric(rho, rho_adjust, tolerance, verbose)
+  arg_is_nonneg_int(degree)
+  if (alpha >= 1 || gamma >= 1) cli::cli_abort("alpha and gamma must be in (0, 1).")
 
   if (is.null(primal_var)) {
-    if (!is.null(weighted_past_counts)) {
-      # should we divide by n?
-      # what do we do when observed_counts == 0
+    if (!is.null(weighted_past_counts))
       primal_var <- log(observed_counts / (n * weighted_past_counts))
-    }
   } else {
-    if (length(primal_var) != n) {
-      cli::cli_abort("`primal_var` must have length {n}.")
-    }
+    arg_is_length(n, primal_var)
   }
   if (is.null(auxi_var)) auxi_var <- double(n - degree)
-  else {
-    if (length(auxi_var) != n - degree) {
-      cli::cli_abort("`auxi_var` must have length {n - degree}.")
-    }
-  }
+  else arg_is_length(n - degree, auxi_var)
+
   if (is.null(dual_var)) dual_var <- double(n - degree)
-  else {
-    if (length(dual_var) != n - degree) {
-      cli::cli_abort("`dual_var` must have length {n - degree}.")
-    }
-  }
+  else arg_is_length(n - degree, dual_var)
 
   structure(
     list(
