@@ -130,6 +130,7 @@ estimate_rt <- function(observed_counts,
 
 
   # (3) check that x is a double vector of length 0 or n
+  if (is.null(x)) x = double(0)
   if (!is.double(x)) x = as.double(x)
   if (!is.numeric(x)) cli::cli_abort("x must be a numeric vector")
   if (!(length(x) == n | length(x) == 0))

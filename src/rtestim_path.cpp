@@ -29,6 +29,7 @@ List rtestim_path(arma::vec y,
   arma::mat theta(n, nsol);
   arma::vec niter(nsol);
 
+
   // Build D matrix
   arma::sp_mat D;
   arma::sp_mat Dk;

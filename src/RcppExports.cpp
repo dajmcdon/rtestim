@@ -136,6 +136,8 @@ BEGIN_RCPP
 END_RCPP
 }
 
+RcppExport SEXP run_testthat_tests(SEXP);
+
 static const R_CallMethodDef CallEntries[] = {
     {"_rtestim_admm_testing", (DL_FUNC) &_rtestim_admm_testing, 14},
     {"_rtestim_dptf", (DL_FUNC) &_rtestim_dptf, 2},
@@ -145,6 +147,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rtestim_buildD", (DL_FUNC) &_rtestim_buildD, 2},
     {"_rtestim_buildDx", (DL_FUNC) &_rtestim_buildDx, 3},
     {"_rtestim_buildDx_tilde", (DL_FUNC) &_rtestim_buildDx_tilde, 3},
+    {"run_testthat_tests", (DL_FUNC) &run_testthat_tests, 1},
     {NULL, NULL, 0}
 };
 

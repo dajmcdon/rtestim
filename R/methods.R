@@ -58,7 +58,7 @@ plot.summary.poisson_rt <- function(summary, ...){
   fig_rt <- summary$Results %>%
     ggplot(aes(x = .data$Time)) +
     geom_line(aes(y = .data$R_rate), col = "#14754C") +
-    ylim(0, 10)+
+    # ylim(0, 10)+
     geom_hline(yintercept=1, linetype="dashed", color = "red")+
     labs(x = "Time", y = "Estimated Rt",
          title = "The estimated Rt") +
