@@ -121,7 +121,7 @@ estimate_rt <- function(observed_counts,
   if (length(lambda) == 0) {
     msg <- "If lambda is not specified,"
     if (lambda_min_ratio >= 1)
-      cli::cli_abort("{msg} lambda_min_ratio must be in [0,1)")
+      cli::cli_abort("{msg} lambda_min_ratio must be in (0,1)")
     if (lambdamin > 0 && lambdamax > 0 && lambdamin >= lambdamax)
       cli::cli_abort("{msg} lambdamin must be < lambdamax.")
   }
@@ -205,10 +205,11 @@ rt_admm_configuration <- function(observed_counts,
                                   verbose = 0) {
   n <- length(observed_counts)
   arg_is_scalar(degree, rho, rho_adjust, alpha, gamma, tolerance, verbose)
-  arg_is_positive(alpha, gamma, verbose, tolerance)
+  arg_is_positive(alpha, gamma, tolerance)
   arg_is_numeric(rho, rho_adjust, tolerance, verbose)
   arg_is_nonneg_int(degree)
-  if (alpha >= 1 || gamma >= 1) cli::cli_abort("alpha and gamma must be in (0, 1).")
+  if (alpha >= 1) cli::cli_abort("alpha must be in (0, 1).")
+  if (gamma > 1) cli::cli_abort("gamma must be in (0, 1].")
 
   if (is.null(primal_var)) {
     if (!is.null(weighted_past_counts))

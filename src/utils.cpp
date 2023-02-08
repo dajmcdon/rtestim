@@ -15,7 +15,7 @@ using namespace arma;
  */
 // [[Rcpp::export]]
 arma::sp_mat buildD(int n, int ord) {
-  if (ord < 0) stop("ord must be non-negative.");
+  if (ord < -1) stop("ord must be non-negative.");
   if (n <= ord + 1) stop("n must be larger than ord + 1.");
   // stop if not: n > ord + 1; ord + 2 > 0 (; n > 0)
   int c1 = ord + 1;
