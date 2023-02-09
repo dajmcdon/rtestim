@@ -194,10 +194,16 @@ estimate_rt <- function(observed_counts,
 #' @param primal_var initial values of log(Rt)
 #' @param auxi_var auxiliary variable in the ADMM algorithm
 #' @param dual_var dual variable in the ADMM algorithm
+#' @param rho double. An ADMM parameter; coefficient of augmented term in the
+#' Lagrangian function.
+#' @param rho_adjust double. An ADMM parameter; adjusted coefficient of
+#' augmented term in the Lagrangian function.
 #' @param alpha Double. A parameter adjusting upper bound in line search algorithm
 #'   in `irls_admm` algorithm.
 #' @param gamma Double. A parameter adjusting step size in line search algorithm
 #'   in `irls_admm` algorithm.
+#' @param tolerance double. Tolerance of ADMM convergence.
+#' @param verbose integer.
 #'
 #' @return a list of model parameters with class `rt_admm_configuration`
 #'
