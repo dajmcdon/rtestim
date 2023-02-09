@@ -8,9 +8,9 @@ handle_arg_list = function(..., tests) {
   values = list(...)
   #names = names(values)
   names = eval(substitute(alist(...)))
-  names = purrr::map(names, deparse)
+  names = map(names, deparse)
 
-  purrr::walk2(names, values, tests)
+  walk2(names, values, tests)
 }
 
 
