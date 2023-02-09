@@ -135,6 +135,21 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// create_lambda_test
+arma::vec create_lambda_test(arma::vec lambda, double lambdamin, double lambdamax, double lambda_min_ratio, int nsol);
+RcppExport SEXP _rtestim_create_lambda_test(SEXP lambdaSEXP, SEXP lambdaminSEXP, SEXP lambdamaxSEXP, SEXP lambda_min_ratioSEXP, SEXP nsolSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type lambda(lambdaSEXP);
+    Rcpp::traits::input_parameter< double >::type lambdamin(lambdaminSEXP);
+    Rcpp::traits::input_parameter< double >::type lambdamax(lambdamaxSEXP);
+    Rcpp::traits::input_parameter< double >::type lambda_min_ratio(lambda_min_ratioSEXP);
+    Rcpp::traits::input_parameter< int >::type nsol(nsolSEXP);
+    rcpp_result_gen = Rcpp::wrap(create_lambda_test(lambda, lambdamin, lambdamax, lambda_min_ratio, nsol));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_rtestim_admm_testing", (DL_FUNC) &_rtestim_admm_testing, 14},
@@ -145,6 +160,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rtestim_buildD", (DL_FUNC) &_rtestim_buildD, 2},
     {"_rtestim_buildDx", (DL_FUNC) &_rtestim_buildDx, 3},
     {"_rtestim_buildDx_tilde", (DL_FUNC) &_rtestim_buildDx_tilde, 3},
+    {"_rtestim_create_lambda_test", (DL_FUNC) &_rtestim_create_lambda_test, 5},
     {NULL, NULL, 0}
 };
 

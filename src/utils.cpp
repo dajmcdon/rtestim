@@ -48,8 +48,7 @@ arma::sp_mat buildDx(int n, int ord, const arma::vec& x) {
   arma::sp_mat D1(n - 1, n);
   D1.diag(0) -= 1;
   D1.diag(1) += 1;
-  if (ord == 0)
-    return D1;                      // ord = 0 is the same as usual
+  if (ord == 0) return D1;          // ord = 0 is the same as usual
   arma::sp_mat Dmat = D1;           // output
   arma::sp_mat delx(n - 1, n - 1);  // diagonal matrix adjusting locations
 
@@ -116,3 +115,14 @@ void create_lambda(arma::vec& lambda,
     }
   }
 }
+
+// [[Rcpp::export()]]
+arma::vec create_lambda_test(arma::vec lambda,
+                             double lambdamin = -1,
+                             double lambdamax = -1,
+                             double lambda_min_ratio = 1e-4,
+                             int nsol = 50) {
+  create_lambda(lambda, lambdamin, lambdamax, lambda_min_ratio, nsol);
+  return(lambda);
+}
+
