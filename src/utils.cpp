@@ -44,10 +44,6 @@ arma::sp_mat buildDx(int n, int ord, const arma::vec& x) {
     arma::sp_mat Dmat = buildD(n, ord);
     return Dmat;
   }
-  if (!all(x)) {
-    arma::sp_mat Dmat = buildD(n, ord);
-    return Dmat;
-  }
   // stop if not: x.size() == n.size()
   // x should be in an increasing order (with no replicated numbers)
   arma::sp_mat D1(n - 1, n);
