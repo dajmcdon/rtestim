@@ -45,8 +45,6 @@ List rtestim_path(arma::vec y,
   create_lambda(lambda, lambdamin, lambdamax, lambda_min_ratio, nsol);
 
   // ADMM parameters
-  // double tolerance_abs = std::sqrt(n) * tolerance; // adjust for number of
-  // parameters
   double _rho = (rho < 0) ? lambda(0) : rho;
 
   // ADMM variables
@@ -61,8 +59,12 @@ List rtestim_path(arma::vec y,
     if (korder == 0) {
       theta = dptf_past_weight(y, lambda(i), w, x);
       niter(i) = 0;
-      break;
-    }
+    } else {
+      if (i > 0)
+        _rho = (rho < 0) ? lambda(i) : rho;
+      if (verbose > 0)
+        Rcout << ".";
+      Rcpp::checkUserInterrupt();
 
     if (i > 0) {
       _rho = (rho < 0) ? lambda(i) : rho;
@@ -85,10 +87,7 @@ List rtestim_path(arma::vec y,
   }
 
   // Return
-  List out = List::create(
-    Named("Rt") = theta,
-    Named("lambda") = lambda,
-    Named("degree") = korder,
-    Named("niter") = niter);
+  List out = List::create(Named("Rt") = theta, Named("lambda") = lambda,
+                          Named("degree") = korder + 1, Named("niter") = niter);
   return out;
 }

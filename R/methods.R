@@ -1,4 +1,3 @@
-
 #' @exportS3Method summary poisson_rt
 summary.poisson_rt <- function(object, ...) {
   "this method is not yet implemented"
