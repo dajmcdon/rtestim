@@ -41,12 +41,12 @@
 #' @param x a vector of positions at which the counts have been observed. In an
 #'   ideal case, we would observe data at regular intervals (e.g. daily or
 #'   weekly) but this may not always be the case.
-#' @param nlambda Integer. The number of tuning parameters `lambda` at which to
+#' @param nsol Integer. The number of tuning parameters `lambda` at which to
 #'   compute Rt.
 #' @param lambdamin Optional value for the smallest `lambda` to use. This should
 #'   be greater than zero.
 #' @param lambdamax Optional value for the largest `lambda` to use.
-#' @param lambdamin_ratio If neither `lambda` nor `lambdamin` is specified, the
+#' @param lambda_min_ratio If neither `lambda` nor `lambdamin` is specified, the
 #'   program will generate a lambdamin by lambdamax * lambda_min_ratio
 #'   A multiplicative factor for the minimal lambda in the
 #'   `lambda` sequence, where `lambdamin = lambdamin_ratio * lambdamax`.
@@ -63,14 +63,11 @@
 #' * `convr` if the model converges `convr==TRUE` or not `convr==FALSE`
 #'
 #' @export
-#'
 #' @examples
-#' y <- c(rev(seq(2, 6, by = 1)), seq(2, 6, by = 1))
-#' admm_solver(
-#'   observed_counts = y, weighted_past_counts = rep(1, 10), degree = 1,
-#'   init = admm_initializer(observed_counts = y,
-#'   weighted_past_counts = rep(1, 10), degree = 1)
-#' )
+#' # runs but ugly
+#' y <- rpois(100, dnorm(1:100, 50, 15)*500 + 1)
+#' out <- estimate_rt(y, nsol = 10)
+#' matplot(out$Rt, ty = "l", lty = 1)
 estimate_rt <- function(observed_counts,
                         degree = 3L,
                         dist_gamma = c(2.5, 2.5),
@@ -173,29 +170,31 @@ estimate_rt <- function(observed_counts,
 #' We should convert this into an S3 method so that we can pass in a
 #' vector of counts or an admm_initializer object (and overwrite)
 #'
-#' @param observed_counts vector of daily infections
+#' @inheritParams estimate_rt
 #' @param weighted_past_counts the weighted sum of past infections counts with
 #'   corresponding serial interval functions (or its Gamma approximation) as
 #'   weights
-#' @param degree degree of the piecewise polynomial curves to be fitted,
-#'   e.g., degree = 0 corresponds to piecewise constant curves
 #' @param primal_var initial values of log(Rt)
 #' @param auxi_var auxiliary variable in the ADMM algorithm
 #' @param dual_var dual variable in the ADMM algorithm
+#' @param rho admm configuration parameter
+#' @param rho_adjust admm configuration parameter
+#' @param tolerance threshold to assess convergence
+#' @param verbose control printing during fitting algorithm
 #'
-#' @return a list of model parameters with class `admm_initializer`
+#' @return a list of model parameters with class `rt_admm_configuration`
 #'
 #' @export
 configure_rt_admm <- function(observed_counts,
-                                  degree,
-                                  weighted_past_counts = NULL,
-                                  primal_var = NULL,
-                                  auxi_var = NULL,
-                                  dual_var = NULL,
-                                  rho = -1,
-                                  rho_adjust = -1,
-                                  tolerance = 1e-4,
-                                  verbose = 0) {
+                              degree,
+                              weighted_past_counts = NULL,
+                              primal_var = NULL,
+                              auxi_var = NULL,
+                              dual_var = NULL,
+                              rho = -1,
+                              rho_adjust = -1,
+                              tolerance = 1e-4,
+                              verbose = 0) {
   n <- length(observed_counts)
   degree <- as.integer(degree)
 

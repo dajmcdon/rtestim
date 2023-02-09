@@ -142,7 +142,7 @@ arg_is_date = function(..., allow_null = FALSE, allow_na = FALSE) {
   handle_arg_list(
     ...,
     tests = function(name, value) {
-      if (!(is(value, "Date") | (is.null(value) & allow_null)))
+      if (!(methods::is(value, "Date") | (is.null(value) & allow_null)))
         cli_abort("Argument {.val {name}} must be a Date. Try `as.Date()`.")
 
       if (any(is.na(value)) & !allow_na)

@@ -14,7 +14,7 @@
 #' @export
 #'
 #' @examples
-#' delay_calculator(c(3,2,5,3,1), c(2.5, 2.5))
+#' delay_calculator(c(3,2,5,3,1), dist_gamma = c(2.5, 2.5))
 delay_calculator <- function(observed_counts, x = NULL,
                              dist_gamma = c(2.5, 2.5)) {
   arg_is_length(2, dist_gamma)
@@ -34,6 +34,6 @@ delay_calculator <- function(observed_counts, x = NULL,
   cw <- cumsum(w)
   regular <- vctrs::vec_unique_count(diff(x)) == 1L
   if (!regular) cli::cli_abort("Uh oh. We don't support irregular x yet...")
-  convolved_seq <- convolve(observed_counts, rev(w))[1:n] / cw
+  convolved_seq <- stats::convolve(observed_counts, rev(w))[1:n] / cw
   c(convolved_seq[1], convolved_seq[1:(n - 1)])
 }

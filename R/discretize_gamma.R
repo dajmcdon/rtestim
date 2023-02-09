@@ -18,7 +18,7 @@
 #' discretize_gamma(1:30, shape = 1, scale = 1)
 discretize_gamma <- function(x, shape = 2.5, scale = 2.5, rate = 1 / scale) {
   stopifnot(shape > 0, scale > 0, all(x >= 0))
-  pgm <- pgamma(x, shape = shape, scale = scale)
+  pgm <- stats::pgamma(x, shape = shape, scale = scale)
   pgm <- c(0, pgm)
   pgm <- diff(pgm)
   pgm / sum(pgm)
