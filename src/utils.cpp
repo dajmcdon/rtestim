@@ -40,7 +40,15 @@ arma::sp_mat buildD(int n, int ord) {
 // [[Rcpp::export]]
 arma::sp_mat buildDx(int n, int ord, const arma::vec& x) {
   // stop if not: n > ord + 1; ord >= 0 (; n > 1)
-  if (x.size() == 0) {
+  std::cout << x.size() << std::endl;
+  std::cout << size(x) << std::endl;
+  std::cout << "finish print" << std::endl;
+  std::cout << all(x) << endl;
+  // if (x.size() == 0) {
+  //   arma::sp_mat Dmat = buildD(n, ord);
+  //   return Dmat;
+  // }
+  if (!all(x)) {
     arma::sp_mat Dmat = buildD(n, ord);
     return Dmat;
   }
