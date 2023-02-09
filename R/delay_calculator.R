@@ -14,14 +14,13 @@
 #' @export
 #'
 #' @examples
-#' delay_calculator(c(3, 2, 5, 3, 1), dist_gamma = c(2.5, 2.5))
-#' delay_calculator(rpois(15, 10), dist_gamma = c(2.5, 2.5))
+#' delay_calculator(c(3,2,5,3,1), c(2.5, 2.5))
 delay_calculator <- function(observed_counts, x = NULL,
                              dist_gamma = c(2.5, 2.5)) {
   arg_is_length(2, dist_gamma)
   arg_is_positive(dist_gamma)
     cli:cli_abort("dist_gamma must have length 2.")
-  if (any(dist_gamma <= 0))
+  if (any(dist_gamma) <= 0)
     cli::cli_abort("dist_gamma must be positive.")
   n <- length(observed_counts)
   if (!is.null(x)) {
@@ -39,7 +38,7 @@ delay_calculator <- function(observed_counts, x = NULL,
   cw <- cumsum(w)
   regular <- vctrs::vec_unique_count(diff(x)) == 1L
   if (regular) {
-    convolved_seq <- convolve(observed_counts, rev(w))[1:n] / cw
+    convolved_seq <- convolve(current_counts, rev(w))[1:n] / cw
     return(c(convolved_seq[1], convolved_seq[1:(n - 1)]))
   } else {
     cli::cli_abort("Uh oh. We don't support irregular x yet...")
