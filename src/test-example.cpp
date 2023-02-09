@@ -35,10 +35,4 @@ context("Sample unit tests") {
     expect_true(twoPlusTwo() == 3);
   }
 
-  test_that("buildDx works with no degree") {
-    arma::sp_mat v1 = buildDx(10, 1, NULL);
-    arma::sp_mat v2 = buildD(10, 1);
-    expect_true(v1.is_square());
-  }
-
 }

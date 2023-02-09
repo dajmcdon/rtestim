@@ -35,7 +35,16 @@ test_that("building D works with empty x", {
 })
 
 
+test_that("building D works with empty x", {
+  x = double(0) # no
+  expect_identical(buildD(10, 2), buildDx(10, 2, x))
+  expect_identical(buildDx_tilde(10, 2, x), buildDx_tilde(10, 2, 1:10))
+})
 
-# test_that("building D doesn't crash R", {
-#   expect_identical(buildD(7, 1), buildDx(7, 2, c()))
-# })
+
+test_that("buildD works as described", {
+  expect_no_error(buildD(10, 0))
+  expect_no_error(buildD(10, -1))
+  expect_error(buildD(10, -2))
+  expect_error(buildD(2, 2))
+})
