@@ -14,19 +14,17 @@
 #' @export
 #'
 #' @examples
-#' delay_calculator(c(3,2,5,3,1), c(2.5, 2.5))
+#' delay_calculator(c(3,2,5,3,1), dist_gamma = c(2.5, 2.5))
 delay_calculator <- function(observed_counts, x = NULL,
                              dist_gamma = c(2.5, 2.5)) {
-  if (length(dist_gamma) != 2L)
-    cli:cli_abort("dist_gamma must have length 2.")
-  if (any(dist_gamma <= 0))
-    cli::cli_abort("dist_gamma must be positive.")
+
+  arg_is_length(2, dist_gamma)
+  arg_is_positive(dist_gamma)
   n <- length(observed_counts)
+  arg_is_length(n, x, allow_null = TRUE)
   if (!is.null(x)) {
     if (any(is.na(x)))
       cli::cli_abort("x may not contain missing values.")
-    if (length(x) != n)
-      cli::cli_abort("x must be the same length as observed_counts {n}.")
     if (is.unsorted(x, strictly = TRUE))
       cli::cli_abort("x must be sorted and contain no duplicates.")
   } else {
@@ -36,10 +34,7 @@ delay_calculator <- function(observed_counts, x = NULL,
   w <- discretize_gamma(x, dist_gamma[1], dist_gamma[2])
   cw <- cumsum(w)
   regular <- vctrs::vec_unique_count(diff(x)) == 1L
-
-  if (!regular)
-    cli::cli_abort("Uh oh. We don't support irregular x yet...")
-
-  convolved_seq <- convolve(observed_counts, rev(w), type = "open")[1:n] / cw
+  if (!regular) cli::cli_abort("Uh oh. We don't support irregular x yet...")
+  convolved_seq <- stats::convolve(observed_counts, rev(w))[1:n] / cw
   c(convolved_seq[1], convolved_seq[1:(n - 1)])
 }

@@ -44,7 +44,7 @@
 #' @param x a vector of positions at which the counts have been observed. In an
 #'   ideal case, we would observe data at regular intervals (e.g. daily or
 #'   weekly) but this may not always be the case.
-#' @param nlambda Integer. The number of tuning parameters `lambda` at which to
+#' @param nsol Integer. The number of tuning parameters `lambda` at which to
 #'   compute Rt.
 #' @param lambdamin Optional value for the smallest `lambda` to use. This should
 #'   be greater than zero.
@@ -66,14 +66,11 @@
 #' * `convr` if the model converges `convr==TRUE` or not `convr==FALSE`
 #'
 #' @export
-#'
 #' @examples
-#' y <- c(rev(seq(2, 6, by = 1)), seq(2, 6, by = 1))
-#' admm_solver(
-#'   observed_counts = y, weighted_past_counts = rep(1, 10), degree = 1,
-#'   init = admm_initializer(observed_counts = y,
-#'   weighted_past_counts = rep(1, 10), degree = 1)
-#' )
+#' # runs but ugly
+#' y <- rpois(100, dnorm(1:100, 50, 15)*500 + 1)
+#' out <- estimate_rt(y, nsol = 10)
+#' matplot(out$Rt, ty = "l", lty = 1)
 estimate_rt <- function(observed_counts,
                         weighted_past_counts = NULL, # for cv, can omit later
                         degree = 3L,
@@ -87,9 +84,17 @@ estimate_rt <- function(observed_counts,
                         maxiter = 1e4,
                         init = NULL) {
 
-  # create weighted past cases
-  if (is.null(weighted_past_counts))
-    weighted_past_counts <- delay_calculator(observed_counts, x, dist_gamma)
+  arg_is_nonneg_int(degree)
+  arg_is_pos_int(nsol, maxiter)
+  arg_is_scalar(degree, nsol, lambda_min_ratio)
+  arg_is_scalar(lambdamin, lambdamax, allow_null = TRUE)
+  arg_is_positive(lambdamax, allow_null = TRUE)
+  arg_is_positive(dist_gamma)
+  arg_is_length(2, dist_gamma)
+
+  # create weighted past cases, do setup
+  weighted_past_counts <- delay_calculator(observed_counts, x, dist_gamma)
+
   if (is.null(init))
     init <- configure_rt_admm(observed_counts, degree, weighted_past_counts)
   if (!inherits(init, "configure_rt_admm"))
@@ -103,38 +108,41 @@ estimate_rt <- function(observed_counts,
   maxiter <- as.integer(maxiter)
   n <- length(observed_counts)
 
-  # (1) check that counts are non-negative, integer, vector
-  if (any(observed_counts < 0)) cli::cli_abort("`observed_counts` must be non-negative")
-  if (!is.vector(observed_counts)) cli::cli_abort("observed_counts must be a vector")
 
+  if (any(observed_counts < 0))
+    cli::cli_abort("`observed_counts` must be non-negative")
 
-  # (2) checks on lambda, lambdamin, lambdamax
-  lambda_size <- length(lambda)
-  if (lambda_size > 0) {
-    lambdamin <- min(lambda)
-    lambdamax <- max(lambda)
-    nsol <- length(lambda)
+  if (is.null(lambda) || length(lambda) == 0) {
+    lambda <- double(0)
+    if (!(lambda_min_ratio < 1 & lambda_min_ratio >= 0))
+      cli_abort("lambdamin_ratio must be in [0, 1)")
   } else {
+    lambda <- sort(lambda)
+    lambda_min_ratio <- 1e-4
+  }
+
+  if (is.null(lambdamin)) lambdamin <- -1.0
+  if (is.null(lambdamax)) lambdamax <- -1.0
+  if (length(lambda) == 0) {
     msg <- "If lambda is not specified,"
-    if (is.null(lambdamax))
-      cli::cli_abort("{msg} lambdamax must be specified")
-    if (lambda_min_ratio < 0 || lambda_min_ratio > 1)
-      cli::cli_abort("{msg} lambda_min_ratio must be in [0,1]")
-    if (lambdamax < 0)
-      cli::cli_abort("{msg} lambdamax must be positive.")
-    if (lambdamin < 0 && !is.null(lambdamin))
-      cli::cli_abort("{msg} lambdamin must be positive.")
-    if (lambdamin >= lambdamax && !is.null(lambdamin))
+
+    if (lambda_min_ratio >= 1)
+      cli::cli_abort("{msg} lambda_min_ratio must be in [0,1)")
+    if (lambdamin > 0 && lambdamax > 0 && lambdamin >= lambdamax)
       cli::cli_abort("{msg} lambdamin must be < lambdamax.")
   }
 
+  arg_is_numeric(x, allow_null = TRUE)
+  if (!is.null(x)) {
+    arg_is_length(n, x)
+    ord <- order(x)
+    x <- x[ord]
+    y <- y[ord]
+    x <- (x - x[1]) / diff(range(x)) * n # handle possibly odd spacings
+  } else {
+    x <- double(0)
+  }
 
-  # (3) check that x is a double vector of length 0 or n
-  if (is.null(x)) x <- double(0)
-  if (!is.double(x)) x <- as.double(x)
-  if (!is.numeric(x)) cli::cli_abort("x must be a numeric vector")
-  if (!(length(x) == n | length(x) == 0))
-    cli::cli_abort("x must be length 0 or n")
 
   mod <- rtestim_path(
     observed_counts,
@@ -171,29 +179,32 @@ estimate_rt <- function(observed_counts,
 #' We should convert this into an S3 method so that we can pass in a
 #' vector of counts or an admm_initializer object (and overwrite)
 #'
-#' @param observed_counts vector of daily infections
+#' @inheritParams estimate_rt
 #' @param weighted_past_counts the weighted sum of past infections counts with
 #'   corresponding serial interval functions (or its Gamma approximation) as
 #'   weights
-#' @param degree degree of the piecewise polynomial curves to be fitted,
-#'   e.g., degree = 0 corresponds to piecewise constant curves
 #' @param primal_var initial values of log(Rt)
 #' @param auxi_var auxiliary variable in the ADMM algorithm
 #' @param dual_var dual variable in the ADMM algorithm
+#' @param rho admm configuration parameter
+#' @param rho_adjust admm configuration parameter
+#' @param tolerance threshold to assess convergence
+#' @param verbose control printing during fitting algorithm
 #'
-#' @return a list of model parameters with class `admm_initializer`
+#' @return a list of model parameters with class `rt_admm_configuration`
 #'
 #' @export
 configure_rt_admm <- function(observed_counts,
-                                  degree,
-                                  weighted_past_counts = NULL,
-                                  primal_var = NULL,
-                                  auxi_var = NULL,
-                                  dual_var = NULL,
-                                  rho = -1,
-                                  rho_adjust = -1,
-                                  tolerance = 1e-4,
-                                  verbose = 0) {
+                              degree,
+                              weighted_past_counts = NULL,
+                              primal_var = NULL,
+                              auxi_var = NULL,
+                              dual_var = NULL,
+                              rho = -1,
+                              rho_adjust = -1,
+                              tolerance = 1e-4,
+                              verbose = 0) {
+
   n <- length(observed_counts)
   degree <- as.integer(degree)
 
@@ -221,8 +232,6 @@ configure_rt_admm <- function(observed_counts,
 
   if (is.null(primal_var)) {
     if (!is.null(weighted_past_counts)) {
-      # should we divide by n?
-      # what do we do when observed_counts == 0
       primal_var <- log(observed_counts / (n * weighted_past_counts))
     }
   } else {
