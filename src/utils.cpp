@@ -3,6 +3,7 @@
 #include "utils.h"
 
 using namespace Rcpp;
+using namespace arma;
 
 /**
  * Generate a (banded) divided difference matrix of an arbitrary order for
@@ -14,6 +15,10 @@ using namespace Rcpp;
  */
 // [[Rcpp::export]]
 arma::sp_mat buildD(int n, int ord) {
+  if (ord < -1)
+    stop("ord must be non-negative.");
+  if (n <= ord + 1)
+    stop("n must be larger than ord + 1.");
   // stop if not: n > ord + 1; ord + 2 > 0 (; n > 0)
   int c1 = ord + 1;
   int m = n - c1;
@@ -48,7 +53,8 @@ arma::sp_mat buildDx(int n, int ord, const arma::vec& x) {
   arma::sp_mat D1(n - 1, n);
   D1.diag(0) -= 1;
   D1.diag(1) += 1;
-  if (ord == 0) return D1;          // ord = 0 is the same as usual
+  if (ord == 0)
+    return D1;                      // ord = 0 is the same as usual
   arma::sp_mat Dmat = D1;           // output
   arma::sp_mat delx(n - 1, n - 1);  // diagonal matrix adjusting locations
 
@@ -116,13 +122,87 @@ void create_lambda(arma::vec& lambda,
   }
 }
 
-// [[Rcpp::export()]]
-arma::vec create_lambda_test(arma::vec lambda,
-                             double lambdamin = -1,
-                             double lambdamax = -1,
-                             double lambda_min_ratio = 1e-4,
-                             int nsol = 50) {
-  create_lambda(lambda, lambdamin, lambdamax, lambda_min_ratio, nsol);
-  return(lambda);
+/**
+ * define fake signals for gaussian tf
+ */
+// [[Rcpp::export]]
+arma::vec fake_data(arma::vec const& y, arma::vec const& w, arma::vec& theta) {
+  int n = y.size();
+  vec c(n);
+  for (int i = 0; i < n; i++) {
+    if (w[i] * exp(theta[i]) > 1e-3) {
+      c[i] = y[i] * exp(-theta[i]) / w[i] - 1 + theta[i];
+    } else {  // deal with overflow using approximation
+      c[i] = y[i] - exp(theta[i]) / w[i] + theta[i];
+    }
+  }
+  return c;
+}
+
+double pois_obj(arma::vec const& y,
+                arma::vec const& w,
+                arma::vec& theta,
+                double lambda,
+                arma::vec& Dv) {
+  vec v = -y % theta + w % exp(theta);
+  double obj = mean(v) + lambda * norm(Dv, 1);
+  return obj;
+}
+
+/**
+ * solve for step size of IRLS
+ * @param s step size
+ * @param alpha scale adjusting upper bound
+ * @param gamma scale adjusting step size
+ * @param y fake signals
+ */
+// [[Rcpp::export]]
+double line_search(double s,
+                   double lambda,
+                   double alpha,
+                   double gamma,
+                   arma::vec const& y,
+                   arma::vec const& x,
+                   arma::vec const& w,
+                   int n,
+                   int ord,
+                   arma::vec& theta,
+                   arma::vec& theta_old,
+                   arma::vec& c1,
+                   arma::vec& c2,
+                   int M) {
+  vec gradient(n);
+  double grades;
+  vec dir = theta - theta_old;
+
+  // initialize upper bound
+  c1 = dir % (w % exp(theta) - y);
+  double bound = mean(c1);
+  c1.set_size(c2.size());
+  calcDvline(n, ord, x, theta, c1);      // c1 = D * theta
+  calcDvline(n, ord, x, theta_old, c2);  // c2 = D * theta_old
+  bound += lambda * (norm(c1, 1) - norm(c2, 1));
+
+  s = 1;
+  for (int i = 0; i < M; i++) {
+    // compute gradient/ grades
+    gradient = -s * dir % y + w % exp(theta_old + s * dir) - w % exp(theta_old);
+    if (i > 0) {
+      calcDvline(n, ord, x, dir, c1);  // c1 = D * dir;
+      c1 *= s;
+      c1 += c2;  // if s=1, c1 stays same
+    }
+    grades = mean(gradient) + lambda * (norm(c1, 1) - norm(c2, 1));
+
+    // adjust upper bound
+    bound *= alpha * s;
+
+    // check criteria
+    if (grades <= bound)
+      break;
+    else
+      s *= gamma;
+  }
+  return s;
 }
 

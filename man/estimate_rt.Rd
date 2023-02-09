@@ -14,6 +14,7 @@ estimate_rt(
   lambdamin = NULL,
   lambdamax = NULL,
   lambda_min_ratio = 1e-04,
+  algo = c("linear_admm", "irls_admm"),
   maxiter = 10000,
   init = NULL
 )
@@ -22,7 +23,7 @@ estimate_rt(
 \item{observed_counts}{vector of the observed daily infection counts}
 
 \item{degree}{Integer. Degree of the piecewise polynomial curve to be
-estimated. Ror example, `degree = 0` corresponds to a piecewise constant
+estimated. For example, `degree = 1` corresponds to a piecewise constant
 curve.}
 
 \item{dist_gamma}{Vector of length 2. These are the shape and scale for the
@@ -41,7 +42,7 @@ determines the balance between data fidelity and
 smoothness of the estimated Rt; larger `lambda` results in a smoother
 estimate. The default, `NULL`
 results in an automatic computation based on `nlambda`, the largest value
-of `lambda` that would a maximally smooth estimate, and `lambdamin_ratio`.
+of `lambda` that would a maximally smooth estimate, and `lambda_min_ratio`.
 Supplying a value of `lambda` overrides
 this behaviour. It is likely better to supply a
 decreasing sequence of `lambda` values than a single (small) value. If
@@ -59,9 +60,13 @@ be greater than zero.}
 \item{lambda_min_ratio}{If neither `lambda` nor `lambdamin` is specified, the
 program will generate a lambdamin by lambdamax * lambda_min_ratio
 A multiplicative factor for the minimal lambda in the
-`lambda` sequence, where `lambdamin = lambdamin_ratio * lambdamax`.
+`lambda` sequence, where `lambdamin = lambda_min_ratio * lambdamax`.
 A very small value will lead to the solution `Rt = log(observed_counts)`.
 This argument has no effect if there is user-defined `lambda` sequence.}
+
+\item{algo}{the algorithm to be used in computation. `linear_admm`:
+linearized ADMM; `irls_admm`: iteratively reweighted least squares with
+standard ADMM.}
 
 \item{maxiter}{Integer. Maximum number of iterations for the estimation
 algorithm.}
@@ -70,18 +75,20 @@ algorithm.}
 `rt_admm_configuration`.}
 }
 \value{
-An object with S3 class `"poison_rt"`. Among the list components:
-* `observed_counts` the observed daily infection counts
-* `weighted_past_counts` the weighted sum of past infection counts
-* `R` the estimated effective reproduction rate. This is a matrix with
+An object with S3 class `poisson_rt`. Among the list components:
+* `observed_counts` the observed daily infection counts.
+* `x` a vector of positions at which the counts have been observed.
+* `weighted_past_counts` the weighted sum of past infection counts.
+* `Rt` the estimated effective reproduction rate. This is a matrix with
     each column corresponding to one value of `lambda`.
 * `lambda` the value of `lambda` actually used in the algorithm.
-* `niter` the required number of iterations for each value of `lambda`
-* `convr` if the model converges `convr==TRUE` or not `convr==FALSE`
+* `degree` degree of the piecewise polynomial curve to be estimated.
+* `maxiter` maximum number of iterations for the estimation algorithm.
+* `niter` the required number of iterations for each value of `lambda`.
 }
 \description{
 The Effective Reproduction Number \eqn{R_t} of an infectious
-disease can be estimated by solving the smoothnesss penalized Poisson
+disease can be estimated by solving the smoothness penalized Poisson
 regression of the form:
 
 \eqn{R_t = argmin_{\theta} (\frac{1}{n} \sum_{i=1}^n e^{\theta_i} -
@@ -93,8 +100,9 @@ at day \eqn{i}, \eqn{\lambda} is the smoothness penalty, and \eqn{D^{(k+1)}}
 is the \eqn{(k+1)}-th order difference matrix.
 }
 \examples{
-# runs but ugly
-y <- rpois(100, dnorm(1:100, 50, 15)*500 + 1)
-out <- estimate_rt(y, nsol = 10)
-matplot(out$Rt, ty = "l", lty = 1)
+y <- c(rev(seq(2, 6, by = 1)), seq(2, 6, by = 1))
+degree <- 3L
+estimate_rt(y, degree, lambda = .1, algo = "irls_admm",
+  init = rt_admm_configuration(y, degree)
+)
 }

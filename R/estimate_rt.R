@@ -2,7 +2,7 @@
 #'
 #' @description
 #' The Effective Reproduction Number \eqn{R_t} of an infectious
-#' disease can be estimated by solving the smoothnesss penalized Poisson
+#' disease can be estimated by solving the smoothness penalized Poisson
 #' regression of the form:
 #'
 #' \eqn{R_t = argmin_{\theta} (\frac{1}{n} \sum_{i=1}^n e^{\theta_i} -
@@ -52,6 +52,9 @@
 #'   `lambda` sequence, where `lambdamin = lambda_min_ratio * lambdamax`.
 #'   A very small value will lead to the solution `Rt = log(observed_counts)`.
 #'   This argument has no effect if there is user-defined `lambda` sequence.
+#' @param algo the algorithm to be used in computation. `linear_admm`:
+#'   linearized ADMM; `irls_admm`: iteratively reweighted least squares with
+#'   standard ADMM.
 #'
 #' @return An object with S3 class `poisson_rt`. Among the list components:
 #' * `observed_counts` the observed daily infection counts.
@@ -65,6 +68,7 @@
 #' * `niter` the required number of iterations for each value of `lambda`.
 #'
 #' @export
+#'
 #' @examples
 #' # runs but ugly
 #' y <- rpois(100, dnorm(1:100, 50, 15)*500 + 1)
@@ -79,26 +83,28 @@ estimate_rt <- function(observed_counts,
                         lambdamin = NULL,
                         lambdamax = NULL,
                         lambda_min_ratio = 1e-4,
+                        algo = c("linear_admm", "irls_admm"),
                         maxiter = 1e4,
                         init = NULL) {
   arg_is_nonneg_int(degree)
   arg_is_pos_int(nsol, maxiter)
   arg_is_scalar(degree, nsol, lambda_min_ratio)
   arg_is_scalar(lambdamin, lambdamax, allow_null = TRUE)
-  arg_is_positive(lambdamax, allow_null = TRUE)
-  arg_is_positive(dist_gamma)
+  arg_is_positive(lambdamin, lambdamax, allow_null = TRUE)
+  arg_is_positive(lambda_min_ratio, dist_gamma)
   arg_is_length(2, dist_gamma)
+  algo <- match.arg(algo)
 
   # create weighted past cases
   weighted_past_counts <- delay_calculator(observed_counts, x, dist_gamma)
 
   # initialize parameters and variables
   if (is.null(init))
-    init <- configure_rt_admm(observed_counts, degree, weighted_past_counts)
+    init <- rt_admm_configuration(observed_counts, degree, weighted_past_counts)
   if (!inherits(init, "rt_admm_configuration"))
-    cli::cli_abort("`init` must be created with `configure_rt_admm()`.")
+    cli::cli_abort("`init` must be created with `rt_admm_configuration()`.")
   if (is.null(init$primal_var)) {
-    init <- configure_rt_admm(
+    init <- rt_admm_configuration(
       observed_counts, init$degree, weighted_past_counts,
       auxi_var = init$auxi_var, dual_var = init$dual_var)
   }
@@ -143,6 +149,7 @@ estimate_rt <- function(observed_counts,
   }
 
   mod <- rtestim_path(
+    algo,
     observed_counts,
     x,
     weighted_past_counts,
@@ -155,16 +162,19 @@ estimate_rt <- function(observed_counts,
     maxiter = maxiter,
     tolerance = init$tolerance,
     lambda_min_ratio = lambda_min_ratio,
+    ls_alpha = init$alpha,
+    ls_gamma = init$gamma,
     verbose = init$verbose)
 
   structure(
     list(
       observed_counts = observed_counts,
-      x = x %||% 1:n,
+      x = x,
       weighted_past_counts = weighted_past_counts,
       Rt = mod$Rt,
       lambda = mod$lambda,
       degree = mod$degree,
+      maxiter = maxiter,
       niter = mod$niter
     ),
     class = "poisson_rt"
@@ -184,24 +194,26 @@ estimate_rt <- function(observed_counts,
 #' @param primal_var initial values of log(Rt)
 #' @param auxi_var auxiliary variable in the ADMM algorithm
 #' @param dual_var dual variable in the ADMM algorithm
-#' @param rho admm configuration parameter
-#' @param rho_adjust admm configuration parameter
-#' @param tolerance threshold to assess convergence
-#' @param verbose control printing during fitting algorithm
+#' @param alpha Double. A parameter adjusting upper bound in line search algorithm
+#'   in `irls_admm` algorithm.
+#' @param gamma Double. A parameter adjusting step size in line search algorithm
+#'   in `irls_admm` algorithm.
 #'
 #' @return a list of model parameters with class `rt_admm_configuration`
 #'
 #' @export
-configure_rt_admm <- function(observed_counts,
-                              degree,
-                              weighted_past_counts = NULL,
-                              primal_var = NULL,
-                              auxi_var = NULL,
-                              dual_var = NULL,
-                              rho = -1,
-                              rho_adjust = -1,
-                              tolerance = 1e-4,
-                              verbose = 0) {
+rt_admm_configuration <- function(observed_counts,
+                                  degree,
+                                  weighted_past_counts = NULL,
+                                  primal_var = NULL,
+                                  auxi_var = NULL,
+                                  dual_var = NULL,
+                                  rho = -1,
+                                  rho_adjust = -1,
+                                  alpha = 0.5,
+                                  gamma = 0.9,
+                                  tolerance = 1e-4,
+                                  verbose = 0) {
   n <- length(observed_counts)
   degree <- as.integer(degree)
 
@@ -228,16 +240,12 @@ configure_rt_admm <- function(observed_counts,
   }
 
   if (is.null(primal_var)) {
-    if (!is.null(weighted_past_counts)) {
-      # should we divide by n?
-      # what do we do when observed_counts == 0
+    if (!is.null(weighted_past_counts))
       primal_var <- log(observed_counts / (n * weighted_past_counts))
-    }
   } else {
-    if (length(primal_var) != n) {
-      cli::cli_abort("`primal_var` must have length {n}.")
-    }
+    arg_is_length(n, primal_var)
   }
+
   if (is.null(auxi_var)) auxi_var <- double(n - degree)
   else {
     if (length(auxi_var) != n - degree) {
@@ -260,7 +268,9 @@ configure_rt_admm <- function(observed_counts,
       rho = rho,
       rho_adjust = rho_adjust,
       tolerance = tolerance,
-      verbose = verbose
+      alpha = alpha,
+      gamma = gamma,
+      verbose = as.integer(verbose)
     ),
     class = "rt_admm_configuration"
   )

@@ -8,5 +8,6 @@
 
 library(testthat)
 library(rtestim)
+library(Matrix)
 
 test_check("rtestim")

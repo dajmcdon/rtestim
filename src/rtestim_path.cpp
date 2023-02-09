@@ -8,7 +8,8 @@
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-List rtestim_path(arma::vec y,
+List rtestim_path(int algo,
+                  arma::vec y,
                   arma::vec x,  // positions
                   arma::vec w,  // weighted past cases
                   int korder,
@@ -20,9 +21,12 @@ List rtestim_path(arma::vec y,
                   int maxiter = 1e5,
                   double tolerance = 1e-3,
                   double lambda_min_ratio = 1e-4,
+                  double ls_alpha = 0.5,
+                  double ls_gamma = 0.9,
                   int verbose = 0) {
   int n = y.n_elem;
-  if (lambda.size() > 0) nsol = lambda.size();
+  if (lambda.size() > 0)
+    nsol = lambda.size();
 
   // Placeholders for solutions
   arma::mat theta(n, nsol);
