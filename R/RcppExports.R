@@ -37,6 +37,10 @@ buildDx_tilde <- function(n, ord, x) {
     .Call(`_rtestim_buildDx_tilde`, n, ord, x)
 }
 
+create_lambda_test <- function(lambda, lambdamin, lambdamax, lambda_min_ratio, nsol) {
+    .Call(`_rtestim_create_lambda_test`, lambda, lambdamin, lambdamax, lambda_min_ratio, nsol)
+}
+
 fake_data <- function(y, w, theta) {
     .Call(`_rtestim_fake_data`, y, w, theta)
 }

@@ -122,6 +122,16 @@ void create_lambda(arma::vec& lambda,
   }
 }
 
+// [[Rcpp::export()]]
+arma::vec create_lambda_test(arma::vec lambda,
+                             double lambdamin,
+                             double lambdamax,
+                             double lambda_min_ratio,
+                             int nsol) {
+  create_lambda(lambda, lambdamin, lambdamax, lambda_min_ratio, nsol);
+  return (lambda);
+}
+
 /**
  * define fake signals for gaussian tf
  */

@@ -9,6 +9,11 @@ void create_lambda(arma::vec& lambda,
                    double& lambdamax,
                    double& lambda_min_ratio,
                    int& nsol);
+arma::vec create_lambda_test(arma::vec lambda,
+                             double lambdamin = -1,
+                             double lambdamax = -1,
+                             double lambda_min_ratio = 1e-4,
+                             int nsol = 50);
 arma::vec fake_data(arma::vec const& y, arma::vec const& w, arma::vec& theta);
 double pois_obj(arma::vec const& y,
                 arma::vec const& w,
