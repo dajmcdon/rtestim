@@ -89,7 +89,6 @@ estimate_rt <- function(observed_counts,
   arg_is_positive(lambdamax, allow_null = TRUE)
   arg_is_positive(dist_gamma)
   arg_is_length(2, dist_gamma)
-  algo <- match.arg(algo)
 
   # create weighted past cases, do setup
   weighted_past_counts <- delay_calculator(observed_counts, x, dist_gamma)
@@ -106,12 +105,8 @@ estimate_rt <- function(observed_counts,
   maxiter <- as.integer(maxiter)
   n <- length(observed_counts)
 
-  # (1) check that counts are non-negative, integer
-  if (any(counts < 0)) cli::cli_abort("`observed_counts` must be non-negative")
-  # if (!all(rlang::is_intergerish(observed_counts))) not required
-  #  cli::cli_abort("`observed_counts` must be integers")
-
-
+  if (any(observed_counts < 0))
+    cli::cli_abort("`observed_counts` must be non-negative")
 
   if (is.null(lambda) || length(lambda) == 0) {
     lambda <- double(0)
@@ -142,9 +137,6 @@ estimate_rt <- function(observed_counts,
   } else {
     x <- double(0)
   }
-
-  algo <- match(algo, c("linear_admm", "irls_admm"))
-  algo <- as.integer(algo)
 
   mod <- rtestim_path(
     observed_counts,
@@ -194,7 +186,7 @@ estimate_rt <- function(observed_counts,
 #' @return a list of model parameters with class `admm_initializer`
 #'
 #' @export
-rt_admm_configuration <- function(observed_counts,
+configure_rt_admm <- function(observed_counts,
                                   degree,
                                   weighted_past_counts = NULL,
                                   primal_var = NULL,
