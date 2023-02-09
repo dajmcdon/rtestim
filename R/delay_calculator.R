@@ -18,7 +18,8 @@
 #' delay_calculator(rpois(15, 10), dist_gamma = c(2.5, 2.5))
 delay_calculator <- function(observed_counts, x = NULL,
                              dist_gamma = c(2.5, 2.5)) {
-  if (length(dist_gamma) != 2L)
+  arg_is_length(2, dist_gamma)
+  arg_is_positive(dist_gamma)
     cli:cli_abort("dist_gamma must have length 2.")
   if (any(dist_gamma <= 0))
     cli::cli_abort("dist_gamma must be positive.")
