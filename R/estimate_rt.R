@@ -129,7 +129,9 @@ estimate_rt <- function(observed_counts,
   }
 
   # (3) check that x is a double vector of length 0 or n
-  x = x %||% 1:n
+  if (is.null(x) && degree == 0)
+    cli::cli_abort("The combination (x is null) and (degree = 0) is not supported
+                   for now")
   if (!is.numeric(x)) cli::cli_abort("x must be a numeric vector")
   if (!is.double(x)) x = as.double(x)
   if (!(length(x) == n | length(x) == 0))
