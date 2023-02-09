@@ -33,3 +33,7 @@ buildDx_tilde <- function(n, ord, x) {
     .Call(`_rtestim_buildDx_tilde`, n, ord, x)
 }
 
+create_lambda_test <- function(lambda, lambdamin = -1, lambdamax = -1, lambda_min_ratio = 1e-4, nsol = 50L) {
+    .Call(`_rtestim_create_lambda_test`, lambda, lambdamin, lambdamax, lambda_min_ratio, nsol)
+}
+

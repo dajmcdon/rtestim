@@ -82,7 +82,16 @@ estimate_rt <- function(observed_counts,
                         lambda_min_ratio = 1e-4,
                         maxiter = 1e4,
                         init = NULL) {
-  # create weighted past cases
+  arg_is_nonneg_int(degree)
+  arg_is_pos_int(nsol, maxiter)
+  arg_is_scalar(degree, nsol, lambda_min_ratio)
+  arg_is_scalar(lambdamin, lambdamax, allow_null = TRUE)
+  arg_is_positive(lambdamax, allow_null = TRUE)
+  arg_is_positive(dist_gamma)
+  arg_is_length(2, dist_gamma)
+  algo <- match.arg(algo)
+
+  # create weighted past cases, do setup
   weighted_past_counts <- delay_calculator(observed_counts, x, dist_gamma)
   if (is.null(init))
     init <- configure_rt_admm(observed_counts, degree, weighted_past_counts)
@@ -103,29 +112,39 @@ estimate_rt <- function(observed_counts,
   #  cli::cli_abort("`observed_counts` must be integers")
 
 
-  # (2) checks on lambda, lambdamin, lambdamax
-  lambda_size <- length(lambda)
-  if (lambda_size > 0) {
-    nsol <- lambda_size
+
+  if (is.null(lambda) || length(lambda) == 0) {
+    lambda <- double(0)
+    if (!(lambda_min_ratio < 1 & lambda_min_ratio >= 0))
+      cli_abort("lambdamin_ratio must be in [0, 1)")
   } else {
+    lambda <- sort(lambda)
+    lambda_min_ratio <- 1e-4
+  }
+
+  if (is.null(lambdamin)) lambdamin <- -1.0
+  if (is.null(lambdamax)) lambdamax <- -1.0
+  if (length(lambda) == 0) {
     msg <- "If lambda is not specified,"
-    if (lambda_min_ratio < 0 || lambda_min_ratio > 1)
-      cli::cli_abort("{msg} lambda_min_ratio must be in [0,1]")
-    if (lambdamax < 0)
-      cli::cli_abort("{msg} lambdamax must be positive.")
-    if (lambdamin < 0)
-      cli::cli_abort("{msg} lambdamin must be positive.")
-    if (lambdamin >= lambdamax)
+    if (lambda_min_ratio >= 1)
+      cli::cli_abort("{msg} lambda_min_ratio must be in [0,1)")
+    if (lambdamin > 0 && lambdamax > 0 && lambdamin >= lambdamax)
       cli::cli_abort("{msg} lambdamin must be < lambdamax.")
   }
 
+  arg_is_numeric(x, allow_null = TRUE)
+  if (!is.null(x)) {
+    arg_is_length(n, x)
+    ord <- order(x)
+    x <- x[ord]
+    y <- y[ord]
+    x <- (x - x[1]) / diff(range(x)) * n # handle possibly odd spacings
+  } else {
+    x <- double(0)
+  }
 
-  # (3) check that x is a double vector of length 0 or n
-  if (!is.numeric(x)) cli::cli_abort("x must be a numeric vector")
-  if (!is.double(x)) x = as.double(x)
-  if (!(length(x) == n | length(x) == 0))
-    cli::cli_abort("x must be length 0 or n")
-
+  algo <- match(algo, c("linear_admm", "irls_admm"))
+  algo <- as.integer(algo)
 
   mod <- rtestim_path(
     observed_counts,

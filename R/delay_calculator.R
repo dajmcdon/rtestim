@@ -19,15 +19,11 @@ delay_calculator <- function(observed_counts, x = NULL,
                              dist_gamma = c(2.5, 2.5)) {
   arg_is_length(2, dist_gamma)
   arg_is_positive(dist_gamma)
-    cli:cli_abort("dist_gamma must have length 2.")
-  if (any(dist_gamma) <= 0)
-    cli::cli_abort("dist_gamma must be positive.")
   n <- length(observed_counts)
+  arg_is_length(n, x, allow_null = TRUE)
   if (!is.null(x)) {
     if (any(is.na(x)))
       cli::cli_abort("x may not contain missing values.")
-    if (length(x) != n)
-      cli::cli_abort("x must be the same length as observed_counts {n}.")
     if (is.unsorted(x, strictly = TRUE))
       cli::cli_abort("x must be sorted and contain no duplicates.")
   } else {
