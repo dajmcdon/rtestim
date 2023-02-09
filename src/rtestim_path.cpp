@@ -8,8 +8,7 @@
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-List rtestim_path(int algo,
-                  arma::vec y,
+List rtestim_path(arma::vec y,
                   arma::vec x,  // positions
                   arma::vec w,  // weighted past cases
                   int korder,
@@ -21,8 +20,6 @@ List rtestim_path(int algo,
                   int maxiter = 1e5,
                   double tolerance = 1e-3,
                   double lambda_min_ratio = 1e-4,
-                  double ls_alpha = 0.5,
-                  double ls_gamma = 0.9,
                   int verbose = 0) {
   int n = y.n_elem;
   if (lambda.size() > 0) nsol = lambda.size();
@@ -67,20 +64,15 @@ List rtestim_path(int algo,
       break;
     }
 
-    if (i > 0) _rho = (rho < 0) ? lambda(i) : rho;
-    if (verbose > 0) Rcout << ".";
+    if (i > 0) {
+      _rho = (rho < 0) ? lambda(i) : rho;
+    }
+    if (verbose > 0)
+      Rcout << ".";
     Rcpp::checkUserInterrupt();
 
-    switch (algo) {
-      case 1:
-        admm(maxiter, y, x, w, n, korder, beta, alpha, u, lambda(i), _rho,
-             mu * lambda(i), tolerance, iters);  // add rho_adjust?
-        break;
-      case 2:
-        irls_admm(maxiter, n, korder, y, x, w, beta, alpha, u, lambda(i), _rho,
-                  mu * lambda(i), ls_alpha, ls_gamma, Dk, tolerance, iters);
-        break;
-    }
+    admm(maxiter, y, w, n, beta, alpha, u, lambda(i), _rho, mu * lambda(i),
+         DkDk, Dk, tolerance, iters);  // add rho_adjust?
 
     // Store solution
     theta.col(i) = exp(beta);
