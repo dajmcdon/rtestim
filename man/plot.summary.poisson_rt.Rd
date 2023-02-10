@@ -2,7 +2,8 @@
 % Please edit documentation in R/methods.R
 \name{plot.summary.poisson_rt}
 \alias{plot.summary.poisson_rt}
-\title{Plot summary of `poisson_rt` models}
+\title{Plot summary of `poisson_rt` models
+(We may change it to draw multiple curves(estimates) simultaneously.)}
 \usage{
 \method{plot}{summary.poisson_rt}(x, ...)
 }
@@ -16,6 +17,7 @@ a figure
 }
 \description{
 Plot summary of `poisson_rt` models
+(We may change it to draw multiple curves(estimates) simultaneously.)
 }
 \examples{
 y <- c(rev(seq(2, 6, by = 1)), seq(2, 6, by = 1))

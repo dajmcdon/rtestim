@@ -70,24 +70,30 @@ List rtestim_path(int algo,
         Rcout << ".";
       Rcpp::checkUserInterrupt();
 
-    if (i > 0) {
-      _rho = (rho < 0) ? lambda(i) : rho;
+      switch (algo) {
+        case 1:
+          admm(maxiter, y, x, w, n, korder, beta, alpha, u, lambda(i), _rho,
+               mu * lambda(i), tolerance, iters);  // add rho_adjust?
+          break;
+        case 2:
+          irls_admm(maxiter, n, korder, y, x, w, beta, alpha, u, lambda(i),
+                    _rho, mu * lambda(i), ls_alpha, ls_gamma, Dk, tolerance,
+                    iters);
+          break;
+      }
+
+      // Store solution
+      theta.col(i) = exp(beta);
+      niter(i) = iters + 1;
+
+      // Verbose handlers
+      if (verbose > 1)
+        Rcout << niter(i);
+      if (verbose > 2)
+        Rcout << "(" << lambda(i) << ")";
+      if (verbose > 0)
+        Rcout << std::endl;
     }
-    if (verbose > 0)
-      Rcout << ".";
-    Rcpp::checkUserInterrupt();
-
-    admm(maxiter, y, w, n, beta, alpha, u, lambda(i), _rho, mu * lambda(i),
-         DkDk, Dk, tolerance, iters);  // add rho_adjust?
-
-    // Store solution
-    theta.col(i) = exp(beta);
-    niter(i) = iters + 1;
-
-    // Verbose handlers
-    if (verbose > 1) Rcout << niter(i);
-    if (verbose > 2) Rcout << "(" << lambda(i) << ")";
-    if (verbose > 0) Rcout << std::endl;
   }
 
   // Return

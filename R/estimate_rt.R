@@ -64,16 +64,18 @@
 #'     each column corresponding to one value of `lambda`.
 #' * `lambda` the value of `lambda` actually used in the algorithm.
 #' * `degree` degree of the piecewise polynomial curve to be estimated.
-#' * `maxiter` maximum number of iterations for the estimation algorithm.
-#' * `niter` the required number of iterations for each value of `lambda`.
+#' * `convergence` if number of iterations for each value of `lambda` is less
+#'     than the maximum number of iterations for the estimation algorithm.
 #'
 #' @export
 #'
 #' @examples
-#' # runs but ugly
-#' y <- rpois(100, dnorm(1:100, 50, 15)*500 + 1)
-#' out <- estimate_rt(y, nsol = 10)
-#' matplot(out$Rt, ty = "l", lty = 1)
+#' y <- c(rev(seq(2, 6, by = 1)), seq(2, 6, by = 1))
+#' degree <- 3L
+#' estimate_rt(y, degree,
+#'   lambda = .1, algo = "irls_admm",
+#'   init = rt_admm_configuration(y, degree)
+#' )
 estimate_rt <- function(observed_counts,
                         degree = 3L,
                         dist_gamma = c(2.5, 2.5),
@@ -86,8 +88,8 @@ estimate_rt <- function(observed_counts,
                         algo = c("linear_admm", "irls_admm"),
                         maxiter = 1e4,
                         init = NULL) {
-  arg_is_nonneg_int(degree)
-  arg_is_pos_int(nsol, maxiter)
+  # check arguments are of proper types
+  arg_is_pos_int(degree, nsol, maxiter)
   arg_is_scalar(degree, nsol, lambda_min_ratio)
   arg_is_scalar(lambdamin, lambdamax, allow_null = TRUE)
   arg_is_positive(lambdamin, lambdamax, allow_null = TRUE)
@@ -99,45 +101,47 @@ estimate_rt <- function(observed_counts,
   weighted_past_counts <- delay_calculator(observed_counts, x, dist_gamma)
 
   # initialize parameters and variables
-  if (is.null(init))
+  if (is.null(init)) {
     init <- rt_admm_configuration(observed_counts, degree, weighted_past_counts)
-  if (!inherits(init, "rt_admm_configuration"))
+  }
+  if (!inherits(init, "rt_admm_configuration")) {
     cli::cli_abort("`init` must be created with `rt_admm_configuration()`.")
+  }
   if (is.null(init$primal_var)) {
     init <- rt_admm_configuration(
       observed_counts, init$degree, weighted_past_counts,
-      auxi_var = init$auxi_var, dual_var = init$dual_var)
+      auxi_var = init$auxi_var, dual_var = init$dual_var
+    )
   }
-  # validate maxiter
-  maxiter <- as.integer(maxiter)
+
+  # check that degree is less than data length
   n <- length(observed_counts)
-  if (degree >= n)
+  if (degree >= n) {
     cli::cli_abort("`degree` must be less than observed data length.")
-
-
-  if (any(observed_counts < 0))
-    cli::cli_abort("`observed_counts` must be non-negative.")
-
-
-  if (is.null(lambda) || length(lambda) == 0) {
-    lambda <- double(0)
-    if (!(lambda_min_ratio < 1 & lambda_min_ratio >= 0))
-      cli_abort("lambdamin_ratio must be in [0, 1)")
-  } else {
-    lambda <- sort(lambda)
-    lambda_min_ratio <- 1e-4
   }
+
+  # check that observed counts are non-negative
+  if (any(observed_counts < 0)) {
+    cli::cli_abort("`observed_counts` must be non-negative.")
+  }
+
+  # checks on lambda, lambdamin, lambdamax
+  if (is.null(lambda)) lambda <- double(0) # prep for create_lambda
   if (is.null(lambdamin)) lambdamin <- -1.0
   if (is.null(lambdamax)) lambdamax <- -1.0
   if (length(lambda) == 0) {
     msg <- "If lambda is not specified,"
-    if (lambda_min_ratio >= 1)
-      cli::cli_abort("{msg} lambda_min_ratio must be in [0,1)")
-    if (lambdamin > 0 && lambdamax > 0 && lambdamin >= lambdamax)
+    if (lambda_min_ratio >= 1) {
+      cli::cli_abort("{msg} lambda_min_ratio must be in (0,1).")
+    }
+    if (lambdamin > 0 && lambdamax > 0 && lambdamin >= lambdamax) {
       cli::cli_abort("{msg} lambdamin must be < lambdamax.")
+    }
   }
 
-  arg_is_numeric(x, allow_null = TRUE)
+  # check that x is a double vector of length 0 or n
+  x = x %||% 1:n
+  arg_is_numeric(x)
   if (!is.null(x)) {
     arg_is_length(n, x)
     ord <- order(x)
@@ -147,6 +151,10 @@ estimate_rt <- function(observed_counts,
   } else {
     x <- double(0)
   }
+
+  # check algorithm
+  algo <- match(algo, c("linear_admm", "irls_admm"))
+  algo <- as.integer(algo)
 
   mod <- rtestim_path(
     algo,
@@ -164,7 +172,8 @@ estimate_rt <- function(observed_counts,
     lambda_min_ratio = lambda_min_ratio,
     ls_alpha = init$alpha,
     ls_gamma = init$gamma,
-    verbose = init$verbose)
+    verbose = init$verbose
+  )
 
   structure(
     list(
@@ -174,8 +183,7 @@ estimate_rt <- function(observed_counts,
       Rt = mod$Rt,
       lambda = mod$lambda,
       degree = mod$degree,
-      maxiter = maxiter,
-      niter = mod$niter
+      convergence = (mod$niter < maxiter)
     ),
     class = "poisson_rt"
   )
@@ -221,48 +229,34 @@ rt_admm_configuration <- function(observed_counts,
                                   tolerance = 1e-4,
                                   verbose = 0) {
   n <- length(observed_counts)
-  degree <- as.integer(degree)
-
-  if (degree < 0) cli::cli_abort("`degree` must be non-negative. ")
-  if (length(rho) != 1 || !is.numeric(rho)) {
-    cli::cli_warn(c("`rho` must be a numeric scalar.",
-                    i = "Resetting to default value."))
-    rho = -1
-  }
-  if (length(rho_adjust) != 1 || !is.numeric(rho_adjust)) {
-    cli::cli_warn(c("`rho_adjust` must be a numeric scalar.",
-                    i = "Resetting to default value."))
-    rho_adjust = -1
-  }
-  if (length(tolerance) != 1 || !is.numeric(tolerance) || tolerance <= 0) {
-    cli::cli_warn(c("`tolerance` must be a positive scalar.",
-                    i = "Resetting to default value."))
-    tolerance = 1e-4
-  }
-  if (length(verbose) != 1 || !is.numeric(verbose) || verbose < 0) {
-    cli::cli_warn(c("`verbose` must be a non-negative scalar.",
-                    i = "Resetting to default value."))
-    verbose = 0L
+  arg_is_scalar(degree, rho, rho_adjust, alpha, gamma, tolerance, verbose)
+  arg_is_positive(alpha, gamma, tolerance)
+  arg_is_numeric(rho, rho_adjust, tolerance)
+  arg_is_pos_int(degree)
+  arg_is_nonneg_int(verbose)
+  if (alpha >= 1) cli::cli_abort("`alpha` must be in (0, 1).")
+  if (gamma > 1) cli::cli_abort("`gamma` must be in (0, 1].")
+  if (degree >= n) {
+    cli::cli_abort("`degree` must be less than observed data length.")
   }
 
   if (is.null(primal_var)) {
-    if (!is.null(weighted_past_counts))
+    if (!is.null(weighted_past_counts)) {
       primal_var <- log(observed_counts / (n * weighted_past_counts))
+    }
   } else {
     arg_is_length(n, primal_var)
   }
-
-  if (is.null(auxi_var)) auxi_var <- double(n - degree)
-  else {
-    if (length(auxi_var) != n - degree) {
-      cli::cli_abort("`auxi_var` must have length {n - degree}.")
-    }
+  if (is.null(auxi_var)) {
+    auxi_var <- double(n - degree + 1)
+  } else {
+    arg_is_length(n - degree + 1, auxi_var)
   }
-  if (is.null(dual_var)) dual_var <- double(n - degree)
-  else {
-    if (length(dual_var) != n - degree) {
-      cli::cli_abort("`dual_var` must have length {n - degree}.")
-    }
+
+  if (is.null(dual_var)) {
+    dual_var <- double(n - degree + 1)
+  } else {
+    arg_is_length(n - degree + 1, dual_var)
   }
 
   structure(
@@ -276,7 +270,7 @@ rt_admm_configuration <- function(observed_counts,
       tolerance = tolerance,
       alpha = alpha,
       gamma = gamma,
-      verbose = as.integer(verbose)
+      verbose = verbose
     ),
     class = "rt_admm_configuration"
   )

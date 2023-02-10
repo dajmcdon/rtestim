@@ -216,3 +216,118 @@ double line_search(double s,
   return s;
 }
 
+/*
+ * calculate b = D * v in place
+ * @param v vec of size n
+ * @param b vec of size (n - ord)
+ */
+void calcDvline(int n,
+                int ord,
+                arma::vec const& x,
+                arma::vec& v,
+                arma::vec& b) {
+  b = v;
+  int fct = 1;
+  for (int i = 0; i < ord; i++) {
+    if (i != 0)
+      b /= (x.tail(n - i) - x.head(n - i));
+    b = b.tail(n - i - 1) - b.head(n - i - 1);
+    b.resize(n - i - 1);
+  }
+  for (int i = 2; i < ord; i++)
+    fct *= i;
+  b *= fct;
+}
+// [[Rcpp::export]]
+arma::vec calcDvline_slow(int n,
+                          int ord,
+                          arma::vec const& x,
+                          arma::vec& v,
+                          arma::vec& b) {
+  arma::sp_mat D = buildDx_tilde(n, ord, x);
+  b = D * v;
+  return b;
+}
+
+/*
+ * calculate b = D^T * v in place
+ * @param b vec of length n
+ */
+void calcDTvline(int n,
+                 int ord,
+                 arma::vec const& x,
+                 arma::vec& v,
+                 arma::vec& b) {
+  b.head(n - ord) = v;
+  int fct = 1;
+
+  for (int i = ord; i > 0; i--) {
+    b[n - i] = b[n - i - 1];
+    for (int j = n - i - 1; j > 0; j--) {
+      b[j] = b[j - 1] - b[j];
+    }
+    b[0] = -b[0];
+    if (i != 1) {
+      b.head(n - i + 1) /= (x.tail(n - i + 1) - x.head(n - i + 1));
+    }
+  }
+  for (int i = 2; i < ord; i++) {
+    fct *= i;
+  }
+  b *= fct;
+}
+// [[Rcpp::export]]
+arma::vec calcDTvline_slow(int n,
+                           int ord,
+                           arma::vec const& x,
+                           arma::vec& v,
+                           arma::vec& b) {
+  arma::sp_mat D = buildDx_tilde(n, ord, x);
+  b = D.t() * v;
+  return b;
+}
+/*
+ * calculate b = D^T * D * v in place
+ * @param v vec of length n
+ * @param b vec of length n
+ */
+void calcDTDvline(int n,
+                  int ord,
+                  arma::vec const& x,
+                  arma::vec& v,
+                  arma::vec& b) {
+  vec c = v;
+  int fct = 1;
+  for (int i = 0; i < ord; i++) {
+    if (i != 0) {
+      c /= (x.tail(n - i) - x.head(n - i));
+    }
+    c = c.tail(n - i - 1) - c.head(n - i - 1);
+    c.resize(n - i - 1);
+  }
+  b.head(n - ord) = c;
+  for (int i = ord; i > 0; i--) {
+    b[n - i] = b[n - i - 1];
+    for (int j = n - i - 1; j > 0; j--) {
+      b[j] = b[j - 1] - b[j];
+    }
+    b[0] = -b[0];
+    if (i != 1) {
+      b.head(n - i + 1) /= (x.tail(n - i + 1) - x.head(n - i + 1));
+    }
+  }
+  for (int i = 2; i < ord; i++) {
+    fct *= i * i;
+  }
+  b *= fct;
+}
+// [[Rcpp::export]]
+arma::vec calcDTDvline_slow(int n,
+                            int ord,
+                            arma::vec const& x,
+                            arma::vec& v,
+                            arma::vec& b) {
+  arma::sp_mat D = buildDx_tilde(n, ord, x);
+  b = D.t() * D * v;
+  return b;
+}

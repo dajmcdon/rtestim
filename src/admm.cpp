@@ -99,7 +99,7 @@ List admm_testing(int M,
                   double mu,
                   double tol,
                   int iter) {
-  admm(M, y, w, n, theta, z, u, lambda, rho, mu, DD, D, tol, iter);
+  admm(M, y, x, w, n, ord, theta, z, u, lambda, rho, mu, tol, iter);
   List out =
       List::create(Named("y") = y, Named("n") = n, Named("lambda") = lambda,
                    Named("theta") = exp(theta), Named("z") = z, Named("u") = u,
