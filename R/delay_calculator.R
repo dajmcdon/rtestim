@@ -35,6 +35,6 @@ delay_calculator <- function(observed_counts, x = NULL,
   cw <- cumsum(w)
   regular <- vctrs::vec_unique_count(diff(x)) == 1L
   if (!regular) cli::cli_abort("Uh oh. We don't support irregular x yet...")
-  convolved_seq <- stats::convolve(observed_counts, rev(w))[1:n] / cw
+  convolved_seq <- stats::convolve(observed_counts, rev(w), type = "open")[1:n] / cw
   c(convolved_seq[1], convolved_seq[1:(n - 1)])
 }

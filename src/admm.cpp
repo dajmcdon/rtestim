@@ -53,7 +53,7 @@ void admm(int M,
       Rcpp::checkUserInterrupt();
     // update primal variable:
     c = y / n - rho * DD * theta + rho * Dt * (z - u) + mu * theta;
-    c = c / mu + log(w);
+    c = c / mu ;
     c.transform([&](double c) { return update_pois(c, mu, n); });
     theta = c - log(w);
 
