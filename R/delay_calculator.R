@@ -30,32 +30,41 @@ delay_calculator <- function(observed_counts, x = NULL,
     x <- 1:n
   }
 
-  w <- discretize_gamma(x, dist_gamma[1], dist_gamma[2])
-  cw <- cumsum(w)
   regular <- vctrs::vec_unique_count(diff(x)) == 1L
 
   if (!regular) {
     observed_counts <- fill_case_counts(x, observed_counts)
+    n <- length(observed_counts)
+    x <- 1:n
   }
 
+  w <- discretize_gamma(x, dist_gamma[1], dist_gamma[2])
+  cw <- cumsum(w)
   convolved_seq <- stats::convolve(observed_counts, rev(w), type = "open")[1:n] / cw
   c(convolved_seq[1], convolved_seq[1:(n - 1)])
 }
 
 
 
-#' Fill case counts for uneven spacing
+#' Interpolate case counts for uneven spaced time points
 #'
 #' Given observation time points `x` and observed case counts `observed_counts`,
 #' this function finds the minimal difference `m` from consecutive `x` and
-#' construct a full and even `x` with difference `m`. This function then look
-#' for places of missing and f
+#' construct a full and even `x` with difference `m`. This function then find
+#' the missing index and interpolate the observed case counts using
+#' `na.fill` method with argument `fill = "extend"`
 #'
 #' @inheritParams delay_calculator
-#' @return
+#'
+#' @return interpolated `observed_counts`
 #' @export
 #'
 #' @examples
+#' x1 <- c(1,3,4,5,7,9)
+#' o1 <- 2*x1
+#' filled_o1 <- fill_case_counts(x1, o1)
+#' o1_true <- 2*c(1:9)
+#' # o1_true should equal filled_o1
 fill_case_counts <- function(x, observed_counts) {
   min_diff <- min(diff(x))
   full_x <- seq(1, max(x), min_diff)

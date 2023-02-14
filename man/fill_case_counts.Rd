@@ -2,7 +2,7 @@
 % Please edit documentation in R/delay_calculator.R
 \name{fill_case_counts}
 \alias{fill_case_counts}
-\title{Fill case counts for uneven spacing}
+\title{Interpolate case counts for uneven spaced time points}
 \usage{
 fill_case_counts(x, observed_counts)
 }
@@ -13,6 +13,20 @@ weekly) but this may not always be the case.}
 
 \item{observed_counts}{vector of the observed daily infection counts}
 }
+\value{
+interpolated `observed_counts`
+}
 \description{
-Fill case counts for uneven spacing
+Given observation time points `x` and observed case counts `observed_counts`,
+this function finds the minimal difference `m` from consecutive `x` and
+construct a full and even `x` with difference `m`. This function then find
+the missing index and interpolate the observed case counts using
+`na.fill` method with argument `fill = "extend"`
+}
+\examples{
+x1 <- c(1,3,4,5,7,9)
+o1 <- 2*x1
+filled_o1 <- fill_case_counts(x1, o1)
+o1_true <- 2*c(1:9)
+# o1_true should equal filled_o1
 }
