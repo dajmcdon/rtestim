@@ -72,30 +72,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// dptf_weight
-arma::vec dptf_weight(arma::vec y, double lam, arma::vec w);
-RcppExport SEXP _rtestim_dptf_weight(SEXP ySEXP, SEXP lamSEXP, SEXP wSEXP) {
+// dptf_past
+arma::vec dptf_past(arma::vec y, double lam, arma::vec w);
+RcppExport SEXP _rtestim_dptf_past(SEXP ySEXP, SEXP lamSEXP, SEXP wSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::vec >::type y(ySEXP);
     Rcpp::traits::input_parameter< double >::type lam(lamSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type w(wSEXP);
-    rcpp_result_gen = Rcpp::wrap(dptf_weight(y, lam, w));
-    return rcpp_result_gen;
-END_RCPP
-}
-// dptf_past_weight
-arma::vec dptf_past_weight(arma::vec y, double lam, arma::vec x, arma::vec w);
-RcppExport SEXP _rtestim_dptf_past_weight(SEXP ySEXP, SEXP lamSEXP, SEXP xSEXP, SEXP wSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::vec >::type y(ySEXP);
-    Rcpp::traits::input_parameter< double >::type lam(lamSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type x(xSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type w(wSEXP);
-    rcpp_result_gen = Rcpp::wrap(dptf_past_weight(y, lam, x, w));
+    rcpp_result_gen = Rcpp::wrap(dptf_past(y, lam, w));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -265,8 +251,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rtestim_admm_testing", (DL_FUNC) &_rtestim_admm_testing, 14},
     {"_rtestim_admm_gauss", (DL_FUNC) &_rtestim_admm_gauss, 15},
     {"_rtestim_dptf", (DL_FUNC) &_rtestim_dptf, 2},
-    {"_rtestim_dptf_weight", (DL_FUNC) &_rtestim_dptf_weight, 3},
-    {"_rtestim_dptf_past_weight", (DL_FUNC) &_rtestim_dptf_past_weight, 4},
+    {"_rtestim_dptf_past", (DL_FUNC) &_rtestim_dptf_past, 3},
     {"_rtestim_rtestim_path", (DL_FUNC) &_rtestim_rtestim_path, 16},
     {"_rtestim_buildD", (DL_FUNC) &_rtestim_buildD, 2},
     {"_rtestim_buildDx", (DL_FUNC) &_rtestim_buildDx, 3},

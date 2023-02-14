@@ -61,7 +61,7 @@ List rtestim_path(int algo,
   // Outer loop to compute solution path
   for (int i = 0; i < nsol; i++) {
     if (korder == 0) {
-      theta = dptf_past_weight(y, lambda(i), w, x);
+      theta = dptf_past(y, lambda(i), w);
       niter(i) = 0;
     } else {
       if (i > 0)
