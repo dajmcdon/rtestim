@@ -33,7 +33,39 @@ delay_calculator <- function(observed_counts, x = NULL,
   w <- discretize_gamma(x, dist_gamma[1], dist_gamma[2])
   cw <- cumsum(w)
   regular <- vctrs::vec_unique_count(diff(x)) == 1L
-  if (!regular) cli::cli_abort("Uh oh. We don't support irregular x yet...")
-  convolved_seq <- stats::convolve(observed_counts, rev(w))[1:n] / cw
+
+  if (!regular) {
+    observed_counts <- fill_case_counts(x, observed_counts)
+  }
+
+  convolved_seq <- stats::convolve(observed_counts, rev(w), type = "open")[1:n] / cw
   c(convolved_seq[1], convolved_seq[1:(n - 1)])
+}
+
+
+
+#' Fill case counts for uneven spacing
+#'
+#' Given observation time points `x` and observed case counts `observed_counts`,
+#' this function finds the minimal difference `m` from consecutive `x` and
+#' construct a full and even `x` with difference `m`. This function then look
+#' for places of missing and f
+#'
+#' @inheritParams delay_calculator
+#' @return
+#' @export
+#'
+#' @examples
+fill_case_counts <- function(x, observed_counts) {
+  min_diff <- min(diff(x))
+  full_x <- seq(1, max(x), min_diff)
+  n_full <- length(full_x)
+  full_x <- round(full_x, 5) # avoid numerical issue
+  full_case_counts <- rep(NA, n_full)
+
+  missing_idx <- !full_x %in% x
+  non_missing_idx <- full_x %in% x
+  full_case_counts[non_missing_idx] <- observed_counts
+
+  zoo::na.fill(full_case_counts, fill = "extend")
 }
