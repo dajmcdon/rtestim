@@ -64,18 +64,17 @@
 #'     each column corresponding to one value of `lambda`.
 #' * `lambda` the value of `lambda` actually used in the algorithm.
 #' * `degree` degree of the piecewise polynomial curve to be estimated.
+#' * `niter` the required number of iterations for each value of `lambda`
 #' * `convergence` if number of iterations for each value of `lambda` is less
 #'     than the maximum number of iterations for the estimation algorithm.
 #'
 #' @export
 #'
 #' @examples
-#' y <- c(rev(seq(2, 6, by = 1)), seq(2, 6, by = 1))
-#' degree <- 3L
-#' estimate_rt(y, degree,
-#'   lambda = .1, algo = "irls_admm",
-#'   init = rt_admm_configuration(y, degree)
-#' )
+#' # runs but ugly
+#' y <- rpois(100, dnorm(1:100, 50, 15)*500 + 1)
+#' out <- estimate_rt(y, nsol = 10)
+#' matplot(out$Rt, ty = "l", lty = 1)
 estimate_rt <- function(observed_counts,
                         degree = 3L,
                         dist_gamma = c(2.5, 2.5),
@@ -102,13 +101,13 @@ estimate_rt <- function(observed_counts,
 
   # initialize parameters and variables
   if (is.null(init)) {
-    init <- rt_admm_configuration(observed_counts, degree, weighted_past_counts)
+    init <- configure_rt_admm(observed_counts, degree, weighted_past_counts)
   }
   if (!inherits(init, "rt_admm_configuration")) {
-    cli::cli_abort("`init` must be created with `rt_admm_configuration()`.")
+    cli::cli_abort("`init` must be created with `configure_rt_admm()`.")
   }
   if (is.null(init$primal_var)) {
-    init <- rt_admm_configuration(
+    init <- configure_rt_admm(
       observed_counts, init$degree, weighted_past_counts,
       auxi_var = init$auxi_var, dual_var = init$dual_var
     )
@@ -140,8 +139,7 @@ estimate_rt <- function(observed_counts,
   }
 
   # check that x is a double vector of length 0 or n
-  x = x %||% 1:n
-  arg_is_numeric(x)
+  arg_is_numeric(x, allow_null = TRUE)
   if (!is.null(x)) {
     arg_is_length(n, x)
     ord <- order(x)
@@ -156,12 +154,15 @@ estimate_rt <- function(observed_counts,
   algo <- match(algo, c("linear_admm", "irls_admm"))
   algo <- as.integer(algo)
 
+  # convert degrees of estimated curves to be
+  # orders (k) of divided difference matrices:
+  k <- init$degree - 1L
   mod <- rtestim_path(
     algo,
     observed_counts,
     x,
     weighted_past_counts,
-    init$degree - 1L,
+    k,
     lambda = lambda,
     lambdamax = lambdamax,
     lambdamin = lambdamin,
@@ -175,6 +176,7 @@ estimate_rt <- function(observed_counts,
     verbose = init$verbose
   )
 
+  if (length(x) == 0) x <- 1:n
   structure(
     list(
       observed_counts = observed_counts,
@@ -183,6 +185,7 @@ estimate_rt <- function(observed_counts,
       Rt = mod$Rt,
       lambda = mod$lambda,
       degree = mod$degree,
+      niter = mod$niter,
       convergence = (mod$niter < maxiter)
     ),
     class = "poisson_rt"
@@ -216,7 +219,7 @@ estimate_rt <- function(observed_counts,
 #' @return a list of model parameters with class `rt_admm_configuration`
 #'
 #' @export
-rt_admm_configuration <- function(observed_counts,
+configure_rt_admm <- function(observed_counts,
                                   degree,
                                   weighted_past_counts = NULL,
                                   primal_var = NULL,

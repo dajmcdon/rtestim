@@ -83,6 +83,7 @@ An object with S3 class `poisson_rt`. Among the list components:
     each column corresponding to one value of `lambda`.
 * `lambda` the value of `lambda` actually used in the algorithm.
 * `degree` degree of the piecewise polynomial curve to be estimated.
+* `niter` the required number of iterations for each value of `lambda`
 * `convergence` if number of iterations for each value of `lambda` is less
     than the maximum number of iterations for the estimation algorithm.
 }
@@ -100,10 +101,8 @@ at day \eqn{i}, \eqn{\lambda} is the smoothness penalty, and \eqn{D^{(k+1)}}
 is the \eqn{(k+1)}-th order difference matrix.
 }
 \examples{
-y <- c(rev(seq(2, 6, by = 1)), seq(2, 6, by = 1))
-degree <- 3L
-estimate_rt(y, degree,
-  lambda = .1, algo = "irls_admm",
-  init = rt_admm_configuration(y, degree)
-)
+# runs but ugly
+y <- rpois(100, dnorm(1:100, 50, 15)*500 + 1)
+out <- estimate_rt(y, nsol = 10)
+matplot(out$Rt, ty = "l", lty = 1)
 }

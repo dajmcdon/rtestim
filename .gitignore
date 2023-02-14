@@ -8,8 +8,4 @@ src/*.dll
 *.swp
 *DS_Store
 *.Rapp.history
-.git
-.github
-.Rbuildignore
 .vscode
-.gitignore

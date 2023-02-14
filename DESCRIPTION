@@ -12,14 +12,13 @@ Description: More about what it does (maybe more than one line) Use four
 License: MIT + file LICENSE
 Imports: 
     cli,
-    dplyr,
-    ggplot2,
     magrittr,
     Matrix,
     methods,
     Rcpp,
     rlang,
-    vctrs
+    vctrs,
+    dplyr
 Suggests: 
     testthat (>= 3.0.0)
 LinkingTo: 
