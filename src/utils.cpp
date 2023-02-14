@@ -229,7 +229,7 @@ void calcDvline(int n,
   b = v;
   int fct = 1;
   for (int i = 0; i < ord; i++) {
-    if (i != 0)
+    if (i != 0 && x.size() > 0)
       b /= (x.tail(n - i) - x.head(n - i));
     b = b.tail(n - i - 1) - b.head(n - i - 1);
     b.resize(n - i - 1);
@@ -238,6 +238,10 @@ void calcDvline(int n,
     fct *= i;
   b *= fct;
 }
+
+/*
+ * for testing `calcDvline`
+ */
 // [[Rcpp::export]]
 arma::vec calcDvline_slow(int n,
                           int ord,
@@ -267,7 +271,7 @@ void calcDTvline(int n,
       b[j] = b[j - 1] - b[j];
     }
     b[0] = -b[0];
-    if (i != 1) {
+    if (i != 1 && x.size() > 0) {
       b.head(n - i + 1) /= (x.tail(n - i + 1) - x.head(n - i + 1));
     }
   }
@@ -276,6 +280,10 @@ void calcDTvline(int n,
   }
   b *= fct;
 }
+
+/*
+ * for testing `calcDTvline`
+ */
 // [[Rcpp::export]]
 arma::vec calcDTvline_slow(int n,
                            int ord,
@@ -286,6 +294,7 @@ arma::vec calcDTvline_slow(int n,
   b = D.t() * v;
   return b;
 }
+
 /*
  * calculate b = D^T * D * v in place
  * @param v vec of length n
@@ -299,7 +308,7 @@ void calcDTDvline(int n,
   vec c = v;
   int fct = 1;
   for (int i = 0; i < ord; i++) {
-    if (i != 0) {
+    if (i != 0 && x.size() > 0) {
       c /= (x.tail(n - i) - x.head(n - i));
     }
     c = c.tail(n - i - 1) - c.head(n - i - 1);
@@ -312,7 +321,7 @@ void calcDTDvline(int n,
       b[j] = b[j - 1] - b[j];
     }
     b[0] = -b[0];
-    if (i != 1) {
+    if (i != 1 && x.size() > 0) {
       b.head(n - i + 1) /= (x.tail(n - i + 1) - x.head(n - i + 1));
     }
   }
@@ -321,6 +330,10 @@ void calcDTDvline(int n,
   }
   b *= fct;
 }
+
+/*
+ * for testing `calcDTDvline`
+ */
 // [[Rcpp::export]]
 arma::vec calcDTDvline_slow(int n,
                             int ord,
