@@ -37,7 +37,6 @@ delay_calculator <- function(observed_counts, x = NULL,
     n <- length(observed_counts)
     x <- 1:n
   }
-  if (observed_counts[1] == 0) observed_counts[1] = 1
   w <- discretize_gamma(x, dist_gamma[1], dist_gamma[2])
   cw <- cumsum(w)
   convolved_seq <- stats::convolve(observed_counts, rev(w), type = "open")[1:n] / cw

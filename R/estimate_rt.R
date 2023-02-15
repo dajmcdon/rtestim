@@ -105,6 +105,9 @@ estimate_rt <- function(observed_counts,
   if (any(observed_counts < 0))
     cli::cli_abort("`observed_counts` must be non-negative")
 
+  if (observed_counts[1] == 0 || is.na(observed_counts[1]))
+    cli::cli_abort("`observed_counts` must start with positive count")
+
   if (is.null(lambda) || length(lambda) == 0) {
     lambda <- double(0)
     if (!(lambda_min_ratio < 1 & lambda_min_ratio >= 0))
@@ -222,16 +225,6 @@ configure_rt_admm <- function(observed_counts,
 
   if (is.null(primal_var)) {
     if (!is.null(weighted_past_counts)) {
-      # should we divide by n?
-      # what do we do when observed_counts == 0
-      obs_zero <- which(observed_counts == 0)
-      # if (any(obs_zero)) {
-      #   observed_counts_no_0 <- observed_counts
-      #   observed_counts_no_0[obs_zero] = 1
-      #   primal_var <- log(observed_counts_no_0 / (n * weighted_past_counts))
-      # } else {
-      #   primal_var <- log(observed_counts / (n * weighted_past_counts))
-      # }
       primal_var <- log(observed_counts / (n * weighted_past_counts))
     }
   } else {
