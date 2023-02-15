@@ -224,6 +224,14 @@ configure_rt_admm <- function(observed_counts,
     if (!is.null(weighted_past_counts)) {
       # should we divide by n?
       # what do we do when observed_counts == 0
+      obs_zero <- which(observed_counts == 0)
+      # if (any(obs_zero)) {
+      #   observed_counts_no_0 <- observed_counts
+      #   observed_counts_no_0[obs_zero] = 1
+      #   primal_var <- log(observed_counts_no_0 / (n * weighted_past_counts))
+      # } else {
+      #   primal_var <- log(observed_counts / (n * weighted_past_counts))
+      # }
       primal_var <- log(observed_counts / (n * weighted_past_counts))
     }
   } else {
