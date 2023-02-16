@@ -72,7 +72,7 @@
 #'
 #' @examples
 #' # runs but ugly
-#' y <- rpois(100, dnorm(1:100, 50, 15)*500 + 1)
+#' y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
 #' out <- estimate_rt(y, nsol = 10)
 #' matplot(out$Rt, ty = "l", lty = 1)
 estimate_rt <- function(observed_counts,
@@ -97,6 +97,10 @@ estimate_rt <- function(observed_counts,
   algo <- match.arg(algo)
 
   # create weighted past cases
+  if (any(observed_counts < 0))
+    cli::cli_abort("`observed_counts` must be non-negative")
+  if (observed_counts[1] == 0 || is.na(observed_counts[1]))
+    cli::cli_abort("`observed_counts` must start with positive count")
   weighted_past_counts <- delay_calculator(observed_counts, x, dist_gamma)
 
   # initialize parameters and variables
@@ -115,14 +119,12 @@ estimate_rt <- function(observed_counts,
 
   # check that degree is less than data length
   n <- length(observed_counts)
-  if (degree >= n) {
+  if (degree >= n)
     cli::cli_abort("`degree` must be less than observed data length.")
-  }
 
   # check that observed counts are non-negative
-  if (any(observed_counts < 0)) {
+  if (any(observed_counts < 0))
     cli::cli_abort("`observed_counts` must be non-negative.")
-  }
 
   # checks on lambda, lambdamin, lambdamax
   if (is.null(lambda)) lambda <- double(0) # prep for create_lambda
