@@ -162,7 +162,8 @@ estimate_rt <- function(observed_counts,
       Rt = mod$Rt,
       lambda = mod$lambda,
       degree = mod$degree,
-      niter = mod$niter
+      niter = mod$niter,
+      convergence = (mod$niter < maxiter)
     ),
     class = "poisson_rt"
   )

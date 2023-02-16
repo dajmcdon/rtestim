@@ -1,4 +1,19 @@
 
+
+#' Print `poisson_rt` object
+#'
+#' @param x
+#' @param ...
+#'
+#' @return
+#' @exportS3Method print poisson_rt
+#'
+#' @examples
+print.poisson_rt <- function(x, ...) {
+  cat("Algorithm convergence status:", x$convergence, "\n")
+  cat("With degree:", x$degree, "and lambda:", x$lambda)
+}
+
 #' Summary of the `poisson_rt` object
 #'
 #' @param object
@@ -36,21 +51,20 @@ plot.poisson_rt <- function(x, ...) {
   observed_counts <- x$observed_counts
   Rt <- x$Rt
   weighted_past_counts <- x$weighted_past_counts
-  obs_freq <- x$x
+  # obs_freq <- x$x
   signal <- Rt*weighted_past_counts
-
-  fig_cases <- ggplot2::ggplot(data.frame(obs_freq = obs_freq,
+  fig_cases <- ggplot2::ggplot(data.frame(idx = 1:length(signal),
                                           observed_counts = observed_counts,
                                           signal = signal))+
-    ggplot2::geom_point(aes(x = obs_freq, y = observed_counts))+
-    ggplot2::geom_line(aes(x = obs_freq, y = signal))+
+    ggplot2::geom_point(aes(x = idx, y = observed_counts))+
+    ggplot2::geom_line(aes(x = idx, y = signal))+
     ggplot2::labs(x = "Time", y = "Daily infection counts (on dots)",
                   title = "Estimated piecewise polynomial curve (in line)") +
     ggplot2::theme_bw()
 
-  fig_rt <- ggplot(data.frame(obs_freq = obs_freq,
+  fig_rt <- ggplot(data.frame(idx = 1:length(Rt),
                               Rt = Rt))+
-    ggplot2::geom_line(aes(x = obs_freq, y = Rt), col = "#14754C") +
+    ggplot2::geom_line(aes(x = idx, y = Rt), col = "#14754C") +
     ggplot2::labs(x = "Time", y = "Estimated Rt",
                   title = "Estimated Rt") +
     ggplot2::theme_bw()
