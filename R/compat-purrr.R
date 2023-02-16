@@ -32,16 +32,29 @@ map_chr <- function(.x, .f, ...) {
   .rlang_purrr_map_mold(.x, .f, character(1), ...)
 }
 
+.check_list_of_data_frames <- function (x, error_call = rlang::caller_env()) {
+  vctrs::vec_check_list(x, call = error_call)
+  is_df_or_null <- map_lgl(x, function(x) is.data.frame(x) || is.null(x))
+  if (all(is_df_or_null)) return()
+  bad <- which(!is_df_or_null)
+  cli::cli_abort(
+    c("Each element of {.arg x} must be either a data frame or {.code NULL}.",
+      i = "Elements {bad} are not."), arg = "x", call = error_call
+  )
+}
+
 map_dfr <- function(.x, .f, ..., .id = NULL) {
   .f <- rlang::as_function(.f, env = rlang::global_env())
   res <- map(.x, .f, ...)
-  dplyr::bind_rows(res, .id = .id)
+  .check_list_of_data_frames(res)
+  vctrs::vec_rbind(!!!res, .names_to = .id)
 }
 
 map2_dfr <- function(.x, .y, .f, ..., .id = NULL) {
   .f <- rlang::as_function(.f, env = rlang::global_env())
   res <- map2(.x, .y, .f, ...)
-  dplyr::bind_rows(res, .id = .id)
+  .check_list_of_data_frames(res)
+  vctrs::vec_rbind(!!!res, .names_to = .id)
 }
 
 .rlang_purrr_map_mold <- function(.x, .f, .mold, ...) {
