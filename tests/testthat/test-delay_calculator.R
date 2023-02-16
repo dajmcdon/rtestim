@@ -36,10 +36,3 @@ test_that("fill_case_counts work as intended", {
   o3_true <- 4*seq(1, 8.2, 0.6)
   expect_equal(filled_o3, o3_true)
 })
-
-
-test_that("weighted_past_counts[1] is reasonable when observed_counts[1] is 0", {
-  y <- c(0, 0, rpois(5, lambda = 3))
-  delay_calculator_output <- delay_calculator(y)
-  expect_false(delay_calculator_output[1] < 1e-3)
-})

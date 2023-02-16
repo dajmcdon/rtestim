@@ -87,6 +87,12 @@ estimate_rt <- function(observed_counts,
   arg_is_positive(dist_gamma)
   arg_is_length(2, dist_gamma)
 
+  if (any(observed_counts < 0))
+    cli::cli_abort("`observed_counts` must be non-negative")
+
+  if (observed_counts[1] == 0 || is.na(observed_counts[1]))
+    cli::cli_abort("`observed_counts` must start with positive count")
+
   # create weighted past cases, do setup
   weighted_past_counts <- delay_calculator(observed_counts, x, dist_gamma)
   if (is.null(init))
@@ -102,11 +108,6 @@ estimate_rt <- function(observed_counts,
   maxiter <- as.integer(maxiter)
   n <- length(observed_counts)
 
-  if (any(observed_counts < 0))
-    cli::cli_abort("`observed_counts` must be non-negative")
-
-  if (observed_counts[1] == 0 || is.na(observed_counts[1]))
-    cli::cli_abort("`observed_counts` must start with positive count")
 
   if (is.null(lambda) || length(lambda) == 0) {
     lambda <- double(0)
