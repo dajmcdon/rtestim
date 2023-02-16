@@ -19,7 +19,8 @@ Imports:
     methods,
     Rcpp,
     rlang,
-    vctrs
+    vctrs,
+    zoo
 Suggests: 
     testthat (>= 3.0.0)
 LinkingTo: 
