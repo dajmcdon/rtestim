@@ -204,8 +204,8 @@ void irls_admm(int M,
 
     theta_old = theta;
 
-    // define new(fake) data for least squares problem
-    c1 = fake_data(y, w, theta);
+    // define new(Gaussianized) data for least squares problem
+    c1 = gaussianized_data(y, w, theta);
     // solve least squares problem (Gaussian TF)
     theta = admm_gauss(M, n, ord, c1, x, w, theta, z, u, rho, lam_z, r_norm,
                        s_norm, DD, tol);

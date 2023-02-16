@@ -14,7 +14,9 @@ arma::vec create_lambda_test(arma::vec lambda,
                              double lambdamax = -1,
                              double lambda_min_ratio = 1e-4,
                              int nsol = 50);
-arma::vec fake_data(arma::vec const& y, arma::vec const& w, arma::vec& theta);
+arma::vec gaussianized_data(arma::vec const& y,
+                            arma::vec const& w,
+                            arma::vec& theta);
 double pois_obj(arma::vec const& y,
                 arma::vec const& w,
                 arma::vec& theta,

@@ -133,10 +133,12 @@ arma::vec create_lambda_test(arma::vec lambda,
 }
 
 /**
- * define fake signals for gaussian tf
+ * define Gaussianized signals for gaussian tf
  */
 // [[Rcpp::export]]
-arma::vec fake_data(arma::vec const& y, arma::vec const& w, arma::vec& theta) {
+arma::vec gaussianized_data(arma::vec const& y,
+                            arma::vec const& w,
+                            arma::vec& theta) {
   int n = y.size();
   vec c(n);
   for (int i = 0; i < n; i++) {
@@ -164,7 +166,7 @@ double pois_obj(arma::vec const& y,
  * @param s step size
  * @param alpha scale adjusting upper bound
  * @param gamma scale adjusting step size
- * @param y fake signals
+ * @param y Gaussianized signals
  */
 // [[Rcpp::export]]
 double line_search(double s,
