@@ -76,7 +76,7 @@
 #' out <- estimate_rt(y, nsol = 10)
 #' matplot(out$Rt, ty = "l", lty = 1)
 #'
-#' out0 <- estimate_rt(y, degree = 0L, nsol = 10)
+#' out0 <- estimate_rt(y, degree = 1L, nsol = 10)
 #' matplot(out0$Rt, ty = "l", lty = 1)
 estimate_rt <- function(observed_counts,
                         degree = 3L,

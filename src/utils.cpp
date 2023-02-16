@@ -15,11 +15,9 @@ using namespace arma;
  */
 // [[Rcpp::export]]
 arma::sp_mat buildD(int n, int ord) {
-  if (ord < -1)
-    stop("ord must be non-negative.");
-  if (n <= ord + 1)
-    stop("n must be larger than ord + 1.");
-  // stop if not: n > ord + 1; ord + 2 > 0 (; n > 0)
+  if (ord < -1) stop("ord must be non-negative."); // ord == -1 results in Id.
+  if (n <= ord + 1) stop("n must be larger than ord + 1.");
+
   int c1 = ord + 1;
   int m = n - c1;
   arma::sp_mat D(m, n);
@@ -53,8 +51,7 @@ arma::sp_mat buildDx(int n, int ord, const arma::vec& x) {
   arma::sp_mat D1(n - 1, n);
   D1.diag(0) -= 1;
   D1.diag(1) += 1;
-  if (ord == 0)
-    return D1;                      // ord = 0 is the same as usual
+  if (ord == 0) return D1;          // ord = 0 is the same as usual
   arma::sp_mat Dmat = D1;           // output
   arma::sp_mat delx(n - 1, n - 1);  // diagonal matrix adjusting locations
 
@@ -142,10 +139,10 @@ arma::vec gaussianized_data(arma::vec const& y,
   int n = y.size();
   vec c(n);
   for (int i = 0; i < n; i++) {
-    if (w[i] * exp(theta[i]) > 1e-3) {
-      c[i] = y[i] * exp(-theta[i]) / w[i] - 1 + theta[i];
+    if (w(i) * exp(theta(i)) > 1e-3) {
+      c(i) = y(i) * exp(-theta(i)) / w(i) - 1 + theta(i);
     } else {  // deal with overflow using approximation
-      c[i] = y[i] - exp(theta[i]) / w[i] + theta[i];
+      c(i) = y(i) - exp(theta(i)) / w(i) + theta(i);
     }
   }
   return c;
