@@ -75,6 +75,9 @@
 #' y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
 #' out <- estimate_rt(y, nsol = 10)
 #' matplot(out$Rt, ty = "l", lty = 1)
+#'
+#' out0 <- estimate_rt(y, degree = 0L, nsol = 10)
+#' matplot(out0$Rt, ty = "l", lty = 1)
 estimate_rt <- function(observed_counts,
                         degree = 3L,
                         dist_gamma = c(2.5, 2.5),
@@ -222,17 +225,17 @@ estimate_rt <- function(observed_counts,
 #'
 #' @export
 configure_rt_admm <- function(observed_counts,
-                                  degree,
-                                  weighted_past_counts = NULL,
-                                  primal_var = NULL,
-                                  auxi_var = NULL,
-                                  dual_var = NULL,
-                                  rho = -1,
-                                  rho_adjust = -1,
-                                  alpha = 0.5,
-                                  gamma = 0.9,
-                                  tolerance = 1e-4,
-                                  verbose = 0) {
+                              degree,
+                              weighted_past_counts = NULL,
+                              primal_var = NULL,
+                              auxi_var = NULL,
+                              dual_var = NULL,
+                              rho = -1,
+                              rho_adjust = -1,
+                              alpha = 0.5,
+                              gamma = 0.9,
+                              tolerance = 1e-4,
+                              verbose = 0) {
   n <- length(observed_counts)
   arg_is_scalar(degree, rho, rho_adjust, alpha, gamma, tolerance, verbose)
   arg_is_positive(alpha, gamma, tolerance)
@@ -252,17 +255,11 @@ configure_rt_admm <- function(observed_counts,
   } else {
     arg_is_length(n, primal_var)
   }
-  if (is.null(auxi_var)) {
-    auxi_var <- double(n - degree + 1)
-  } else {
-    arg_is_length(n - degree + 1, auxi_var)
-  }
+  if (is.null(auxi_var)) auxi_var <- double(n - degree + 1)
+  else arg_is_length(n - degree + 1, auxi_var)
 
-  if (is.null(dual_var)) {
-    dual_var <- double(n - degree + 1)
-  } else {
-    arg_is_length(n - degree + 1, dual_var)
-  }
+  if (is.null(dual_var)) dual_var <- double(n - degree + 1)
+  else arg_is_length(n - degree + 1, dual_var)
 
   structure(
     list(

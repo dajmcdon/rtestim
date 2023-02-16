@@ -105,4 +105,7 @@ is the \eqn{(k+1)}-th order difference matrix.
 y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
 out <- estimate_rt(y, nsol = 10)
 matplot(out$Rt, ty = "l", lty = 1)
+
+out0 <- estimate_rt(y, degree = 0L, nsol = 10)
+matplot(out0$Rt, ty = "l", lty = 1)
 }

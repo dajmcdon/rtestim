@@ -129,7 +129,7 @@ arma::vec create_lambda_test(arma::vec lambda,
                              double lambda_min_ratio,
                              int nsol) {
   create_lambda(lambda, lambdamin, lambdamax, lambda_min_ratio, nsol);
-  return (lambda);
+  return lambda;
 }
 
 /**
@@ -210,10 +210,8 @@ double line_search(double s,
     bound *= alpha * s;
 
     // check criteria
-    if (grades <= bound)
-      break;
-    else
-      s *= gamma;
+    if (grades <= bound) break;
+    else s *= gamma;
   }
   return s;
 }
@@ -231,13 +229,11 @@ void calcDvline(int n,
   b = v;
   int fct = 1;
   for (int i = 0; i < ord; i++) {
-    if (i != 0 && x.size() > 0)
-      b /= (x.tail(n - i) - x.head(n - i));
+    if (i != 0 && x.size() > 0) b /= (x.tail(n - i) - x.head(n - i));
     b = b.tail(n - i - 1) - b.head(n - i - 1);
     b.resize(n - i - 1);
   }
-  for (int i = 2; i < ord; i++)
-    fct *= i;
+  for (int i = 2; i < ord; i++) fct *= i;
   b *= fct;
 }
 
@@ -268,18 +264,14 @@ void calcDTvline(int n,
   int fct = 1;
 
   for (int i = ord; i > 0; i--) {
-    b[n - i] = b[n - i - 1];
-    for (int j = n - i - 1; j > 0; j--) {
-      b[j] = b[j - 1] - b[j];
-    }
+    b(n - i) = b(n - i - 1);
+    for (int j = n - i - 1; j > 0; j--) b(j) = b(j - 1) - b(j);
     b[0] = -b[0];
     if (i != 1 && x.size() > 0) {
       b.head(n - i + 1) /= (x.tail(n - i + 1) - x.head(n - i + 1));
     }
   }
-  for (int i = 2; i < ord; i++) {
-    fct *= i;
-  }
+  for (int i = 2; i < ord; i++) fct *= i;
   b *= fct;
 }
 
@@ -310,26 +302,20 @@ void calcDTDvline(int n,
   vec c = v;
   int fct = 1;
   for (int i = 0; i < ord; i++) {
-    if (i != 0 && x.size() > 0) {
-      c /= (x.tail(n - i) - x.head(n - i));
-    }
+    if (i != 0 && x.size() > 0) c /= (x.tail(n - i) - x.head(n - i));
     c = c.tail(n - i - 1) - c.head(n - i - 1);
     c.resize(n - i - 1);
   }
   b.head(n - ord) = c;
   for (int i = ord; i > 0; i--) {
-    b[n - i] = b[n - i - 1];
-    for (int j = n - i - 1; j > 0; j--) {
-      b[j] = b[j - 1] - b[j];
-    }
+    b(n - i) = b(n - i - 1);
+    for (int j = n - i - 1; j > 0; j--) b(j) = b(j - 1) - b(j);
     b[0] = -b[0];
     if (i != 1 && x.size() > 0) {
       b.head(n - i + 1) /= (x.tail(n - i + 1) - x.head(n - i + 1));
     }
   }
-  for (int i = 2; i < ord; i++) {
-    fct *= i * i;
-  }
+  for (int i = 2; i < ord; i++) fct *= i * i;
   b *= fct;
 }
 

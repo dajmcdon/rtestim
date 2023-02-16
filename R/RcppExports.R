@@ -37,8 +37,8 @@ create_lambda_test <- function(lambda, lambdamin, lambdamax, lambda_min_ratio, n
     .Call(`_rtestim_create_lambda_test`, lambda, lambdamin, lambdamax, lambda_min_ratio, nsol)
 }
 
-fake_data <- function(y, w, theta) {
-    .Call(`_rtestim_fake_data`, y, w, theta)
+gaussianized_data <- function(y, w, theta) {
+    .Call(`_rtestim_gaussianized_data`, y, w, theta)
 }
 
 line_search <- function(s, lambda, alpha, gamma, y, x, w, n, ord, theta, theta_old, c1, c2, M) {

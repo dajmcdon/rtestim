@@ -164,16 +164,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// fake_data
-arma::vec fake_data(arma::vec const& y, arma::vec const& w, arma::vec& theta);
-RcppExport SEXP _rtestim_fake_data(SEXP ySEXP, SEXP wSEXP, SEXP thetaSEXP) {
+// gaussianized_data
+arma::vec gaussianized_data(arma::vec const& y, arma::vec const& w, arma::vec& theta);
+RcppExport SEXP _rtestim_gaussianized_data(SEXP ySEXP, SEXP wSEXP, SEXP thetaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::vec const& >::type y(ySEXP);
     Rcpp::traits::input_parameter< arma::vec const& >::type w(wSEXP);
     Rcpp::traits::input_parameter< arma::vec& >::type theta(thetaSEXP);
-    rcpp_result_gen = Rcpp::wrap(fake_data(y, w, theta));
+    rcpp_result_gen = Rcpp::wrap(gaussianized_data(y, w, theta));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -257,7 +257,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rtestim_buildDx", (DL_FUNC) &_rtestim_buildDx, 3},
     {"_rtestim_buildDx_tilde", (DL_FUNC) &_rtestim_buildDx_tilde, 3},
     {"_rtestim_create_lambda_test", (DL_FUNC) &_rtestim_create_lambda_test, 5},
-    {"_rtestim_fake_data", (DL_FUNC) &_rtestim_fake_data, 3},
+    {"_rtestim_gaussianized_data", (DL_FUNC) &_rtestim_gaussianized_data, 3},
     {"_rtestim_line_search", (DL_FUNC) &_rtestim_line_search, 14},
     {"_rtestim_calcDvline_slow", (DL_FUNC) &_rtestim_calcDvline_slow, 5},
     {"_rtestim_calcDTvline_slow", (DL_FUNC) &_rtestim_calcDTvline_slow, 5},

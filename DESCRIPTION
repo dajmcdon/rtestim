@@ -18,7 +18,6 @@ Imports:
     Rcpp,
     rlang,
     vctrs,
-    dplyr,
     zoo
 Suggests: 
     testthat (>= 3.0.0)
