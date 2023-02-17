@@ -25,6 +25,10 @@ rtestim_path <- function(algo, y, x, w, korder, lambda, lambdamax = -1, lambdami
     .Call(`_rtestim_rtestim_path`, algo, y, x, w, korder, lambda, lambdamax, lambdamin, nsol, rho, maxiter, maxiter_inner, tolerance, lambda_min_ratio, ls_alpha, ls_gamma, verbose)
 }
 
+get_Dtil <- function(k, xd) {
+    .Call(`_rtestim_get_Dtil`, k, xd)
+}
+
 buildD <- function(n, ord) {
     .Call(`_rtestim_buildD`, n, ord)
 }

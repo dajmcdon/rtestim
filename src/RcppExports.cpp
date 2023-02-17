@@ -2,6 +2,7 @@
 // Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 #include <RcppArmadillo.h>
+#include <RcppEigen.h>
 #include <Rcpp.h>
 
 using namespace Rcpp;
@@ -136,6 +137,18 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type ls_gamma(ls_gammaSEXP);
     Rcpp::traits::input_parameter< int >::type verbose(verboseSEXP);
     rcpp_result_gen = Rcpp::wrap(rtestim_path(algo, y, x, w, korder, lambda, lambdamax, lambdamin, nsol, rho, maxiter, maxiter_inner, tolerance, lambda_min_ratio, ls_alpha, ls_gamma, verbose));
+    return rcpp_result_gen;
+END_RCPP
+}
+// get_Dtil
+Eigen::SparseMatrix<double> get_Dtil(int k, NumericVector xd);
+RcppExport SEXP _rtestim_get_Dtil(SEXP kSEXP, SEXP xdSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type xd(xdSEXP);
+    rcpp_result_gen = Rcpp::wrap(get_Dtil(k, xd));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -283,7 +296,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rtestim_prox_newton_testing", (DL_FUNC) &_rtestim_prox_newton_testing, 17},
     {"_rtestim_dptf", (DL_FUNC) &_rtestim_dptf, 2},
     {"_rtestim_dptf_past", (DL_FUNC) &_rtestim_dptf_past, 3},
-    {"_rtestim_rtestim_path", (DL_FUNC) &_rtestim_rtestim_path, 17},
+    {"_rtestim_rtestim_path", (DL_FUNC) &_rtestim_rtestim_path, 16},
+    {"_rtestim_get_Dtil", (DL_FUNC) &_rtestim_get_Dtil, 2},
     {"_rtestim_buildD", (DL_FUNC) &_rtestim_buildD, 2},
     {"_rtestim_buildDx", (DL_FUNC) &_rtestim_buildDx, 3},
     {"_rtestim_buildDx_tilde", (DL_FUNC) &_rtestim_buildDx_tilde, 3},
