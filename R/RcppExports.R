@@ -29,6 +29,10 @@ get_Dtil <- function(k, xd) {
     .Call(`_rtestim_get_Dtil`, k, xd)
 }
 
+get_D <- function(k, xd) {
+    .Call(`_rtestim_get_D`, k, xd)
+}
+
 buildD <- function(n, ord) {
     .Call(`_rtestim_buildD`, n, ord)
 }
