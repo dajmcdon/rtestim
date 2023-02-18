@@ -164,6 +164,45 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// doDv
+NumericVector doDv(NumericVector v, int k, NumericVector xd);
+RcppExport SEXP _rtestim_doDv(SEXP vSEXP, SEXP kSEXP, SEXP xdSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type v(vSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type xd(xdSEXP);
+    rcpp_result_gen = Rcpp::wrap(doDv(v, k, xd));
+    return rcpp_result_gen;
+END_RCPP
+}
+// doDtv
+NumericVector doDtv(NumericVector v, int k, NumericVector xd);
+RcppExport SEXP _rtestim_doDtv(SEXP vSEXP, SEXP kSEXP, SEXP xdSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type v(vSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type xd(xdSEXP);
+    rcpp_result_gen = Rcpp::wrap(doDtv(v, k, xd));
+    return rcpp_result_gen;
+END_RCPP
+}
+// doDtDv
+NumericVector doDtDv(NumericVector v, int k, NumericVector xd);
+RcppExport SEXP _rtestim_doDtDv(SEXP vSEXP, SEXP kSEXP, SEXP xdSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type v(vSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type xd(xdSEXP);
+    rcpp_result_gen = Rcpp::wrap(doDtDv(v, k, xd));
+    return rcpp_result_gen;
+END_RCPP
+}
 // buildD
 arma::sp_mat buildD(int n, int ord);
 RcppExport SEXP _rtestim_buildD(SEXP nSEXP, SEXP ordSEXP) {
@@ -311,6 +350,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rtestim_rtestim_path", (DL_FUNC) &_rtestim_rtestim_path, 16},
     {"_rtestim_get_Dtil", (DL_FUNC) &_rtestim_get_Dtil, 2},
     {"_rtestim_get_D", (DL_FUNC) &_rtestim_get_D, 2},
+    {"_rtestim_doDv", (DL_FUNC) &_rtestim_doDv, 3},
+    {"_rtestim_doDtv", (DL_FUNC) &_rtestim_doDtv, 3},
+    {"_rtestim_doDtDv", (DL_FUNC) &_rtestim_doDtDv, 3},
     {"_rtestim_buildD", (DL_FUNC) &_rtestim_buildD, 2},
     {"_rtestim_buildDx", (DL_FUNC) &_rtestim_buildDx, 3},
     {"_rtestim_buildDx_tilde", (DL_FUNC) &_rtestim_buildDx_tilde, 3},

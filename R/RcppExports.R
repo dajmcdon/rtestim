@@ -33,6 +33,18 @@ get_D <- function(k, xd) {
     .Call(`_rtestim_get_D`, k, xd)
 }
 
+doDv <- function(v, k, xd) {
+    .Call(`_rtestim_doDv`, v, k, xd)
+}
+
+doDtv <- function(v, k, xd) {
+    .Call(`_rtestim_doDtv`, v, k, xd)
+}
+
+doDtDv <- function(v, k, xd) {
+    .Call(`_rtestim_doDtDv`, v, k, xd)
+}
+
 buildD <- function(n, ord) {
     .Call(`_rtestim_buildD`, n, ord)
 }
