@@ -1,14 +1,32 @@
 #include <RcppEigen.h>
 #include <boost/math/special_functions/lambert_w.hpp>
-#include "tf_dp.h"
+#include "dptfe.h"
 #include "utils-eigen.h"
-#include "admm.h"
+
 
 // [[Rcpp::depends(RcppEigen)]]
 // [[Rcpp::depends(BH)]]
 // [[Rcpp::plugins("cpp11")]]
 
 using namespace Rcpp;
+
+
+double update_epois(double c, double mu, int n) {
+  // @elvis, explain why this is the solution
+  if (c < 500) {  // deal with potential overflow from big exp(c)
+    c -= boost::math::lambert_w0(exp(c) / (mu * n));
+  } else {
+    // See:
+    // https://en.wikipedia.org/wiki/Lambert_W_function#Asymptotic_expansions We
+    // use the first four terms.
+    double la, lb;
+    la = c - log(mu * n);
+    lb = log(la);
+    c -= la - lb + lb / la + (lb * (lb - 2)) / (2 * la * la);
+  }
+  return c;
+}
+
 
 
 void admm_eigen(int M,
@@ -39,14 +57,14 @@ void admm_eigen(int M,
     tmp_n = y / n - rho * tmp_n + rho * doDtv(z - u, ord, x) + mu * theta;
     tmp_n = tmp_n / mu + log(w);
     for (int it = 0; it < n; it++) {
-      tmp_n(it) = update_pois(tmp_n(it), mu, n);
+      tmp_n(it) = update_epois(tmp_n(it), mu, n);
     }
     theta = tmp_n - log(w);
 
     // update alternating variable:
     tmp_m = doDv(theta, ord, x);
     tmp_m += u;
-    tf_dp(n, tmp_m.begin(), lam_z, z.begin());
+    z = dptfe(tmp_m, lam_z);
     // z = dptf(tmp_m, lam_z);
 
     // update dual variable:

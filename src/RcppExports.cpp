@@ -12,131 +12,52 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// linear_admm_testing
-Rcpp::List linear_admm_testing(int M, arma::vec const& y, arma::vec const& x, arma::vec const& w, int n, int ord, arma::vec theta, arma::vec z, arma::vec u, double lambda, double rho, double mu, double tol, int iter);
-RcppExport SEXP _rtestim_linear_admm_testing(SEXP MSEXP, SEXP ySEXP, SEXP xSEXP, SEXP wSEXP, SEXP nSEXP, SEXP ordSEXP, SEXP thetaSEXP, SEXP zSEXP, SEXP uSEXP, SEXP lambdaSEXP, SEXP rhoSEXP, SEXP muSEXP, SEXP tolSEXP, SEXP iterSEXP) {
+// admm_eigen_testing
+List admm_eigen_testing(int M, NumericVector const& y, NumericVector const& x, NumericVector const& w, int n, int ord, NumericVector theta, NumericVector z, NumericVector u, double lambda, double rho, double mu, double tol, int iter);
+RcppExport SEXP _rtestim_admm_eigen_testing(SEXP MSEXP, SEXP ySEXP, SEXP xSEXP, SEXP wSEXP, SEXP nSEXP, SEXP ordSEXP, SEXP thetaSEXP, SEXP zSEXP, SEXP uSEXP, SEXP lambdaSEXP, SEXP rhoSEXP, SEXP muSEXP, SEXP tolSEXP, SEXP iterSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< int >::type M(MSEXP);
-    Rcpp::traits::input_parameter< arma::vec const& >::type y(ySEXP);
-    Rcpp::traits::input_parameter< arma::vec const& >::type x(xSEXP);
-    Rcpp::traits::input_parameter< arma::vec const& >::type w(wSEXP);
+    Rcpp::traits::input_parameter< NumericVector const& >::type y(ySEXP);
+    Rcpp::traits::input_parameter< NumericVector const& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< NumericVector const& >::type w(wSEXP);
     Rcpp::traits::input_parameter< int >::type n(nSEXP);
     Rcpp::traits::input_parameter< int >::type ord(ordSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type theta(thetaSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type z(zSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type u(uSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type z(zSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type u(uSEXP);
     Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
     Rcpp::traits::input_parameter< double >::type rho(rhoSEXP);
     Rcpp::traits::input_parameter< double >::type mu(muSEXP);
     Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
     Rcpp::traits::input_parameter< int >::type iter(iterSEXP);
-    rcpp_result_gen = Rcpp::wrap(linear_admm_testing(M, y, x, w, n, ord, theta, z, u, lambda, rho, mu, tol, iter));
+    rcpp_result_gen = Rcpp::wrap(admm_eigen_testing(M, y, x, w, n, ord, theta, z, u, lambda, rho, mu, tol, iter));
     return rcpp_result_gen;
 END_RCPP
 }
-// admm_gauss
-arma::vec admm_gauss(int M, int n, int ord, arma::vec const& y, arma::vec const& x, arma::vec const& w, arma::vec& theta, arma::vec& z, arma::vec& u, double rho, double lam_z, double r_norm, double s_norm, arma::sp_mat const& DD, double tol);
-RcppExport SEXP _rtestim_admm_gauss(SEXP MSEXP, SEXP nSEXP, SEXP ordSEXP, SEXP ySEXP, SEXP xSEXP, SEXP wSEXP, SEXP thetaSEXP, SEXP zSEXP, SEXP uSEXP, SEXP rhoSEXP, SEXP lam_zSEXP, SEXP r_normSEXP, SEXP s_normSEXP, SEXP DDSEXP, SEXP tolSEXP) {
+// dptfe
+Rcpp::NumericVector dptfe(Rcpp::NumericVector y, double lam);
+RcppExport SEXP _rtestim_dptfe(SEXP ySEXP, SEXP lamSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type M(MSEXP);
-    Rcpp::traits::input_parameter< int >::type n(nSEXP);
-    Rcpp::traits::input_parameter< int >::type ord(ordSEXP);
-    Rcpp::traits::input_parameter< arma::vec const& >::type y(ySEXP);
-    Rcpp::traits::input_parameter< arma::vec const& >::type x(xSEXP);
-    Rcpp::traits::input_parameter< arma::vec const& >::type w(wSEXP);
-    Rcpp::traits::input_parameter< arma::vec& >::type theta(thetaSEXP);
-    Rcpp::traits::input_parameter< arma::vec& >::type z(zSEXP);
-    Rcpp::traits::input_parameter< arma::vec& >::type u(uSEXP);
-    Rcpp::traits::input_parameter< double >::type rho(rhoSEXP);
-    Rcpp::traits::input_parameter< double >::type lam_z(lam_zSEXP);
-    Rcpp::traits::input_parameter< double >::type r_norm(r_normSEXP);
-    Rcpp::traits::input_parameter< double >::type s_norm(s_normSEXP);
-    Rcpp::traits::input_parameter< arma::sp_mat const& >::type DD(DDSEXP);
-    Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
-    rcpp_result_gen = Rcpp::wrap(admm_gauss(M, n, ord, y, x, w, theta, z, u, rho, lam_z, r_norm, s_norm, DD, tol));
-    return rcpp_result_gen;
-END_RCPP
-}
-// prox_newton_testing
-Rcpp::List prox_newton_testing(int M, int M_inner, int n, int ord, arma::vec const& y, arma::vec const& x, arma::vec const& w, arma::vec& theta, arma::vec& z, arma::vec& u, double lambda, double rho, double alpha, double gamma, arma::sp_mat const& D, double tol, int iter);
-RcppExport SEXP _rtestim_prox_newton_testing(SEXP MSEXP, SEXP M_innerSEXP, SEXP nSEXP, SEXP ordSEXP, SEXP ySEXP, SEXP xSEXP, SEXP wSEXP, SEXP thetaSEXP, SEXP zSEXP, SEXP uSEXP, SEXP lambdaSEXP, SEXP rhoSEXP, SEXP alphaSEXP, SEXP gammaSEXP, SEXP DSEXP, SEXP tolSEXP, SEXP iterSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type M(MSEXP);
-    Rcpp::traits::input_parameter< int >::type M_inner(M_innerSEXP);
-    Rcpp::traits::input_parameter< int >::type n(nSEXP);
-    Rcpp::traits::input_parameter< int >::type ord(ordSEXP);
-    Rcpp::traits::input_parameter< arma::vec const& >::type y(ySEXP);
-    Rcpp::traits::input_parameter< arma::vec const& >::type x(xSEXP);
-    Rcpp::traits::input_parameter< arma::vec const& >::type w(wSEXP);
-    Rcpp::traits::input_parameter< arma::vec& >::type theta(thetaSEXP);
-    Rcpp::traits::input_parameter< arma::vec& >::type z(zSEXP);
-    Rcpp::traits::input_parameter< arma::vec& >::type u(uSEXP);
-    Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
-    Rcpp::traits::input_parameter< double >::type rho(rhoSEXP);
-    Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
-    Rcpp::traits::input_parameter< double >::type gamma(gammaSEXP);
-    Rcpp::traits::input_parameter< arma::sp_mat const& >::type D(DSEXP);
-    Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
-    Rcpp::traits::input_parameter< int >::type iter(iterSEXP);
-    rcpp_result_gen = Rcpp::wrap(prox_newton_testing(M, M_inner, n, ord, y, x, w, theta, z, u, lambda, rho, alpha, gamma, D, tol, iter));
-    return rcpp_result_gen;
-END_RCPP
-}
-// dptf
-arma::vec dptf(arma::vec y, double lam);
-RcppExport SEXP _rtestim_dptf(SEXP ySEXP, SEXP lamSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::vec >::type y(ySEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type y(ySEXP);
     Rcpp::traits::input_parameter< double >::type lam(lamSEXP);
-    rcpp_result_gen = Rcpp::wrap(dptf(y, lam));
+    rcpp_result_gen = Rcpp::wrap(dptfe(y, lam));
     return rcpp_result_gen;
 END_RCPP
 }
-// dptf_past
-arma::vec dptf_past(arma::vec y, double lam, arma::vec w);
-RcppExport SEXP _rtestim_dptf_past(SEXP ySEXP, SEXP lamSEXP, SEXP wSEXP) {
+// dptfe_past
+Rcpp::NumericVector dptfe_past(Rcpp::NumericVector y, double lam, Rcpp::NumericVector w);
+RcppExport SEXP _rtestim_dptfe_past(SEXP ySEXP, SEXP lamSEXP, SEXP wSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::vec >::type y(ySEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type y(ySEXP);
     Rcpp::traits::input_parameter< double >::type lam(lamSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type w(wSEXP);
-    rcpp_result_gen = Rcpp::wrap(dptf_past(y, lam, w));
-    return rcpp_result_gen;
-END_RCPP
-}
-// rtestim_path
-List rtestim_path(int algo, arma::vec y, arma::vec x, arma::vec w, int korder, arma::vec lambda, double lambdamax, double lambdamin, int nsol, double rho, int maxiter, int maxiter_inner, double tolerance, double lambda_min_ratio, double ls_alpha, double ls_gamma, int verbose);
-RcppExport SEXP _rtestim_rtestim_path(SEXP algoSEXP, SEXP ySEXP, SEXP xSEXP, SEXP wSEXP, SEXP korderSEXP, SEXP lambdaSEXP, SEXP lambdamaxSEXP, SEXP lambdaminSEXP, SEXP nsolSEXP, SEXP rhoSEXP, SEXP maxiterSEXP, SEXP maxiter_innerSEXP, SEXP toleranceSEXP, SEXP lambda_min_ratioSEXP, SEXP ls_alphaSEXP, SEXP ls_gammaSEXP, SEXP verboseSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type algo(algoSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type y(ySEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type x(xSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type w(wSEXP);
-    Rcpp::traits::input_parameter< int >::type korder(korderSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type lambda(lambdaSEXP);
-    Rcpp::traits::input_parameter< double >::type lambdamax(lambdamaxSEXP);
-    Rcpp::traits::input_parameter< double >::type lambdamin(lambdaminSEXP);
-    Rcpp::traits::input_parameter< int >::type nsol(nsolSEXP);
-    Rcpp::traits::input_parameter< double >::type rho(rhoSEXP);
-    Rcpp::traits::input_parameter< int >::type maxiter(maxiterSEXP);
-    Rcpp::traits::input_parameter< int >::type maxiter_inner(maxiter_innerSEXP);
-    Rcpp::traits::input_parameter< double >::type tolerance(toleranceSEXP);
-    Rcpp::traits::input_parameter< double >::type lambda_min_ratio(lambda_min_ratioSEXP);
-    Rcpp::traits::input_parameter< double >::type ls_alpha(ls_alphaSEXP);
-    Rcpp::traits::input_parameter< double >::type ls_gamma(ls_gammaSEXP);
-    Rcpp::traits::input_parameter< int >::type verbose(verboseSEXP);
-    rcpp_result_gen = Rcpp::wrap(rtestim_path(algo, y, x, w, korder, lambda, lambdamax, lambdamin, nsol, rho, maxiter, maxiter_inner, tolerance, lambda_min_ratio, ls_alpha, ls_gamma, verbose));
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type w(wSEXP);
+    rcpp_result_gen = Rcpp::wrap(dptfe_past(y, lam, w));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -342,12 +263,9 @@ END_RCPP
 RcppExport SEXP run_testthat_tests(SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_rtestim_linear_admm_testing", (DL_FUNC) &_rtestim_linear_admm_testing, 14},
-    {"_rtestim_admm_gauss", (DL_FUNC) &_rtestim_admm_gauss, 15},
-    {"_rtestim_prox_newton_testing", (DL_FUNC) &_rtestim_prox_newton_testing, 17},
-    {"_rtestim_dptf", (DL_FUNC) &_rtestim_dptf, 2},
-    {"_rtestim_dptf_past", (DL_FUNC) &_rtestim_dptf_past, 3},
-    {"_rtestim_rtestim_path", (DL_FUNC) &_rtestim_rtestim_path, 16},
+    {"_rtestim_admm_eigen_testing", (DL_FUNC) &_rtestim_admm_eigen_testing, 14},
+    {"_rtestim_dptfe", (DL_FUNC) &_rtestim_dptfe, 2},
+    {"_rtestim_dptfe_past", (DL_FUNC) &_rtestim_dptfe_past, 3},
     {"_rtestim_get_Dtil", (DL_FUNC) &_rtestim_get_Dtil, 2},
     {"_rtestim_get_D", (DL_FUNC) &_rtestim_get_D, 2},
     {"_rtestim_doDv", (DL_FUNC) &_rtestim_doDv, 3},

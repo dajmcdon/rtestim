@@ -7,7 +7,7 @@
 // [[Rcpp::depends(RcppEigen)]]
 // [[Rcpp::depends(dspline)]]
 
-using Rcpp::NumericVector;
+using namespace Rcpp;
 
 Eigen::SparseMatrix<double> identity(int n) {
   Eigen::SparseMatrix<double> Id(n, n);
