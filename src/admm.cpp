@@ -1,8 +1,7 @@
-#include <RcppEigen.h>
+#include <RcppArmadillo.h>
 #include <boost/math/special_functions/lambert_w.hpp>
 #include "dptf.h"
 #include "utils.h"
-#include "utils-eigen.h"
 #include "admm.h"
 
 // [[Rcpp::depends(RcppArmadillo)]]
@@ -10,6 +9,7 @@
 // [[Rcpp::plugins("cpp11")]]
 
 using namespace Rcpp;
+using namespace arma;
 
 /**
  * Solving Lambert_0 function for primal step of linearized ADMM
@@ -50,37 +50,41 @@ void linear_admm(int M,
           double tol,
           int& iter) {
   double r_norm, s_norm;
-  NumericVector z_old = clone(z);
+  vec z_old = z;
   double lam_z = lambda / rho;
-  NumericVector tmp_n(n);
-  NumericVector tmp_m(z.size());
+  vec c(n);  // a buffer
+  vec c2(n);
+  vec c3(n);
+  vec c4(z.size());
 
   // start of iteration:
   for (iter = 0; iter < M; iter++) {
-    if (iter % 500 == 0) Rcpp::checkUserInterrupt();
+    if (iter % 1000 == 0)
+      Rcpp::checkUserInterrupt();
     // update primal variable:
-    tmp_n = doDtDv(theta, ord, x);
-    tmp_n = y / n - rho * tmp_n + rho * doDtv(z - u, ord, x) + mu * theta;
-    tmp_n = tmp_n / mu + log(w);
-    for (int it = 0; it < n; it++) {
-      tmp_n(it) = update_pois(tmp_n(it), mu, n);
-    }
-    theta = tmp_n - log(w);
+    calcDTDvline(n, ord, x, theta, c2);  // c2 = DD * theta
+    z -= u;
+    calcDTvline(n, ord, x, z, c3);  // c3 = Dt * (z - u)
+    c = y / n - rho * c2 + rho * c3 + mu * theta;
+    c = c / mu + log(w);
+    c.transform([&](double c) { return update_pois(c, mu, n); });
+    theta = c - log(w);
 
     // update alternating variable:
-    tmp_m = doDv(theta, ord, x);
-    tmp_m += u;
-    z = dptf(tmp_m, lam_z);
+    calcDvline(n, ord, x, theta, c4);
+    c4 += u;  // c4 = D * theta + u;
+    z = dptf(c4, lam_z);
 
     // update dual variable:
-    tmp_m = doDv(theta, ord, x);
-    u += tmp_m - z;
+    calcDvline(n, ord, x, theta, c4);  // c4 = D * theta
+    u += c4 - z;
 
     // stopping criteria check:
-    r_norm = sqrt(mean(pow(tmp_m - z, 2)));
+    r_norm = sqrt(mean(square(c4 - z)));
     // dual residuals:
-    s_norm = rho * sqrt(mean(pow(z_old - z, 2)));
-    if ((r_norm < tol) && (s_norm < tol)) break;
+    s_norm = rho * sqrt(mean(square(z_old - z)));
+    if ((r_norm < tol) && (s_norm < tol))
+      break;
     // auxiliary variables update:
     z_old = z;
   }
