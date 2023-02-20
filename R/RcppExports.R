@@ -5,6 +5,10 @@ admm_eigen_testing <- function(M, y, x, w, n, ord, theta, z, u, lambda, rho, mu,
     .Call(`_rtestim_admm_eigen_testing`, M, y, x, w, n, ord, theta, z, u, lambda, rho, mu, tol, iter)
 }
 
+admm_gauss <- function(M, n, ord, y, x, w, theta, z, u, rho, lam_z, r_norm, s_norm, DD, tol) {
+    .Call(`_rtestim_admm_gauss`, M, n, ord, y, x, w, theta, z, u, rho, lam_z, r_norm, s_norm, DD, tol)
+}
+
 dptfe <- function(y, lam) {
     .Call(`_rtestim_dptfe`, y, lam)
 }
@@ -33,26 +37,19 @@ doDtDv <- function(v, k, xd) {
     .Call(`_rtestim_doDtDv`, v, k, xd)
 }
 
-buildD <- function(n, ord) {
-    .Call(`_rtestim_buildD`, n, ord)
+one_norm <- function(z) {
+    .Call(`_rtestim_one_norm`, z)
 }
 
-buildDx <- function(n, ord, x) {
-    .Call(`_rtestim_buildDx`, n, ord, x)
-}
-
-buildDx_tilde <- function(n, ord, x) {
-    .Call(`_rtestim_buildDx_tilde`, n, ord, x)
-}
-
-create_lambda_test <- function(lambda, lambdamin, lambdamax, lambda_min_ratio, nsol) {
-    .Call(`_rtestim_create_lambda_test`, lambda, lambdamin, lambdamax, lambda_min_ratio, nsol)
+pois_obj <- function(ord, y, x, w, theta, lambda) {
+    .Call(`_rtestim_pois_obj`, ord, y, x, w, theta, lambda)
 }
 
 gaussianized_data <- function(y, w, theta) {
     .Call(`_rtestim_gaussianized_data`, y, w, theta)
 }
 
+<<<<<<< HEAD
 line_search <- function(s, lambda, alpha, gamma, y, x, w, n, ord, theta, theta_old, c1, c2, M) {
     .Call(`_rtestim_line_search`, s, lambda, alpha, gamma, y, x, w, n, ord, theta, theta_old, c1, c2, M)
 }
@@ -67,5 +64,9 @@ calcDTvline_test <- function(n, ord, x, v, b) {
 
 calcDTDvline_test <- function(n, ord, x, v, b) {
     .Call(`_rtestim_calcDTDvline_test`, n, ord, x, v, b)
+=======
+line_search <- function(s, lambda, alpha, gamma, y, x, w, n, ord, theta, theta_old, M) {
+    .Call(`_rtestim_line_search`, s, lambda, alpha, gamma, y, x, w, n, ord, theta, theta_old, M)
+>>>>>>> 2198fcf (builds)
 }
 

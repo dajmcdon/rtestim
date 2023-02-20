@@ -139,7 +139,7 @@ NumericVector admm_gauss(int M,
                          double lam_z,
                          double r_norm,
                          double s_norm,
-                         SparseMatrix<double> const& DD,
+                         Eigen::SparseMatrix<double> const& DD,
                          double tol) {
 
   SparseMatrix<double> cDD = DD * n * rho; // a copy that doesn't change
@@ -154,13 +154,12 @@ NumericVector admm_gauss(int M,
     if (iter % 1000 == 0) Rcpp::checkUserInterrupt();
     // solve for primal variable - theta:
     SparseMatrix<double> wDD(cDD); // another copy that we alter
-    SparseMatrix<double> W = identity(n);
     VectorXd etheta = nvec_to_evec(theta);
-    W = W * etheta.exp();
+    wDD.diagonal() += etheta.exp();
     tmp_n = doDtv(z - u, ord, x) * n * rho;
     tmp_n += exp(theta) * y;
     tmp_theta = nvec_to_evec(tmp_n);
-    qr.compute(W);
+    qr.compute(wDD);
     tmp_theta = qr.solve(tmp_theta);
     theta = evec_to_nvec(tmp_theta);
     // solve for alternating variable - z:
@@ -198,7 +197,7 @@ void irls_admm(int M,
                double mu,
                double alpha,
                double gamma,
-               SparseMatrix<double> const& DD,
+               Eigen::SparseMatrix<double> const& DD,
                double tol,
                int& iter) {
   double s;             // step size
@@ -206,7 +205,6 @@ void irls_admm(int M,
   double obj = 1e4;     // initialize it to be large
   NumericVector theta_old(n);     // a buffer for line search
   double lam_z = lambda / rho;
-  int m = z.size();
   double r_norm = 0.0;
   double s_norm = 0.0;
 
