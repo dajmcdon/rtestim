@@ -4,18 +4,18 @@
 \alias{summary.poisson_rt}
 \title{Summary of the `poisson_rt` object}
 \usage{
-summary.poisson_rt(object, ...)
+\method{summary}{poisson_rt}(object, \dots)
 }
 \arguments{
 \item{object}{output of function `estimate_rt` of class `poisson_rt`}
 
-\item{...}{}
+\item{...}{further arguments passed to or from other methods.}
 }
 \value{
 summary of the `poisson_rt` object in a table
 }
 \description{
-summarize the `poisson_rt` object in a table
+Summary of the `poisson_rt` object
 }
 \examples{
 y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))

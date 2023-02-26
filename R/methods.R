@@ -1,12 +1,14 @@
 
 
 #' Print `poisson_rt` object
-#' @description print the `poisson_rt` object
-#' @param x output of function `estimate_rt` of class `poisson_rt`
-#' @param ...
 #'
+#' @param x output of function `estimate_rt` of class `poisson_rt`
+#' @param ... further arguments passed to or from other methods.
+#'
+#' @usage \method{print}{poisson_rt}(x, \dots)
 #' @return status of the `poisson_rt` object
 #' @exportS3Method print poisson_rt
+#'
 #' @examples
 #' y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
 #' out <- estimate_rt(y, lambda = log(c(1.1,1.3,1.5)))
@@ -18,12 +20,14 @@ print.poisson_rt <- function(x, ...) {
 }
 
 #' Summary of the `poisson_rt` object
-#' @description summarize the `poisson_rt` object in a table
-#' @param object output of function `estimate_rt` of class `poisson_rt`
-#' @param ...
 #'
+#' @param object output of function `estimate_rt` of class `poisson_rt`
+#' @param ... further arguments passed to or from other methods.
+#'
+#' @usage \method{summary}{poisson_rt}(object, \dots)
 #' @return summary of the `poisson_rt` object in a table
 #' @exportS3Method summary poisson_rt
+#'
 #' @examples
 #' y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
 #' out <- estimate_rt(y, lambda = log(c(1.1,1.3,1.5)))
@@ -50,7 +54,7 @@ summary.poisson_rt <- function(object, ...) {
 #' @param which_lambda select which Rt's to plot. If no lambdas are provided,
 #' all Rt's are plotted. Lambdas provided must match the lambda used in
 #' generating the Rt's.
-#' @param ...
+#' @param ... further arguments passed to or from other methods.
 #'
 #' @return plot of all or selected Rt from an object of class `poisson_rt`
 #' @exportS3Method
@@ -75,9 +79,9 @@ plot.poisson_rt <- function(x, which_lambda = NULL, ...) {
 
   plt_color <- c(1:length(lambda))
 
-  matplot(Rt, type = "l", lty = 1, col = plt_color, main = "Estimated Rt",
+  graphics::matplot(Rt, type = "l", lty = 1, col = plt_color, main = "Estimated Rt",
           xlab = "Time")
-  legend("topright",
+  graphics::legend("topright",
          legend = round(lambda, 3), title = "Lambda", lty = 1,
          col = plt_color)
   plt <- grDevices::recordPlot()

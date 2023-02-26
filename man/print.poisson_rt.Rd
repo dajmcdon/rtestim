@@ -4,18 +4,18 @@
 \alias{print.poisson_rt}
 \title{Print `poisson_rt` object}
 \usage{
-print.poisson_rt(x, ...)
+\method{print}{poisson_rt}(x, \dots)
 }
 \arguments{
 \item{x}{output of function `estimate_rt` of class `poisson_rt`}
 
-\item{...}{}
+\item{...}{further arguments passed to or from other methods.}
 }
 \value{
 status of the `poisson_rt` object
 }
 \description{
-print the `poisson_rt` object
+Print `poisson_rt` object
 }
 \examples{
 y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))

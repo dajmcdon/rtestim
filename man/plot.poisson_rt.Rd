@@ -13,7 +13,7 @@
 all Rt's are plotted. Lambdas provided must match the lambda used in
 generating the Rt's.}
 
-\item{...}{}
+\item{...}{further arguments passed to or from other methods.}
 }
 \value{
 plot of all or selected Rt from an object of class `poisson_rt`
