@@ -7,8 +7,18 @@
 print.poisson_rt(x, ...)
 }
 \arguments{
+\item{x}{output of function `estimate_rt` of class `poisson_rt`}
+
 \item{...}{}
 }
+\value{
+status of the `poisson_rt` object
+}
 \description{
-Print `poisson_rt` object
+print the `poisson_rt` object
+}
+\examples{
+y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
+out <- estimate_rt(y, lambda = log(c(1.1,1.3,1.5)))
+out
 }
