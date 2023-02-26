@@ -8,3 +8,4 @@ src/*.dll
 *.swp
 *DS_Store
 *.Rapp.history
+.vscode

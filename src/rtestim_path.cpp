@@ -8,7 +8,8 @@
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-List rtestim_path(arma::vec y,
+List rtestim_path(int algo,
+                  arma::vec y,
                   arma::vec x,  // positions
                   arma::vec w,  // weighted past cases
                   int korder,
@@ -20,6 +21,8 @@ List rtestim_path(arma::vec y,
                   int maxiter = 1e5,
                   double tolerance = 1e-3,
                   double lambda_min_ratio = 1e-4,
+                  double ls_alpha = 0.5,
+                  double ls_gamma = 0.9,
                   int verbose = 0) {
   int n = y.n_elem;
   if (lambda.size() > 0) nsol = lambda.size();
@@ -45,8 +48,6 @@ List rtestim_path(arma::vec y,
   create_lambda(lambda, lambdamin, lambdamax, lambda_min_ratio, nsol);
 
   // ADMM parameters
-  // double tolerance_abs = std::sqrt(n) * tolerance; // adjust for number of
-  // parameters
   double _rho = (rho < 0) ? lambda(0) : rho;
 
   // ADMM variables
@@ -58,25 +59,30 @@ List rtestim_path(arma::vec y,
 
   // Outer loop to compute solution path
   for (int i = 0; i < nsol; i++) {
-    if (korder == 0) {
-      theta = dptf_past_weight(y, lambda(i), w, x);
-      niter(i) = 0;
-      break;
-    }
-
-    if (i > 0) {
-      _rho = (rho < 0) ? lambda(i) : rho;
-    }
-    if (verbose > 0)
-      Rcout << ".";
+    if (verbose > 0) Rcout << ".";
     Rcpp::checkUserInterrupt();
 
-    admm(maxiter, y, w, n, beta, alpha, u, lambda(i), _rho, mu * lambda(i),
-         DkDk, Dk, tolerance, iters);  // add rho_adjust?
+    if (korder == 0) {
+      beta = dptf_past(y, lambda(i), w);
+      niter(i) = 1;
+    } else {
+      if (i > 0) _rho = (rho < 0) ? lambda(i) : rho;
+      switch (algo) {
+        case 1:
+          admm(maxiter, y, x, w, n, korder, beta, alpha, u, lambda(i), _rho,
+               mu * lambda(i), tolerance, iters);  // add rho_adjust?
+          break;
+        case 2:
+          irls_admm(maxiter, n, korder, y, x, w, beta, alpha, u, lambda(i),
+                    _rho, mu * lambda(i), ls_alpha, ls_gamma, Dk, tolerance,
+                    iters);
+          break;
+      }
+      niter(i) = iters + 1;
+    }
 
     // Store solution
     theta.col(i) = exp(beta);
-    niter(i) = iters + 1;
 
     // Verbose handlers
     if (verbose > 1) Rcout << niter(i);
@@ -88,7 +94,7 @@ List rtestim_path(arma::vec y,
   List out = List::create(
     Named("Rt") = theta,
     Named("lambda") = lambda,
-    Named("degree") = korder,
+    Named("degree") = korder + 1,
     Named("niter") = niter);
   return out;
 }

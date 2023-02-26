@@ -13,6 +13,8 @@ configure_rt_admm(
   dual_var = NULL,
   rho = -1,
   rho_adjust = -1,
+  alpha = 0.5,
+  gamma = 0.9,
   tolerance = 1e-04,
   verbose = 0
 )
@@ -21,7 +23,7 @@ configure_rt_admm(
 \item{observed_counts}{vector of the observed daily infection counts}
 
 \item{degree}{Integer. Degree of the piecewise polynomial curve to be
-estimated. Ror example, `degree = 0` corresponds to a piecewise constant
+estimated. For example, `degree = 1` corresponds to a piecewise constant
 curve.}
 
 \item{weighted_past_counts}{the weighted sum of past infections counts with
@@ -34,18 +36,26 @@ weights}
 
 \item{dual_var}{dual variable in the ADMM algorithm}
 
-\item{rho}{admm configuration parameter}
+\item{rho}{double. An ADMM parameter; coefficient of augmented term in the
+Lagrangian function.}
 
-\item{rho_adjust}{admm configuration parameter}
+\item{rho_adjust}{double. An ADMM parameter; adjusted coefficient of
+augmented term in the Lagrangian function.}
 
-\item{tolerance}{threshold to assess convergence}
+\item{alpha}{Double. A parameter adjusting upper bound in line search algorithm
+in `irls_admm` algorithm.}
 
-\item{verbose}{control printing during fitting algorithm}
+\item{gamma}{Double. A parameter adjusting step size in line search algorithm
+in `irls_admm` algorithm.}
+
+\item{tolerance}{double. Tolerance of ADMM convergence.}
+
+\item{verbose}{integer.}
 }
 \value{
 a list of model parameters with class `rt_admm_configuration`
 }
 \description{
 We should convert this into an S3 method so that we can pass in a
-vector of counts or an admm_initializer object (and overwrite)
+vector of counts or an rt_admm_configuration object (and overwrite)
 }

@@ -12,8 +12,6 @@ Description: More about what it does (maybe more than one line) Use four
 License: MIT + file LICENSE
 Imports: 
     cli,
-    dplyr,
-    ggplot2,
     grDevices,
     magrittr,
     Matrix,
