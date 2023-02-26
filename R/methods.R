@@ -66,7 +66,8 @@ plot.poisson_rt <- function(x, which_lambda = NULL, ...) {
 
   if (!is.null(which_lambda)) {
     if (!all(which_lambda %in% lambda))
-      cli::cli_abort("Can only plot for lambda that already existed")
+      cli::cli_abort("Can only plot for lambda that used to generate Rt in
+                     `estimate_rt`")
     idx <- which(lambda %in% which_lambda)
     Rt <- Rt[, idx]
     lambda <- lambda[idx]
