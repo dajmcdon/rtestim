@@ -82,7 +82,8 @@ List rtestim_path(int algo,
     }
 
     // Store solution
-    theta.col(i) = exp(beta);
+    (korder == int(0)) ? theta.col(i) = beta : theta.col(i) = exp(beta);
+
 
     // Verbose handlers
     if (verbose > 1) Rcout << niter(i);
