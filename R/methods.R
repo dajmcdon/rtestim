@@ -2,37 +2,47 @@
 
 #' Print `poisson_rt` object
 #'
-#' @param x
+#' @param x output of function `estimate_rt` of class `poisson_rt`
 #' @param ...
 #'
 #' @return
 #' @exportS3Method print poisson_rt
 #'
 #' @examples
+#' y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
+#' out <- estimate_rt(y, lambda = log(c(1.1,1.3,1.5)))
+#' out
 print.poisson_rt <- function(x, ...) {
-  cat("Algorithm convergence status:", x$convergence, "\n")
-  cat("With degree:", x$degree, "and lambda:", x$lambda)
+  cat("Algorithm terminated\n")
+  if (all(x$convergence)) cat("All runs converged!\n")
+  cat("Degree of the piecewise polynomial curve fitted:", x$degree, "\n")
 }
 
 #' Summary of the `poisson_rt` object
 #'
-#' @param object
+#' @param object output of function `estimate_rt` of class `poisson_rt`
 #' @param ...
 #'
 #' @return
 #' @exportS3Method summary poisson_rt
 #'
 #' @examples
+#' y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
+#' out <- estimate_rt(y, lambda = log(c(1.1,1.3,1.5)))
+#' summary(out)
 summary.poisson_rt <- function(object, ...) {
-  res <- list(
-    Time = object$x, # This need to change, it shows (x - x[1]) / diff(range(x)) * n
-    Observed_time_points = object$observed_counts,
-    R_rate = object$Rt,
-    Predicted_cases = object$Rt * object$weighted_past_counts
-  )
+  lambda <- object$lambda
+  nsol <- length(lambda)
+  tab <- matrix(0, nsol, 2)
+  tab[, 1] <- lambda
+  tab[, 2] <- object$convergence
+  colnames(tab) <- c("lambda", "convergence")
 
-  class(res) = "summary.poisson_rt"
-  return(res)
+  tab <- as.table(tab)
+  class(tab) <- "summary.poisson_rt"
+
+  cat("Degree of the piecewise polynomial curve fitted:", object$degree, "\n")
+  print(tab)
 }
 
 #' Plot `poisson_rt` object
