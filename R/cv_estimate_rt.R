@@ -21,28 +21,24 @@
 #'
 #' @export
 #'
-#' @examples cv_estimate_rt(c(1:20), degree = 2, fold = 2, lambda = c(1:4))
+#' @examples
+#' y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
+#' cv <- cv_estimate_rt(y, degree = 3, fold = 2, nsol=30)
+#' cv
 cv_estimate_rt <- function(observed_counts,
                            degree = 3L,
                            dist_gamma = c(2.5, 2.5),
                            fold = 3,
                            x = NULL,
                            lambda = NULL,
-                           lambdamin = NULL,
-                           lambdamax = NULL,
-                           lambda_min_ratio = 1e-4,
                            ...) {
 
-  ## Run program once to create lambda
-
+  ## Run program one time to create lambda
   full_data_fit <- estimate_rt(
     observed_counts = observed_counts,
     degree = degree,
     x = x,
     lambda = lambda,
-    lambdamax = lambdamax,
-    lambdamin = lambdamin,
-    lambda_min_ratio = lambda_min_ratio,
     ...)
 
   ## Use values from the full data fit
@@ -75,9 +71,6 @@ cv_estimate_rt <- function(observed_counts,
       x = train_x,
       degree = degree,
       lambda = lambda,
-      lambdamin = lambdamin,
-      lambdamax = lambdamax,
-      lambda_min_ratio = lambda_min_ratio,
       ...)
 
 
@@ -111,9 +104,6 @@ cv_estimate_rt <- function(observed_counts,
     x = x,
     degree = degree,
     lambda = op_lambda,
-    lambdamin = lambdamin,
-    lambdamax = lambdamax,
-    lambda_min_ratio = lambda_min_ratio,
     ...)
 
 

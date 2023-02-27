@@ -11,9 +11,6 @@ cv_estimate_rt(
   fold = 3,
   x = NULL,
   lambda = NULL,
-  lambdamin = NULL,
-  lambdamax = NULL,
-  lambda_min_ratio = 1e-04,
   ...
 )
 }
@@ -53,18 +50,6 @@ this behaviour. It is likely better to supply a
 decreasing sequence of `lambda` values than a single (small) value. If
 supplied, the user-defined `lambda` sequence is automatically sorted in
 decreasing order.}
-
-\item{lambdamin}{Optional value for the smallest `lambda` to use. This should
-be greater than zero.}
-
-\item{lambdamax}{Optional value for the largest `lambda` to use.}
-
-\item{lambda_min_ratio}{If neither `lambda` nor `lambdamin` is specified, the
-program will generate a lambdamin by lambdamax * lambda_min_ratio
-A multiplicative factor for the minimal lambda in the
-`lambda` sequence, where `lambdamin = lambda_min_ratio * lambdamax`.
-A very small value will lead to the solution `Rt = log(observed_counts)`.
-This argument has no effect if there is user-defined `lambda` sequence.}
 }
 \value{
 An object with S3 class `"cv_result"`. Among the list components:
@@ -82,5 +67,7 @@ optimal lambda
 Leave-kth-out cross validation for choosing a optimal parameter lambda
 }
 \examples{
-cv_estimate_rt(c(1:20), degree = 2, fold = 2, lambda = c(1:4))
+y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
+cv <- cv_estimate_rt(y, degree = 2, fold = 2, nsol=30)
+cv
 }
