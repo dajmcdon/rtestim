@@ -188,9 +188,10 @@ estimate_rt <- function(observed_counts,
       x = x,
       weighted_past_counts = weighted_past_counts,
       Rt = mod$Rt,
-      lambda = mod$lambda,
+      lambda = drop(mod$lambda),
       degree = mod$degree,
-      niter = mod$niter,
+      dof = drop(mod$dof),
+      niter = drop(mod$niter),
       convergence = (mod$niter < maxiter)
     ),
     class = "poisson_rt"

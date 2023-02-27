@@ -30,6 +30,7 @@ List rtestim_path(int algo,
   // Placeholders for solutions
   arma::mat theta(n, nsol);
   arma::vec niter(nsol);
+  arma::vec dof(nsol);
 
   // Build D matrix
   arma::sp_mat D;
@@ -81,8 +82,15 @@ List rtestim_path(int algo,
       niter(i) = iters + 1;
     }
 
+
     // Store solution
-    (korder == int(0)) ? theta.col(i) = beta : theta.col(i) = exp(beta);
+    if (korder == int(0)) {
+      theta.col(i) = beta;
+      dof(i) = arma::sum(arma::abs(arma::diff(beta)) > tolerance);
+    } else {
+      theta.col(i) = exp(beta);
+      dof(i) = arma::sum(arma::abs(arma::diff(alpha)) > tolerance);
+    }
 
 
     // Verbose handlers
@@ -96,6 +104,7 @@ List rtestim_path(int algo,
     Named("Rt") = theta,
     Named("lambda") = lambda,
     Named("degree") = korder + 1,
+    Named("dof") = dof,
     Named("niter") = niter);
   return out;
 }
