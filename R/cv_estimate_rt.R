@@ -54,7 +54,6 @@ cv_estimate_rt <- function(observed_counts,
 
   # Cross validation (copied from glmgen cv.trendfilter)
   foldid = fold_calculator(n, fold)
-  if (length(x) == 0) x <- 1:n
   cvall <- matrix(0, fold, length(lambda))
 
   for (f in 1:fold) {
@@ -73,7 +72,6 @@ cv_estimate_rt <- function(observed_counts,
     ### Run solver with the training set
     mod <- estimate_rt(
       observed_counts = train_observed_counts,
-      weighted_past_counts = train_weighted_past_counts,
       x = train_x,
       degree = degree,
       lambda = lambda,
@@ -110,7 +108,6 @@ cv_estimate_rt <- function(observed_counts,
   ### Re-train with optimal lambda from cv
   op_mod <- estimate_rt(
     observed_counts = observed_counts,
-    weighted_past_counts = weighted_past_counts,
     x = x,
     degree = degree,
     lambda = op_lambda,
