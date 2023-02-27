@@ -2,6 +2,7 @@
 
 S3method(plot,poisson_rt)
 S3method(print,poisson_rt)
+S3method(print,summary.poisson_rt)
 S3method(summary,poisson_rt)
 export("%>%")
 export(configure_rt_admm)
