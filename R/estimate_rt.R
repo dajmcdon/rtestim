@@ -71,13 +71,12 @@
 #' @export
 #'
 #' @examples
-#' # runs but ugly
 #' y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
 #' out <- estimate_rt(y, nsol = 10)
-#' matplot(out$Rt, ty = "l", lty = 1)
+#' plot(out)
 #'
 #' out0 <- estimate_rt(y, degree = 1L, nsol = 10)
-#' matplot(out0$Rt, ty = "l", lty = 1)
+#' plot(out0)
 estimate_rt <- function(observed_counts,
                         degree = 3L,
                         dist_gamma = c(2.5, 2.5),
@@ -192,7 +191,8 @@ estimate_rt <- function(observed_counts,
       degree = mod$degree,
       dof = drop(mod$dof),
       niter = drop(mod$niter),
-      convergence = (mod$niter < maxiter)
+      convergence = (mod$niter < maxiter),
+      call = match.call()
     ),
     class = "poisson_rt"
   )

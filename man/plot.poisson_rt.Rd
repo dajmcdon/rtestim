@@ -2,24 +2,23 @@
 % Please edit documentation in R/methods.R
 \name{plot.poisson_rt}
 \alias{plot.poisson_rt}
-\title{Plot `poisson_rt` object}
+\title{Plot estimated Rt values from a `poisson_rt` object}
 \usage{
 \method{plot}{poisson_rt}(x, which_lambda = NULL, ...)
 }
 \arguments{
-\item{x}{output of function `estimate_rt` of class `poisson_rt`}
+\item{x}{output of the function [estimate_rt()] of class `poisson_rt`}
 
-\item{which_lambda}{select which Rt's to plot. If no lambdas are provided,
-all Rt's are plotted. Lambdas provided must match the lambda used in
+\item{which_lambda}{select which Rt's to plot. If not provided,
+all Rt's are plotted. Any lambdas provided must match the values used in
 generating the Rt's.}
 
-\item{...}{further arguments passed to or from other methods.}
-}
-\value{
-plot of all or selected Rt from an object of class `poisson_rt`
+\item{...}{Not used.}
 }
 \description{
-Plot `poisson_rt` object
+Produces a figure showing some or all estimated Rt values for different
+values of the penalty. The result is a [ggplot2::ggplot()]. Additional user
+modifications can be added as desired.
 }
 \examples{
 y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))

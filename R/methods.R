@@ -1,63 +1,62 @@
-
-
-#' Print `poisson_rt` object
-#'
-#' @param x output of function `estimate_rt` of class `poisson_rt`
-#' @param ... further arguments passed to or from other methods.
-#'
-#' @usage \method{print}{poisson_rt}(x, \dots)
-#' @return status of the `poisson_rt` object
-#' @exportS3Method print poisson_rt
-#'
-#' @examples
-#' y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
-#' out <- estimate_rt(y, lambda = log(c(1.1,1.3,1.5)))
-#' out
-print.poisson_rt <- function(x, ...) {
-  cat("Algorithm terminated\n")
-  if (all(x$convergence)) cat("All runs converged!\n")
-  cat("Degree of the piecewise polynomial curve fitted:", x$degree, "\n")
-}
-
-#' Summary of the `poisson_rt` object
-#'
-#' @param object output of function `estimate_rt` of class `poisson_rt`
-#' @param ... further arguments passed to or from other methods.
-#'
-#' @usage \method{summary}{poisson_rt}(object, \dots)
-#' @return summary of the `poisson_rt` object in a table
-#' @exportS3Method summary poisson_rt
-#'
-#' @examples
-#' y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
-#' out <- estimate_rt(y, lambda = log(c(1.1,1.3,1.5)))
-#' summary(out)
+#' @method summary poisson_rt
+#' @export
 summary.poisson_rt <- function(object, ...) {
+  rlang::check_dots_empty()
+  ns <- length(object$lambda)
+  if (ns > 5) {
+    xlam <- round(stats::quantile(1:ns))
+    names(xlam) <- rev(c("Max.", "3rd Qu.", "Median", "1st Qu.", "Min."))
+  } else {
+    xlam <- seq_len(ns)
+    names(xlam) <- paste0("s", seq_len(ns))
+  }
+  tab <- with(object, data.frame(
+    lambda = lambda[xlam],
+    index = xlam,
+    approx_dof = dof[xlam],
+    niterations = niter[xlam]))
   lambda <- object$lambda
-  nsol <- length(lambda)
-  tab <- matrix(0, nsol, 2)
-  tab[, 1] <- lambda
-  tab[, 2] <- object$convergence
-  colnames(tab) <- c("lambda", "convergence")
-
-  tab <- as.table(tab)
-  class(tab) <- "summary.poisson_rt"
-
-  cat("Degree of the piecewise polynomial curve fitted:", object$degree, "\n")
-  cat("\n")
-  print(tab)
+  rownames(tab) <- names(xlam)
+  out <- structure(
+    list(call = object$call, table = tab, degree = object$degree, nlam = ns),
+    class = "summary.poisson_rt")
+  out
 }
 
-#' Plot `poisson_rt` object
+#' @method print summary.poisson_rt
+#' @export
+print.summary.poisson_rt <- function(x,
+                                     digits = max(3, getOption("digits") - 3),
+                                     ...) {
+  rlang::check_dots_empty()
+  cat("\nCall: ", deparse(x$call), fill = TRUE)
+  cat("\nDegree of the estimated piecewise polynomial curve:", x$degree, "\n")
+  cat("\nSummary of the", x$nlam, "estimated models:\n")
+  print(x$tab, digits = digits)
+  cat("\n")
+}
+
+#' @method print poisson_rt
+#' @export
+print.poisson_rt <- function(x, digits = min(3, getOption("digits") - 3), ...) {
+  rlang::check_dots_empty()
+  print(summary(x), digits = digits)
+}
+
+#' Plot estimated Rt values from a `poisson_rt` object
 #'
-#' @param x output of function `estimate_rt` of class `poisson_rt`
-#' @param which_lambda select which Rt's to plot. If no lambdas are provided,
-#' all Rt's are plotted. Lambdas provided must match the lambda used in
-#' generating the Rt's.
-#' @param ... further arguments passed to or from other methods.
+#' Produces a figure showing some or all estimated Rt values for different
+#' values of the penalty. The result is a [ggplot2::ggplot()]. Additional user
+#' modifications can be added as desired.
 #'
-#' @return plot of all or selected Rt from an object of class `poisson_rt`
-#' @exportS3Method
+#'
+#' @param x output of the function [estimate_rt()] of class `poisson_rt`
+#' @param which_lambda select which Rt's to plot. If not provided,
+#'   all Rt's are plotted. Any lambdas provided must match the values used in
+#'   generating the Rt's.
+#' @param ... Not used.
+#'
+#' @export
 #'
 #' @examples
 #' y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
@@ -71,19 +70,20 @@ plot.poisson_rt <- function(x, which_lambda = NULL, ...) {
   if (!is.null(which_lambda)) {
     if (!all(which_lambda %in% lambda))
       cli::cli_abort("Can only plot for lambda that used to generate Rt in
-                     `estimate_rt`")
+                     `estimate_rt()`")
     idx <- which(lambda %in% which_lambda)
     Rt <- Rt[, idx]
     lambda <- lambda[idx]
   }
 
-  plt_color <- c(1:length(lambda))
+  df <- data.frame(
+    Rt = c(Rt),
+    lambda = rep(lambda, each = nrow(Rt)),
+    Time = rep(x$x, ncol(Rt))
+  )
 
-  graphics::matplot(Rt, type = "l", lty = 1, col = plt_color, main = "Estimated Rt",
-          xlab = "Time")
-  graphics::legend("topright",
-         legend = round(lambda, 3), title = "Lambda", lty = 1,
-         col = plt_color)
-  plt <- grDevices::recordPlot()
-  plt
+  ggplot2::ggplot(df, ggplot2::aes(Time, Rt, colour = lambda, group = lambda)) +
+    ggplot2::geom_line() +
+    ggplot2::theme_bw() +
+    ggplot2::scale_colour_viridis_c(trans = "log10")
 }

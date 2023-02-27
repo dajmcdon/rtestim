@@ -101,11 +101,10 @@ at day \eqn{i}, \eqn{\lambda} is the smoothness penalty, and \eqn{D^{(k+1)}}
 is the \eqn{(k+1)}-th order difference matrix.
 }
 \examples{
-# runs but ugly
 y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
 out <- estimate_rt(y, nsol = 10)
-matplot(out$Rt, ty = "l", lty = 1)
+plot(out)
 
 out0 <- estimate_rt(y, degree = 1L, nsol = 10)
-matplot(out0$Rt, ty = "l", lty = 1)
+plot(out0)
 }
