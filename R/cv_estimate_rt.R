@@ -73,7 +73,6 @@ cv_estimate_rt <- function(observed_counts,
       lambda = lambda,
       ...)
 
-
     ### Predict training value ###
     pred_rt <- pred_kth_rt(mod$Rt,
                            n = n,
