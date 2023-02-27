@@ -58,6 +58,7 @@ print.poisson_rt <- function(x, digits = min(3, getOption("digits") - 3), ...) {
 #'
 #' @export
 #'
+#' @importFrom rlang .data
 #' @examples
 #' y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
 #' out <- estimate_rt(y, lambda = log(c(1.1,1.3,1.5)))
@@ -82,7 +83,10 @@ plot.poisson_rt <- function(x, which_lambda = NULL, ...) {
     Time = rep(x$x, ncol(Rt))
   )
 
-  ggplot2::ggplot(df, ggplot2::aes(Time, Rt, colour = lambda, group = lambda)) +
+  ggplot2::ggplot(
+    df,
+    ggplot2::aes(.data$Time, .data$Rt, colour = .data$lambda,
+                 group = .data$lambda)) +
     ggplot2::geom_line() +
     ggplot2::theme_bw() +
     ggplot2::scale_colour_viridis_c(trans = "log10")
