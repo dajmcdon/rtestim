@@ -88,7 +88,8 @@ List rtestim_path(int algo,
 
     // Store solution
     if (korder == int(0)) {
-      theta.col(i) = beta;
+      theta.col(i) = beta;  // the algorithm returns mean (exp of the
+                            // natural parameter)
       dof(i) = arma::sum(arma::abs(arma::diff(beta)) > tolerance);
     } else {
       theta.col(i) = exp(beta);
