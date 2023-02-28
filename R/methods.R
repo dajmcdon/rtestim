@@ -73,7 +73,7 @@ plot.poisson_rt <- function(x, which_lambda = NULL, ...) {
       cli::cli_abort("Can only plot for lambda that used to generate Rt in
                      `estimate_rt()`")
     idx <- which(lambda %in% which_lambda)
-    Rt <- Rt[, idx]
+    Rt <- as.matrix(Rt[, idx])
     lambda <- lambda[idx]
   }
 
@@ -133,24 +133,35 @@ print.summary.cv_result <- function(x,
 #' Plot cv_result
 #'
 #' @param x result of cv_estimate_rt of class `cv_result`
-#' @param ...
+#' @param plot_rt plot cross-validation scores only if set to `FALSE`; plot
+#' Rt and specify which Rt to generate with the `which_lambda` parameter if set
+#' to `TRUE`
+#' @param which_lambda select which Rt's to plot, if `plot_rt == TRUE`. If not
+#' provided, plot R estimated with the optimal lambda. Any lambda provided must
+#' match the values used in generating the Rt's.
+#' @param ... Not used.
 #'
 #' @return plot of cv scores
 #' @exportS3Method
 #'
 #' @examples
-#' cv <- cv_estimate_rt(c(1:20), degree = 2, fold = 2, nsol=100)
+#' y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
+#' cv <- cv_estimate_rt(y, degree = 3, fold = 2, nsol=30)
 #' plot(cv)
-plot.cv_result <- function(x, ...) {
+plot.cv_result <- function(x, use_lambda = NULL, ...) {
+  arg_is_numeric(use_lambda, allow_null = TRUE)
+
+
   df <- data.frame(
     cv_scores = x$cv_scores,
     lambda = x$lambda
   )
 
-  ggplot2::ggplot(df, ggplot2::aes(x=lambda, y = cv_scores))+
+  plt_scores <- ggplot2::ggplot(df, ggplot2::aes(x=lambda, y = cv_scores))+
     ggplot2::geom_line() +
     ggplot2::theme_bw() +
     ggplot2::labs(title="Cross Validation Scores", x = "Lambda", y = "CV scores")+
     ggplot2::scale_x_log10()
 
+  plt_scores
 }
