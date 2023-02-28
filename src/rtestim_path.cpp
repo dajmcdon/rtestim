@@ -25,7 +25,8 @@ List rtestim_path(int algo,
                   double ls_gamma = 0.9,
                   int verbose = 0) {
   int n = y.n_elem;
-  if (lambda.size() > 0) nsol = lambda.size();
+  if (lambda.size() > 0)
+    nsol = lambda.size();
 
   // Placeholders for solutions
   arma::mat theta(n, nsol);
@@ -45,6 +46,7 @@ List rtestim_path(int algo,
     arma::mat matD(D);                // convert to dense mat to avoid spsolve
     arma::solve(b, matD.t(), w % y);  // very approximate; for unevenly space?
     lambdamax = arma::norm(b, "inf");
+    lambdamax /= n;
   }
   create_lambda(lambda, lambdamin, lambdamax, lambda_min_ratio, nsol);
 
@@ -60,14 +62,16 @@ List rtestim_path(int algo,
 
   // Outer loop to compute solution path
   for (int i = 0; i < nsol; i++) {
-    if (verbose > 0) Rcout << ".";
+    if (verbose > 0)
+      Rcout << ".";
     Rcpp::checkUserInterrupt();
 
     if (korder == 0) {
       beta = dptf_past(y, lambda(i), w);
       niter(i) = 1;
     } else {
-      if (i > 0) _rho = (rho < 0) ? lambda(i) : rho;
+      if (i > 0)
+        _rho = (rho < 0) ? lambda(i) : rho;
       switch (algo) {
         case 1:
           admm(maxiter, y, x, w, n, korder, beta, alpha, u, lambda(i), _rho,
@@ -82,7 +86,6 @@ List rtestim_path(int algo,
       niter(i) = iters + 1;
     }
 
-
     // Store solution
     if (korder == int(0)) {
       theta.col(i) = beta;
@@ -92,19 +95,18 @@ List rtestim_path(int algo,
       dof(i) = arma::sum(arma::abs(arma::diff(alpha)) > tolerance);
     }
 
-
     // Verbose handlers
-    if (verbose > 1) Rcout << niter(i);
-    if (verbose > 2) Rcout << "(" << lambda(i) << ")";
-    if (verbose > 0) Rcout << std::endl;
+    if (verbose > 1)
+      Rcout << niter(i);
+    if (verbose > 2)
+      Rcout << "(" << lambda(i) << ")";
+    if (verbose > 0)
+      Rcout << std::endl;
   }
 
   // Return
-  List out = List::create(
-    Named("Rt") = theta,
-    Named("lambda") = lambda,
-    Named("degree") = korder + 1,
-    Named("dof") = dof,
-    Named("niter") = niter);
+  List out = List::create(Named("Rt") = theta, Named("lambda") = lambda,
+                          Named("degree") = korder + 1, Named("dof") = dof,
+                          Named("niter") = niter);
   return out;
 }
