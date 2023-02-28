@@ -15,7 +15,7 @@
 #'
 #' @param observed_counts vector of the observed daily infection counts
 #' @param degree Integer. Degree of the piecewise polynomial curve to be
-#'   estimated. For example, `degree = 1` corresponds to a piecewise constant
+#'   estimated. For example, `degree = 0` corresponds to a piecewise constant
 #'   curve.
 #' @param lambda Vector. A user supplied sequence of tuning parameters which
 #'   determines the balance between data fidelity and
@@ -75,7 +75,7 @@
 #' out <- estimate_rt(y, nsol = 10)
 #' plot(out)
 #'
-#' out0 <- estimate_rt(y, degree = 1L, nsol = 10)
+#' out0 <- estimate_rt(y, degree = 0L, nsol = 10)
 #' plot(out0)
 estimate_rt <- function(observed_counts,
                         degree = 3L,
@@ -90,7 +90,8 @@ estimate_rt <- function(observed_counts,
                         maxiter = 1e4,
                         init = NULL) {
   # check arguments are of proper types
-  arg_is_pos_int(degree, nsol, maxiter)
+  arg_is_nonneg_int(degree)
+  arg_is_pos_int(nsol, maxiter)
   arg_is_scalar(degree, nsol, lambda_min_ratio)
   arg_is_scalar(lambdamin, lambdamax, allow_null = TRUE)
   arg_is_positive(lambdamin, lambdamax, allow_null = TRUE)
@@ -121,8 +122,8 @@ estimate_rt <- function(observed_counts,
 
   # check that degree is less than data length
   n <- length(observed_counts)
-  if (degree >= n)
-    cli::cli_abort("`degree` must be less than observed data length.")
+  if (degree + 1 >= n)
+    cli::cli_abort("`degree` must be less than observed data length minus 1.")
 
   # check that observed counts are non-negative
   if (any(observed_counts < 0))
@@ -158,15 +159,12 @@ estimate_rt <- function(observed_counts,
   algo <- match(algo, c("linear_admm", "irls_admm"))
   algo <- as.integer(algo)
 
-  # convert degrees of estimated curves to be
-  # orders (k) of divided difference matrices:
-  k <- init$degree - 1L
   mod <- rtestim_path(
     algo,
     observed_counts,
     x,
     weighted_past_counts,
-    k,
+    degree,
     lambda = lambda,
     lambdamax = lambdamax,
     lambdamin = lambdamin,
@@ -241,12 +239,11 @@ configure_rt_admm <- function(observed_counts,
   arg_is_scalar(degree, rho, rho_adjust, alpha, gamma, tolerance, verbose)
   arg_is_positive(alpha, gamma, tolerance)
   arg_is_numeric(rho, rho_adjust, tolerance)
-  arg_is_pos_int(degree)
-  arg_is_nonneg_int(verbose)
+  arg_is_nonneg_int(degree, verbose)
   if (alpha >= 1) cli::cli_abort("`alpha` must be in (0, 1).")
   if (gamma > 1) cli::cli_abort("`gamma` must be in (0, 1].")
-  if (degree >= n) {
-    cli::cli_abort("`degree` must be less than observed data length.")
+  if (degree + 1 >= n) {
+    cli::cli_abort("`degree` must be less than observed data length minus 1.")
   }
 
   if (is.null(primal_var)) {
@@ -256,11 +253,11 @@ configure_rt_admm <- function(observed_counts,
   } else {
     arg_is_length(n, primal_var)
   }
-  if (is.null(auxi_var)) auxi_var <- double(n - degree + 1)
-  else arg_is_length(n - degree + 1, auxi_var)
+  if (is.null(auxi_var)) auxi_var <- double(n - degree)
+  else arg_is_length(n - degree, auxi_var)
 
-  if (is.null(dual_var)) dual_var <- double(n - degree + 1)
-  else arg_is_length(n - degree + 1, dual_var)
+  if (is.null(dual_var)) dual_var <- double(n - degree)
+  else arg_is_length(n - degree, dual_var)
 
   structure(
     list(
