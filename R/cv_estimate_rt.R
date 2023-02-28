@@ -108,13 +108,15 @@ cv_estimate_rt <- function(observed_counts,
 
   structure(
     list(
+      full_fit = full_data_fit,
       weighted_past_counts = weighted_past_counts,
       observed_counts = observed_counts,
       cv_scores = cv_scores,
       optimal_Rt = op_mod$Rt,
       optimal_lambda = op_lambda,
       lambda = lambda,
-      x = x
+      x = x,
+      call = match.call()
     ),
     class = "cv_result"
   )

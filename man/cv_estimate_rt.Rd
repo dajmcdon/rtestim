@@ -68,6 +68,6 @@ Leave-kth-out cross validation for choosing a optimal parameter lambda
 }
 \examples{
 y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
-cv <- cv_estimate_rt(y, degree = 2, fold = 2, nsol=30)
+cv <- cv_estimate_rt(y, degree = 3, fold = 2, nsol=30)
 cv
 }

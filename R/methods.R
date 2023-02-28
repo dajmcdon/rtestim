@@ -92,7 +92,43 @@ plot.poisson_rt <- function(x, which_lambda = NULL, ...) {
     ggplot2::scale_colour_viridis_c(trans = "log10")
 }
 
+#' @method summary cv_result
+#' @export
+summary.cv_result <- function(object, ...) {
+  rlang::check_dots_empty()
+  ns <- length(object$cv_scores)
+  if (ns > 5) {
+    xcv <- round(stats::quantile(1:ns))
+    names(xcv) <- rev(c("Max.", "3rd Qu.", "Median", "1st Qu.", "Min."))
+  } else {
+    xcv <- seq_len(ns)
+    names(xcv) <- paste0("s", seq_len(ns))
+  }
+  tab <- with(object, data.frame(
+    cv_scores = cv_scores[xcv],
+    index = xcv,
+    lambda = object$lambda[xcv])
+    )
+  rownames(tab) <- names(xcv)
+  out <- structure(
+    list(call = object$call, table = tab, degree = object$degree, ncv = ns),
+    class = "summary.cv_result")
+  out
+}
 
+
+#' @method print summary.cv_result
+#' @export
+print.summary.cv_result <- function(x,
+                                     digits = max(3, getOption("digits") - 3),
+                                     ...) {
+  rlang::check_dots_empty()
+  cat("\nCall: ", deparse(x$call), fill = TRUE)
+  cat("\nSummary of the", x$ncv, "estimated models:\n")
+  print(x$tab, digits = digits)
+  cat("\n")
+  cat("\nLambda =", x$tab$lambda[1], "gives the best CV score")
+}
 
 #' Plot cv_result
 #'
@@ -106,7 +142,15 @@ plot.poisson_rt <- function(x, which_lambda = NULL, ...) {
 #' cv <- cv_estimate_rt(c(1:20), degree = 2, fold = 2, nsol=100)
 #' plot(cv)
 plot.cv_result <- function(x, ...) {
-  par(mar = c(5,4,4,2), mfrow=c(1,2))
-  plot(x$cv_scores, type = "l")
-  plot(x$optimal_Rt)
+  df <- data.frame(
+    cv_scores = x$cv_scores,
+    lambda = x$lambda
+  )
+
+  ggplot2::ggplot(df, ggplot2::aes(x=lambda, y = cv_scores))+
+    ggplot2::geom_line() +
+    ggplot2::theme_bw() +
+    ggplot2::labs(title="Cross Validation Scores", x = "Lambda", y = "CV scores")+
+    ggplot2::scale_x_log10()
+
 }
