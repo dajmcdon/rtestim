@@ -123,9 +123,11 @@ arma::vec admm_gauss(int M,
                      double s_norm,
                      arma::sp_mat const& DD,
                      double tol) {
+  vec W = exp(theta);
   mat dDD(DD);
   dDD *= n * rho;
-  mat W(n, n);
+  dDD.diag() += W;
+  mat W_inv = inv(dDD);
   vec c(n);
   vec c2(z.size());
   vec z_old(z);
@@ -134,11 +136,9 @@ arma::vec admm_gauss(int M,
     if (iter % 1000 == 0)
       Rcpp::checkUserInterrupt();
     // solve for primal variable - theta:
-    W = dDD;
-    W.diag() += exp(theta);
     z -= u;
     calcDTvline(n, ord, x, z, c);  // c = Dt * (z - u)
-    theta = solve(W, exp(theta) % y + n * rho * c);
+    theta = W_inv * (W % y + n * rho * c);
     // solve for alternating variable - z:
     calcDvline(n, ord, x, theta, c2);
     c2 += u;  // c2 = D * theta + u;
