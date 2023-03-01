@@ -96,20 +96,17 @@ plot.poisson_rt <- function(x, which_lambda = NULL, ...) {
 #' @export
 summary.cv_result <- function(object, ...) {
   rlang::check_dots_empty()
-  ns <- length(object$cv_scores)
-  if (ns > 5) {
-    xcv <- round(stats::quantile(1:ns))
-    names(xcv) <- rev(c("Max.", "3rd Qu.", "Median", "1st Qu.", "Min."))
-  } else {
-    xcv <- seq_len(ns)
-    names(xcv) <- paste0("s", seq_len(ns))
-  }
+  cv_scores <- object$cv_scores
+  ns <- length(cv_scores)
+
+  xcv <- order(cv_scores)
+  if (ns > 5) xcv <- xcv[1:5]
+
   tab <- with(object, data.frame(
     cv_scores = cv_scores[xcv],
     index = xcv,
     lambda = object$lambda[xcv])
     )
-  rownames(tab) <- names(xcv)
   out <- structure(
     list(call = object$call, table = tab, degree = object$degree, ncv = ns),
     class = "summary.cv_result")
@@ -124,16 +121,19 @@ print.summary.cv_result <- function(x,
                                      ...) {
   rlang::check_dots_empty()
   cat("\nCall: ", deparse(x$call), fill = TRUE)
-  cat("\nSummary of the", x$ncv, "estimated models:\n")
+  cat("\n")
+  cat("\nDegree of the estimated piecewise polynomial curve:", x$degree, "\n")
+  cat("\nLambda =", x$tab$lambda[1], "gives the best CV score")
+  cat("\n")
+  cat("\nSummary of cross validation from", x$ncv, "lambdas:\n")
   print(x$tab, digits = digits)
   cat("\n")
-  cat("\nLambda =", x$tab$lambda[1], "gives the best CV score")
 }
 
 #' Plot cv_result
 #'
 #' @param x result of cv_estimate_rt of class `cv_result`
-#' @param plot_rt plot cross-validation scores only if set to `FALSE`; plot
+#' @param plot_Rt plot cross-validation scores only if set to `FALSE`; plot
 #' Rt and specify which Rt to generate with the `which_lambda` parameter if set
 #' to `TRUE`
 #' @param which_lambda select which Rt's to plot, if `plot_rt == TRUE`. If not
@@ -148,20 +148,34 @@ print.summary.cv_result <- function(x,
 #' y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
 #' cv <- cv_estimate_rt(y, degree = 3, fold = 2, nsol=30)
 #' plot(cv)
-plot.cv_result <- function(x, use_lambda = NULL, ...) {
-  arg_is_numeric(use_lambda, allow_null = TRUE)
+#' plot(cv, plot_Rt = TRUE)
+plot.cv_result <- function(x, plot_Rt = FALSE, which_lambda = NULL, ...) {
+  arg_is_numeric(which_lambda, allow_null = TRUE)
+  arg_is_logical(plot_Rt)
+  lambda <- x$lambda
+  cv_scores <- x$cv_scores
 
+  if (!plot_Rt && !is.null(which_lambda)) {
+    cli::cli_warn("plot_Rt is False, ignoring input to `which_lambda`. Plot
+                  cross validation score as default")
+  }
+  if (!plot_Rt) {
+    df <- data.frame(
+      cv_scores = cv_scores,
+      lambda = lambda
+    )
+    plt_scores <- ggplot2::ggplot(df, ggplot2::aes(x=lambda, y = cv_scores))+
+      ggplot2::geom_line() +
+      ggplot2::theme_bw() +
+      ggplot2::labs(title="Cross Validation Scores",
+                    x = "Lambda", y = "CV scores")+
+      ggplot2::scale_x_log10()
+    return(plt_scores)
 
-  df <- data.frame(
-    cv_scores = x$cv_scores,
-    lambda = x$lambda
-  )
-
-  plt_scores <- ggplot2::ggplot(df, ggplot2::aes(x=lambda, y = cv_scores))+
-    ggplot2::geom_line() +
-    ggplot2::theme_bw() +
-    ggplot2::labs(title="Cross Validation Scores", x = "Lambda", y = "CV scores")+
-    ggplot2::scale_x_log10()
-
-  plt_scores
+  } else {
+    if (is.null(which_lambda))
+      return(plot(x$full_fit, which_lambda = x$optimal_lambda))
+    else
+      return(plot(x$full_fit, which_lambda = which_lambda))
+  }
 }

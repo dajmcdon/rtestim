@@ -7,6 +7,8 @@
 fold_calculator(n, fold)
 }
 \arguments{
+\item{n}{length of the sequence to partition from}
+
 \item{fold}{Integer. This the number of folds to conduct the leave-kth-out
 cross validation. For leave-kth-out cross validation, every kth
 observed_counts and their corresponding position (evenly or unevenly

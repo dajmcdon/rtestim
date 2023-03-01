@@ -7,6 +7,7 @@
 #' spaced) are placed into the same fold. The first and last observed_counts are
 #' not assigned to any folds. Smallest allowable value if `fold = 2`. It is
 #' generally not recommended to set `fold` to a large number
+#' @param ... not used.
 
 #' @return An object with S3 class `"cv_result"`. Among the list components:
 #' * `cv_scores` leave-kth-out cross validation scores
@@ -116,7 +117,8 @@ cv_estimate_rt <- function(observed_counts,
       optimal_lambda = op_lambda,
       lambda = lambda,
       x = x,
-      call = match.call()
+      call = match.call(),
+      degree = degree
     ),
     class = "cv_result"
   )
@@ -127,6 +129,7 @@ cv_estimate_rt <- function(observed_counts,
 #' Helper function. Calculate the fold index for each `observed_counts`
 #'
 #' @inheritParams cv_estimate_rt
+#' @param n length of the sequence to partition from
 #' @return a vector of fold index at which the counts are distributed into folds
 #' @export
 #'

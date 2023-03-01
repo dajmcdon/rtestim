@@ -50,6 +50,8 @@ this behaviour. It is likely better to supply a
 decreasing sequence of `lambda` values than a single (small) value. If
 supplied, the user-defined `lambda` sequence is automatically sorted in
 decreasing order.}
+
+\item{...}{not used.}
 }
 \value{
 An object with S3 class `"cv_result"`. Among the list components:

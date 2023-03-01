@@ -4,12 +4,20 @@
 \alias{plot.cv_result}
 \title{Plot cv_result}
 \usage{
-\method{plot}{cv_result}(x, ...)
+\method{plot}{cv_result}(x, plot_Rt = FALSE, which_lambda = NULL, ...)
 }
 \arguments{
 \item{x}{result of cv_estimate_rt of class `cv_result`}
 
-\item{...}{}
+\item{plot_Rt}{plot cross-validation scores only if set to `FALSE`; plot
+Rt and specify which Rt to generate with the `which_lambda` parameter if set
+to `TRUE`}
+
+\item{which_lambda}{select which Rt's to plot, if `plot_rt == TRUE`. If not
+provided, plot R estimated with the optimal lambda. Any lambda provided must
+match the values used in generating the Rt's.}
+
+\item{...}{Not used.}
 }
 \value{
 plot of cv scores
@@ -18,6 +26,6 @@ plot of cv scores
 Plot cv_result
 }
 \examples{
-cv <- cv_estimate_rt(c(1:20), degree = 2, fold = 2, nsol=100)
-plot(cv)
+y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
+cv <- cv_estimate_rt(y, degree = 3, fold = 2, nsol=30)
 }
