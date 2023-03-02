@@ -81,7 +81,7 @@
 estimate_rt <- function(observed_counts,
                         degree = 3L,
                         dist_gamma = c(2.5, 2.5),
-                        x = NULL,
+                        x = 1:n,
                         lambda = NULL,
                         nsol = 100L,
                         lambdamin = NULL,
@@ -100,6 +100,18 @@ estimate_rt <- function(observed_counts,
   arg_is_positive(lambda_min_ratio, dist_gamma)
   arg_is_length(2, dist_gamma)
   algo <- match.arg(algo)
+  n <- length(observed_counts)
+
+  # check that x is a sorted, double vector of length n
+  arg_is_numeric(x)
+  arg_is_length(n, x)
+  if (is.unsorted(x)) {
+    ord <- order(x)
+    x <- x[ord]
+    y <- y[ord]
+  }
+  x <- (x - x[1]) / (diff(range(x)) + 1) * n  + 1 # handle possibly odd spacings
+
 
   # create weighted past cases
   if (any(observed_counts < 0))
@@ -123,9 +135,8 @@ estimate_rt <- function(observed_counts,
   }
 
   # check that degree is less than data length
-  n <- length(observed_counts)
-  if (degree + 1 >= n)
-    cli::cli_abort("`degree` must be less than observed data length minus 1.")
+  if (degree >= n)
+    cli::cli_abort("`degree` must be less than observed data length.")
 
   # check that observed counts are non-negative
   if (any(observed_counts < 0))
@@ -143,18 +154,6 @@ estimate_rt <- function(observed_counts,
     if (lambdamin > 0 && lambdamax > 0 && lambdamin >= lambdamax) {
       cli::cli_abort("{msg} lambdamin must be < lambdamax.")
     }
-  }
-
-  # check that x is a double vector of length 0 or n
-  arg_is_numeric(x, allow_null = TRUE)
-  if (!is.null(x)) {
-    arg_is_length(n, x)
-    ord <- order(x)
-    x <- x[ord]
-    observed_counts <- observed_counts[ord]
-    x <- (x - x[1]) / diff(range(x)) * n # handle possibly odd spacings
-  } else {
-    x <- 1:n
   }
 
   # check algorithm
