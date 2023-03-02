@@ -56,7 +56,6 @@ void create_lambda(NumericVector& lambda,
     double p;
     if (lambdamin < lmpad) {
       p = pow(lambdamax / lmpad, 1 / (ns - 2));
-      Rcout << p << std::endl;
       lambda(1) = lmpad;
       for (int i = 2; i < nsol; i++) lambda[i] = lambda[i - 1] * p;
       lambda(0) = lambdamin;
@@ -67,14 +66,6 @@ void create_lambda(NumericVector& lambda,
     }
   }
 }
-
-// [[Rcpp::export()]]
-double try_pow(double a, int b) {
-  double bb = static_cast<double>(b);
-  double cc = 1 / bb;
-  return cc;
-}
-
 
 // [[Rcpp::export()]]
 NumericVector create_lambda_test(NumericVector lambda,

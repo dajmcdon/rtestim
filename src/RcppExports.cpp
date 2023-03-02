@@ -110,18 +110,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// try_pow
-double try_pow(double a, int b);
-RcppExport SEXP _rtestim_try_pow(SEXP aSEXP, SEXP bSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< double >::type a(aSEXP);
-    Rcpp::traits::input_parameter< int >::type b(bSEXP);
-    rcpp_result_gen = Rcpp::wrap(try_pow(a, b));
-    return rcpp_result_gen;
-END_RCPP
-}
 // create_lambda_test
 NumericVector create_lambda_test(NumericVector lambda, double lambdamin, double lambdamax, double lambda_min_ratio, int nsol);
 RcppExport SEXP _rtestim_create_lambda_test(SEXP lambdaSEXP, SEXP lambdaminSEXP, SEXP lambdamaxSEXP, SEXP lambda_min_ratioSEXP, SEXP nsolSEXP) {
@@ -248,7 +236,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rtestim_dptfe_past", (DL_FUNC) &_rtestim_dptfe_past, 3},
     {"_rtestim_get_Dtil", (DL_FUNC) &_rtestim_get_Dtil, 2},
     {"_rtestim_get_D", (DL_FUNC) &_rtestim_get_D, 2},
-    {"_rtestim_try_pow", (DL_FUNC) &_rtestim_try_pow, 2},
     {"_rtestim_create_lambda_test", (DL_FUNC) &_rtestim_create_lambda_test, 5},
     {"_rtestim_doDv", (DL_FUNC) &_rtestim_doDv, 3},
     {"_rtestim_doDtv", (DL_FUNC) &_rtestim_doDtv, 3},

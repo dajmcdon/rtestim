@@ -26,11 +26,14 @@ get_D <- function(k, xd) {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 try_pow <- function(a, b) {
     .Call(`_rtestim_try_pow`, a, b)
 }
 
+=======
+>>>>>>> b4fdcb2 (kill spurious noise)
 create_lambda_test <- function(lambda, lambdamin, lambdamax, lambda_min_ratio, nsol) {
     .Call(`_rtestim_create_lambda_test`, lambda, lambdamin, lambdamax, lambda_min_ratio, nsol)
 }
