@@ -154,7 +154,7 @@ estimate_rt <- function(observed_counts,
     observed_counts <- observed_counts[ord]
     x <- (x - x[1]) / diff(range(x)) * n # handle possibly odd spacings
   } else {
-    x <- double(0)
+    x <- 1:n
   }
 
   # check algorithm
