@@ -132,7 +132,7 @@ estimate_rt <- function(observed_counts,
     cli::cli_abort("`observed_counts` must be non-negative.")
 
   # checks on lambda, lambdamin, lambdamax
-  if (is.null(lambda)) lambda <- double(0) # prep for create_lambda
+  if (is.null(lambda)) lambda <- double(nsol) # prep for create_lambda
   if (is.null(lambdamin)) lambdamin <- -1.0
   if (is.null(lambdamax)) lambdamax <- -1.0
   if (length(lambda) == 0) {

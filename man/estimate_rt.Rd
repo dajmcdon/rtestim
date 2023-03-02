@@ -85,7 +85,7 @@ An object with S3 class `poisson_rt`. Among the list components:
 * `Rt` the estimated effective reproduction rate. This is a matrix with
     each column corresponding to one value of `lambda`.
 * `lambda` the value of `lambda` actually used in the algorithm.
-* `degree` degree of the piecewise polynomial curve to be estimated.
+* `degree` degree of the estimated piecewise polynomial curve.
 * `niter` the required number of iterations for each value of `lambda`
 * `convergence` if number of iterations for each value of `lambda` is less
     than the maximum number of iterations for the estimation algorithm.

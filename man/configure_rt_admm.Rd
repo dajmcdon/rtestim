@@ -16,6 +16,7 @@ configure_rt_admm(
   alpha = 0.5,
   gamma = 0.9,
   tolerance = 1e-04,
+  maxiter_inner = 30L,
   verbose = 0
 )
 }
@@ -36,19 +37,30 @@ weights}
 
 \item{dual_var}{dual variable in the ADMM algorithm}
 
-\item{rho}{double. An ADMM parameter; coefficient of augmented term in the
+\item{rho}{Double. An ADMM parameter; coefficient of augmented term in the
 Lagrangian function.}
 
-\item{rho_adjust}{double. An ADMM parameter; adjusted coefficient of
+\item{rho_adjust}{Double. An ADMM parameter; adjusted coefficient of
 augmented term in the Lagrangian function.}
 
+<<<<<<< HEAD
 \item{alpha}{Double. A parameter adjusting upper bound in line search algorithm
 in `prox_newton` algorithm.}
 
 \item{gamma}{Double. A parameter adjusting step size in line search algorithm
 in `prox_newton` algorithm.}
+=======
+\item{alpha}{Double. A parameter adjusting upper bound in line search
+algorithm in `irls_admm` algorithm.}
 
-\item{tolerance}{double. Tolerance of ADMM convergence.}
+\item{gamma}{Double. A parameter adjusting step size in line search
+algorithm in `irls_admm` algorithm.}
+>>>>>>> fd2e7d3 (fix lambda creator)
+
+\item{tolerance}{Double. Tolerance of ADMM convergence.}
+
+\item{maxiter_inner}{Integer. Maximum number of iterations that can be spent
+in the inner loop of the proximal Newton algorithm.}
 
 \item{verbose}{integer.}
 }
