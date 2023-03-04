@@ -108,7 +108,7 @@ estimate_rt <- function(observed_counts,
   if (is.unsorted(x)) {
     ord <- order(x)
     x <- x[ord]
-    y <- y[ord]
+    observed_counts <- observed_counts[ord]
   }
   x <- (x - x[1]) / (diff(range(x)) + 1) * n  + 1 # handle possibly odd spacings
 
@@ -165,7 +165,7 @@ estimate_rt <- function(observed_counts,
     observed_counts,
     x,
     weighted_past_counts,
-    degree,
+    init$degree,
     lambda = lambda,
     lambdamax = lambdamax,
     lambdamin = lambdamin,
