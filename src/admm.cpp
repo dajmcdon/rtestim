@@ -192,26 +192,27 @@ arma::vec admm_gauss(int M,
   return theta;
 }
 
-void prox_newton(int M,
-                 int M_inner,
-                 int n,
-                 int ord,
-                 arma::vec const& y,
-                 arma::vec const& x,
-                 arma::vec const& w,
-                 arma::vec& theta,
-                 arma::vec& z,
-                 arma::vec& u,
-                 double lambda,
-                 double rho,
-                 double alpha,
-                 double gamma,
-                 arma::sp_mat const& D,
-                 double tol,
-                 int& iter) {
-  int m = z.size();
-  int iter_best = 0;
-  double s;  // step size
+void prox_newton(int& M,
+               int n,
+               int ord,
+               NumericVector const& y,
+               NumericVector const& x,
+               NumericVector const& w,
+               NumericVector& theta,
+               NumericVector& z,
+               NumericVector& u,
+               double lambda,
+               double rho,
+               double alpha,
+               double gamma,
+               Eigen::SparseMatrix<double> const& DD,
+               double tol,
+               int Minner,
+               int& iter) {
+  double s;             // step size
+  NumericVector obj_list(M + 1);  // objective list for each iterate
+  double obj = 1e4;     // initialize it to be large
+  NumericVector theta_old(n);     // a buffer for line search
   double lam_z = lambda / rho;
   double r_norm = 0.0;
   double s_norm = 0.0;

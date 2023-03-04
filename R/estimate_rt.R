@@ -110,7 +110,7 @@ estimate_rt <- function(observed_counts,
     x <- x[ord]
     observed_counts <- observed_counts[ord]
   }
-  x <- (x - x[1]) / (diff(range(x)) + 1) * n  + 1 # handle possibly odd spacings
+  # x <- (x - x[1]) / (diff(range(x)) + 1) * n  + 1 # handle possibly odd spacings
 
 
   # create weighted past cases
@@ -135,8 +135,8 @@ estimate_rt <- function(observed_counts,
   }
 
   # check that degree is less than data length
-  if (degree >= n)
-    cli::cli_abort("`degree` must be less than observed data length.")
+  if (degree + 1 >= n)
+    cli::cli_abort("`degree + 1` must be less than observed data length.")
 
   # check that observed counts are non-negative
   if (any(observed_counts < 0))
@@ -179,8 +179,6 @@ estimate_rt <- function(observed_counts,
     ls_gamma = init$gamma,
     verbose = init$verbose
   )
-
-  if (length(x) == 0) x <- 1:n
   structure(
     list(
       observed_counts = observed_counts,
