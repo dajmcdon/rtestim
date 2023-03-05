@@ -4,12 +4,12 @@
 \alias{fold_calculator}
 \title{Helper function. Calculate the fold index for each `observed_counts`}
 \usage{
-fold_calculator(n, fold)
+fold_calculator(n, nfold)
 }
 \arguments{
 \item{n}{length of the sequence to partition from}
 
-\item{fold}{Integer. This the number of folds to conduct the leave-kth-out
+\item{nfold}{Integer. This the number of folds to conduct the leave-kth-out
 cross validation. For leave-kth-out cross validation, every kth
 observed_counts and their corresponding position (evenly or unevenly
 spaced) are placed into the same fold. The first and last observed_counts are

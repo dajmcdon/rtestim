@@ -1,7 +1,7 @@
 #' Leave-kth-out cross validation for choosing a optimal parameter lambda
 #'
 #' @inheritParams estimate_rt
-#' @param fold Integer. This the number of folds to conduct the leave-kth-out
+#' @param nfold Integer. This the number of folds to conduct the leave-kth-out
 #' cross validation. For leave-kth-out cross validation, every kth
 #' observed_counts and their corresponding position (evenly or unevenly
 #' spaced) are placed into the same fold. The first and last observed_counts are
@@ -24,15 +24,18 @@
 #'
 #' @examples
 #' y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
-#' cv <- cv_estimate_rt(y, degree = 3, fold = 2, nsol=30)
+#' cv <- cv_estimate_rt(y, degree = 3, nfold = 2, nsol=30)
 #' cv
 cv_estimate_rt <- function(observed_counts,
                            degree = 3L,
                            dist_gamma = c(2.5, 2.5),
-                           fold = 3,
+                           nfold = 3,
                            x = NULL,
                            lambda = NULL,
                            ...) {
+
+  arg_is_pos_int(nfold)
+  if (nfold==1) cli::cli_abort("nfold must be greater than 1")
 
   ## Run program one time to create lambda
   full_data_fit <- estimate_rt(
@@ -50,26 +53,18 @@ cv_estimate_rt <- function(observed_counts,
 
 
   # Cross validation (copied from glmgen cv.trendfilter)
-  foldid = fold_calculator(n, fold)
-  cvall <- matrix(0, fold, length(lambda))
+  foldid = fold_calculator(n, nfold)
+  cvall <- matrix(0, nfold, length(lambda))
 
-  for (f in 1:fold) {
+  for (f in 1:nfold) {
     ### train test splits
     train_idx <- which(foldid != f)
     test_idx <- which(foldid == f)
 
-    train_observed_counts <- observed_counts[train_idx]
-    train_weighted_past_counts <- weighted_past_counts[train_idx]
-    train_x <- x[train_idx]
-
-    test_observed_counts <- observed_counts[test_idx]
-    test_weighted_past_counts <- weighted_past_counts[test_idx]
-    test_x <- x[test_idx]
-
     ### Run solver with the training set
     mod <- estimate_rt(
-      observed_counts = train_observed_counts,
-      x = train_x,
+      observed_counts = observed_counts[train_idx],
+      x = x[train_idx],
       degree = degree,
       lambda = lambda,
       ...)
@@ -79,13 +74,13 @@ cv_estimate_rt <- function(observed_counts,
                            n = n,
                            train_idx = train_idx,
                            test_idx = test_idx,
-                           train_x = train_x,
-                           test_x = test_x)
+                           train_x = x[train_idx],
+                           test_x = x[test_idx])
 
     ### Calculate CV scores (Poisson loss) and store ###
-    pred_observed_counts <- pred_rt*test_weighted_past_counts
+    pred_observed_counts <- pred_rt * weighted_past_counts[test_idx]
     # taking neg-log of density without the factorial term as score
-    score <- -colMeans(test_observed_counts*log(pred_observed_counts)
+    score <- -colMeans(observed_counts[test_idx] * log(pred_observed_counts)
                        - pred_observed_counts)
     cvall[f,] <- score # scores for all lambda for this left-out set
   }
@@ -93,19 +88,14 @@ cv_estimate_rt <- function(observed_counts,
   ### Notes: cvall is a k by n_lambda matrix, each row contains score for each
   ### lambda for the particular fold
 
-  ### Calculate CV scores
+  ### Calculate CV summary
   cv_scores <- colMeans(cvall)
+  # calculate se for all lambda
+  cv_se <- apply(cvall, FUN = sd, MARGIN = 2)/sqrt(nfold)
+  i0 <- which.min(cv_scores)
+
   op_lambda <- lambda[which.min(cv_scores)]
-
-
-  ### Re-train with optimal lambda from cv
-  op_mod <- estimate_rt(
-    observed_counts = observed_counts,
-    x = x,
-    degree = degree,
-    lambda = op_lambda,
-    ...)
-
+  lambda_1se <- max(lambda[cv_scores <= cv_scores[i0] + cv_se[i0]])
 
   structure(
     list(
@@ -113,14 +103,16 @@ cv_estimate_rt <- function(observed_counts,
       weighted_past_counts = weighted_past_counts,
       observed_counts = observed_counts,
       cv_scores = cv_scores,
-      optimal_Rt = op_mod$Rt,
+      cv_se = cv_se,
       optimal_lambda = op_lambda,
       lambda = lambda,
+      lambda_1se = lambda_1se,
       x = x,
       call = match.call(),
-      degree = degree
+      degree = degree,
+      dof = full_data_fit$dof
     ),
-    class = "cv_result"
+    class = "cv_poisson_rt"
   )
 }
 
@@ -134,8 +126,8 @@ cv_estimate_rt <- function(observed_counts,
 #' @export
 #'
 #' @examples fold_calculator(20, 3)
-fold_calculator <- function(n, fold) {
-  c(0,rep(seq(1,fold),n-2)[seq(1,n-2)],0)
+fold_calculator <- function(n, nfold) {
+  c(0, rep_len(1:nfold, n - 2), 0)
 }
 
 
@@ -157,19 +149,15 @@ fold_calculator <- function(n, fold) {
 #' @export
 #'
 #' @examples
-#' n <- 10
-#' x <- 1:10
 #' train_idx <- c(1, 3, 5, 7, 9, 10)
 #' test_idx <- c(2, 4, 6, 8)
 #' train_x <- x[train_idx]
 #' test_x <- x[test_idx]
 #' rt <- matrix(c(1.1, 1.3, 1.5, 1.7, 1.9, 2.0), nrow=6)
-#'
 #' pred_kth_rt(rt, n, train_idx, test_idx, train_x, test_x)
-#' # Should equal to c(1.2, 1.4, 1.6, 1.8)
 pred_kth_rt <- function(rt, n, train_idx, test_idx, train_x, test_x) {
-  ilo <- which((seq(1,n)%in%(test_idx-1))[train_idx])
-  ihi <- which((seq(1,n)%in%(test_idx+1))[train_idx])
+  ilo <- which((seq(1, n) %in% (test_idx - 1))[train_idx])
+  ihi <- which((seq(1, n) %in% (test_idx + 1))[train_idx])
   a <- (test_x - train_x[ilo])/(train_x[ihi] - train_x[ilo])
-  rt[ilo,]*(1-a) + rt[ihi,]*a
+  rt[ilo,] * (1 - a) + rt[ihi,] * a
 }

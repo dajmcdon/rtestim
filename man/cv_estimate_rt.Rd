@@ -8,7 +8,7 @@ cv_estimate_rt(
   observed_counts,
   degree = 3L,
   dist_gamma = c(2.5, 2.5),
-  fold = 3,
+  nfold = 3,
   x = NULL,
   lambda = NULL,
   ...
@@ -28,7 +28,7 @@ some period of time after having become infectious.
 As in most literature, we assume that this interval follows a gamma
 distribution with some shape and scale.}
 
-\item{fold}{Integer. This the number of folds to conduct the leave-kth-out
+\item{nfold}{Integer. This the number of folds to conduct the leave-kth-out
 cross validation. For leave-kth-out cross validation, every kth
 observed_counts and their corresponding position (evenly or unevenly
 spaced) are placed into the same fold. The first and last observed_counts are
@@ -70,6 +70,6 @@ Leave-kth-out cross validation for choosing a optimal parameter lambda
 }
 \examples{
 y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
-cv <- cv_estimate_rt(y, degree = 3, fold = 2, nsol=30)
+cv <- cv_estimate_rt(y, degree = 3, nfold = 2, nsol=30)
 cv
 }
