@@ -78,9 +78,9 @@ List rtestim_path(int algo,
                mu * lambda(i), tolerance, iters);  // add rho_adjust?
           break;
         case 2:
-          irls_admm(maxiter, n, korder, y, x, w, beta, alpha, u, lambda(i),
-                    _rho, mu * lambda(i), ls_alpha, ls_gamma, Dk, tolerance,
-                    iters);
+          prox_newton(maxiter, n, korder, y, x, w, beta, alpha, u, lambda(i),
+                      _rho, mu * lambda(i), ls_alpha, ls_gamma, Dk, tolerance,
+                      iters);
           break;
       }
       niter(i) = iters + 1;

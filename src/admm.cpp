@@ -163,23 +163,23 @@ arma::vec admm_gauss(int M,
   return theta;
 }
 
-void irls_admm(int M,
-               int n,
-               int ord,
-               arma::vec const& y,
-               arma::vec const& x,
-               arma::vec const& w,
-               arma::vec& theta,
-               arma::vec& z,
-               arma::vec& u,
-               double lambda,
-               double rho,
-               double mu,
-               double alpha,
-               double gamma,
-               arma::sp_mat const& D,
-               double tol,
-               int& iter) {
+void prox_newton(int M,
+                 int n,
+                 int ord,
+                 arma::vec const& y,
+                 arma::vec const& x,
+                 arma::vec const& w,
+                 arma::vec& theta,
+                 arma::vec& z,
+                 arma::vec& u,
+                 double lambda,
+                 double rho,
+                 double mu,
+                 double alpha,
+                 double gamma,
+                 arma::sp_mat const& D,
+                 double tol,
+                 int& iter) {
   double s;             // step size
   vec obj_list(M + 1);  // objective list for each iterate
   double obj = 1e4;     // initialize it to be large

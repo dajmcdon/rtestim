@@ -53,8 +53,7 @@
 #'   A very small value will lead to the solution `Rt = log(observed_counts)`.
 #'   This argument has no effect if there is user-defined `lambda` sequence.
 #' @param algo the algorithm to be used in computation. `linear_admm`:
-#'   linearized ADMM; `irls_admm`: iteratively reweighted least squares with
-#'   standard ADMM.
+#'   linearized ADMM; `prox_newton`: proximal newton-based method.
 #'
 #' @return An object with S3 class `poisson_rt`. Among the list components:
 #' * `observed_counts` the observed daily infection counts.
@@ -86,7 +85,7 @@ estimate_rt <- function(observed_counts,
                         lambdamin = NULL,
                         lambdamax = NULL,
                         lambda_min_ratio = 1e-4,
-                        algo = c("linear_admm", "irls_admm"),
+                        algo = c("linear_admm", "prox_newton"),
                         maxiter = 1e4,
                         init = NULL) {
   # check arguments are of proper types
@@ -156,7 +155,7 @@ estimate_rt <- function(observed_counts,
   }
 
   # check algorithm
-  algo <- match(algo, c("linear_admm", "irls_admm"))
+  algo <- match(algo, c("linear_admm", "prox_newton"))
   algo <- as.integer(algo)
 
   mod <- rtestim_path(
@@ -214,9 +213,9 @@ estimate_rt <- function(observed_counts,
 #' @param rho_adjust double. An ADMM parameter; adjusted coefficient of
 #' augmented term in the Lagrangian function.
 #' @param alpha Double. A parameter adjusting upper bound in line search algorithm
-#'   in `irls_admm` algorithm.
+#'   in `prox_newton` algorithm.
 #' @param gamma Double. A parameter adjusting step size in line search algorithm
-#'   in `irls_admm` algorithm.
+#'   in `prox_newton` algorithm.
 #' @param tolerance double. Tolerance of ADMM convergence.
 #' @param verbose integer.
 #'

@@ -14,7 +14,7 @@ estimate_rt(
   lambdamin = NULL,
   lambdamax = NULL,
   lambda_min_ratio = 1e-04,
-  algo = c("linear_admm", "irls_admm"),
+  algo = c("linear_admm", "prox_newton"),
   maxiter = 10000,
   init = NULL
 )
@@ -23,7 +23,7 @@ estimate_rt(
 \item{observed_counts}{vector of the observed daily infection counts}
 
 \item{degree}{Integer. Degree of the piecewise polynomial curve to be
-estimated. For example, `degree = 1` corresponds to a piecewise constant
+estimated. For example, `degree = 0` corresponds to a piecewise constant
 curve.}
 
 \item{dist_gamma}{Vector of length 2. These are the shape and scale for the
@@ -65,8 +65,7 @@ A very small value will lead to the solution `Rt = log(observed_counts)`.
 This argument has no effect if there is user-defined `lambda` sequence.}
 
 \item{algo}{the algorithm to be used in computation. `linear_admm`:
-linearized ADMM; `irls_admm`: iteratively reweighted least squares with
-standard ADMM.}
+linearized ADMM; `prox_newton`: proximal newton-based method.}
 
 \item{maxiter}{Integer. Maximum number of iterations for the estimation
 algorithm.}
@@ -105,6 +104,6 @@ y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
 out <- estimate_rt(y, nsol = 10)
 plot(out)
 
-out0 <- estimate_rt(y, degree = 1L, nsol = 10)
+out0 <- estimate_rt(y, degree = 0L, nsol = 10)
 plot(out0)
 }
