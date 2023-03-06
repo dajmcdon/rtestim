@@ -2,7 +2,7 @@
 % Please edit documentation in R/methods.R
 \name{match_lambda}
 \alias{match_lambda}
-\title{Find indices of elements in smaller list in a bigger list}
+\title{Find indices of a list of elements from another list}
 \usage{
 match_lambda(which_lambda, lambda)
 }
@@ -15,7 +15,10 @@ match_lambda(which_lambda, lambda)
 list of index of the elements in `which_lambda` from `lambda`
 }
 \description{
-Find indices of elements in smaller list in a bigger list
+Find indices of every elements from `which_lambda` in `lambda`. Return
+the indices if all elements in `which_lambda` are in `lambda`. Return
+indices and warning if some elements in `which_lambda` are not in `lambda`.
+Abort the program if no element in `which_lambda` is in `lambda`
 }
 \examples{
 lambda <- c(1:20)

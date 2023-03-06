@@ -70,7 +70,7 @@ plot.poisson_rt <- function(x, which_lambda = NULL, ...) {
 
   if (!is.null(which_lambda)) {
     lambda_idx <- match_lambda(which_lambda, lambda)
-    Rt <- as.matrix(Rt[, lambda_idx])
+    Rt <- Rt[, lambda_idx, drop = FALSE]
     lambda <- lambda[lambda_idx]
   }
 
@@ -196,16 +196,15 @@ plot.cv_poisson_rt <- function(x, which_lambda = NULL, ...) {
       ggplot2::geom_point(color="darkblue")+
       ggplot2::geom_vline(xintercept = optimal_lambda, linetype='dotted')+
       ggplot2::annotate("text", x = optimal_lambda,
-                        y = c(max(cv_scores) + 1.1 * max(cv_se)),
-                        label = paste0("CV minimizer: lambda = \n",
+                        y = c(max(cv_scores) + 1 * max(cv_se)),
+                        label = paste0("CV minimizer:\n lambda = ",
                                        round(optimal_lambda, 2)))+
       ggplot2::geom_vline(xintercept = lambda_1se, linetype='dotted')+
       ggplot2::annotate("text", x = lambda_1se,
-                        y = c(max(cv_scores) + 1.3 * max(cv_se)),
-                        label = paste0("1se rule: lambda =\n",
+                        y = c(max(cv_scores) + 1.5 * max(cv_se)),
+                        label = paste0("1se rule:\n lambda =",
                                        round(lambda_1se, 2)))+
       ggplot2::theme_bw() +
-      ggplot2::coord_cartesian(clip = "off") +
       ggplot2::labs(title="Cross Validation Scores",
                     x = "Lambda", y = "CV scores")+
       ggplot2::ylim(c(min(cv_scores) - 2* max(cv_se)),
@@ -213,10 +212,13 @@ plot.cv_poisson_rt <- function(x, which_lambda = NULL, ...) {
       ggplot2::scale_x_log10()
 
     return(plt_scores)
+
     } else if (is.numeric(which_lambda)) {
         return(plot(x$full_fit, which_lambda = which_lambda))
+
     } else if (which_lambda == "lambda.1se") {
         return(plot(x$full_fit, which_lambda = x$lambda_1se))
+
     } else if (which_lambda == "lambda.min") {
         return(plot(x$full_fit, which_lambda = x$optimal_lambda))
   }
@@ -259,17 +261,25 @@ fitted.cv_poisson_rt <- function(object, which_lambda = NULL, ...) {
   if (is.numeric(which_lambda)) {
     lambda_idx <- match_lambda(which_lambda, lambda)
     return(full_fit$Rt[, match(which_lambda, lambda)])
+
   } else if (is.null(which_lambda)) {
     return(full_fit$Rt)
+
   } else if (which_lambda == "lambda.min") {
     return(full_fit$Rt[, which.min(object$cv_scores)])
+
   } else if (which_lambda == "lambda.1se") {
     return(full_fit$Rt[, match(object$lambda_1se, lambda)])
   }
 }
 
 
-#' Find indices of elements in smaller list in a bigger list
+#' Find indices of a list of elements from another list
+#'
+#' Find indices of every elements from `which_lambda` in `lambda`. Return
+#' the indices if all elements in `which_lambda` are in `lambda`. Return
+#' indices and warning if some elements in `which_lambda` are not in `lambda`.
+#' Abort the program if no element in `which_lambda` is in `lambda`
 #'
 #' @param lambda list where the indices of elements are to be found from
 #' @param which_lambda list of elements whose indices are to be found from `lambda`
