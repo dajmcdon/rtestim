@@ -4,18 +4,19 @@
 \alias{plot.cv_poisson_rt}
 \title{Plot cv_poisson_rt}
 \usage{
-\method{plot}{cv_poisson_rt}(x, plot_Rt = FALSE, which_lambda = NULL, ...)
+\method{plot}{cv_poisson_rt}(x, which_lambda = NULL, ...)
 }
 \arguments{
 \item{x}{result of cv_estimate_rt of class `cv_poisson_rt`}
 
-\item{plot_Rt}{plot cross-validation scores only if set to `FALSE`; plot
-Rt and specify which Rt to generate with the `which_lambda` parameter if set
-to `TRUE`}
-
-\item{which_lambda}{select which Rt's to plot, if `plot_Rt == TRUE`. If not
-provided, plot R estimated with the optimal lambda. Any lambda provided must
-match the values used in generating the Rt's.}
+\item{which_lambda}{select which Rt's to plot. If not provided, the
+cross validation score will be plotted. If it is a list of lambda, in which case
+the corresponding Rt estimation will be plotted. If it is a string, it must be
+either `lambda.min`, `lambda.1se`, or `cv_scores`. If it is `lambda_min`, plot
+Rt which is generated from the lambda that minimizes the cross validation score.
+If it is `lambda.1se`, plot Rt which is generated from the lambda whose
+corresponding cross validation score is 1 standard error away of the minimal
+cross validation score. If it is `cv_scores`, plot the cross validation score.}
 
 \item{...}{Not used.}
 }
@@ -27,8 +28,9 @@ Plot cv_poisson_rt
 }
 \examples{
 y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
-cv <- cv_estimate_rt(y, degree = 3, fold = 2, nsol=30)
+cv <- cv_estimate_rt(y, degree = 3, nfold = 2, nsol=30)
 plot(cv)
-plot(cv, plot_Rt = TRUE)
-plot(cv, plot_Rt = TRUE, which_lambda = cv$lambda[1])
+plot(cv, which_lambda = cv$lambda[1])
+plot(cv, which_lambda = "lambda.min")
+plot(cv, which_lambda = "lambda.1se")
 }

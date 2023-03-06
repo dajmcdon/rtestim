@@ -91,7 +91,7 @@ cv_estimate_rt <- function(observed_counts,
   ### Calculate CV summary
   cv_scores <- colMeans(cvall)
   # calculate se for all lambda
-  cv_se <- apply(cvall, FUN = sd, MARGIN = 2)/sqrt(nfold)
+  cv_se <- apply(cvall, FUN = stats::sd, MARGIN = 2)/sqrt(nfold)
   i0 <- which.min(cv_scores)
 
   op_lambda <- lambda[which.min(cv_scores)]
@@ -149,6 +149,8 @@ fold_calculator <- function(n, nfold) {
 #' @export
 #'
 #' @examples
+#' x <- 1:10
+#' n <- 10
 #' train_idx <- c(1, 3, 5, 7, 9, 10)
 #' test_idx <- c(2, 4, 6, 8)
 #' train_x <- x[train_idx]

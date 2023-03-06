@@ -2,23 +2,23 @@
 % Please edit documentation in R/methods.R
 \name{match_lambda}
 \alias{match_lambda}
-\title{Find index of elements from a smaller list in a bigger list}
+\title{Find indices of elements in smaller list in a bigger list}
 \usage{
 match_lambda(which_lambda, lambda)
 }
 \arguments{
-\item{which_lambda}{list of elements to be found indices from `lambda`}
+\item{which_lambda}{list of elements whose indices are to be found from `lambda`}
 
-\item{lambda}{list where elements are to be found}
+\item{lambda}{list where the indices of elements are to be found from}
 }
 \value{
 list of index of the elements in `which_lambda` from `lambda`
 }
 \description{
-Find index of elements from a smaller list in a bigger list
+Find indices of elements in smaller list in a bigger list
 }
 \examples{
 lambda <- c(1:20)
 which_lambda <- c(1,3,6)
-which_lambda_notin(lambda, which_lambda)
+match_lambda(lambda, which_lambda)
 }

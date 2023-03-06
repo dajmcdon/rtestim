@@ -31,6 +31,8 @@ Predicted Rt at the hold-out set
 Helper function. Calculate Rt at hold-out set
 }
 \examples{
+x <- 1:10
+n <- 10
 train_idx <- c(1, 3, 5, 7, 9, 10)
 test_idx <- c(2, 4, 6, 8)
 train_x <- x[train_idx]
