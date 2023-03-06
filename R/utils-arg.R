@@ -213,16 +213,3 @@ arg_is_logical = function(..., allow_null = FALSE) {
 
     })
 }
-
-arg_is_numeric_or_char = function(..., allow_null = FALSE) {
-  handle_arg_list(
-    ...,
-    tests = function(name, value) {
-      if (!(is.numeric(value) | (is.null(value) & allow_null))) {
-        if (!(is.character(value)) | (is.null(value) & allow_null)) {
-          cli_abort("All {.val {name}} must be numeric or is character")
-        }
-      }
-    }
-  )
-}
