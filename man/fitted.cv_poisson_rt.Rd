@@ -10,13 +10,13 @@
 \item{object}{result of cross validation of type `cv_poisson_rt`}
 
 \item{which_lambda}{select which Rt's to output. If not provided, all Rt's
-are returned. If it is a list of lambda, in which case
-the corresponding Rt estimation will be outputed If it is a string, it must be
-either `lambda.min` or `lambda.1se`. If it is `lambda_min`, return
-Rt which is generated from the lambda that minimizes the cross validation score.
-If it is `lambda.1se`, return Rt which is generated from the lambda whose
-corresponding cross validation score is 1 standard error away of the minimal
-cross validation score.}
+are returned. If provided a list of lambda,the corresponding Rt estimation
+will be returned. If provided a string, it must be either one of `lambda.min`
+or `lambda.1se`. If provided `lambda_min`, return Rt which is generated from
+the lambda that minimizes the cross validation score. If provided
+`lambda.1se`, return Rt which is generated from the lambda whose corresponding
+cross validation score is 1 standard error away of the minimal cross
+validation score.}
 
 \item{...}{not used.}
 }

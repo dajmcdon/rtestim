@@ -146,13 +146,14 @@ print.summary.cv_poisson_rt <- function(x,
 #'
 #' @param x result of cv_estimate_rt of class `cv_poisson_rt`
 #' @param which_lambda select which Rt's to plot. If not provided, the
-#' cross validation score will be plotted. If it is a list of lambda, in which case
-#' the corresponding Rt estimation will be plotted. If it is a string, it must be
-#' either `lambda.min`, `lambda.1se`, or `cv_scores`. If it is `lambda_min`, plot
-#' Rt which is generated from the lambda that minimizes the cross validation score.
-#' If it is `lambda.1se`, plot Rt which is generated from the lambda whose
-#' corresponding cross validation score is 1 standard error away of the minimal
-#' cross validation score. If it is `cv_scores`, plot the cross validation score.
+#' cross validation score will be plotted. If provided a list of lambda,
+#' the corresponding Rt estimation will be plotted. If provided a string, it
+#' must be either of `lambda.min`, `lambda.1se`, or `cv_scores`. If provided
+#' `lambda_min`, plot Rt which is generated from the lambda that minimizes the
+#' cross validation score. If provided `lambda.1se`, plot Rt which is generated
+#' from the lambda whose corresponding cross validation score is 1 standard
+#' error away of the minimal cross validation score. If provided `cv_scores`,
+#' plot the cross validation score.
 #'
 #' @param ... Not used.
 #'
@@ -226,13 +227,13 @@ plot.cv_poisson_rt <- function(x, which_lambda = NULL, ...) {
 #'
 #' @param object result of cross validation of type `cv_poisson_rt`
 #' @param which_lambda select which Rt's to output. If not provided, all Rt's
-#' are returned. If it is a list of lambda, in which case
-#' the corresponding Rt estimation will be outputed If it is a string, it must be
-#' either `lambda.min` or `lambda.1se`. If it is `lambda_min`, return
-#' Rt which is generated from the lambda that minimizes the cross validation score.
-#' If it is `lambda.1se`, return Rt which is generated from the lambda whose
-#' corresponding cross validation score is 1 standard error away of the minimal
-#' cross validation score.
+#' are returned. If provided a list of lambda,the corresponding Rt estimation
+#' will be returned. If provided a string, it must be either one of `lambda.min`
+#' or `lambda.1se`. If provided `lambda_min`, return Rt which is generated from
+#' the lambda that minimizes the cross validation score. If provided
+#' `lambda.1se`, return Rt which is generated from the lambda whose corresponding
+#' cross validation score is 1 standard error away of the minimal cross
+#' validation score.
 #' @param ... not used.
 #'
 #' @return Rt's estimated from provided lambda
