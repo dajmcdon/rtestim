@@ -174,7 +174,7 @@ print.summary.cv_poisson_rt <- function(x,
 #'
 #' @examples
 #' y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
-#' cv <- cv_estimate_rt(y, degree = 1, nfold = 2, nsol = 30)
+#' cv <- cv_estimate_rt(y, degree = 1, nfold = 3, nsol = 30)
 #' plot(cv)
 #' plot(cv, which_lambda = cv$lambda[1])
 #' plot(cv, which_lambda = "lambda.min")
@@ -253,7 +253,7 @@ plot.cv_poisson_rt <- function(x,
 #'
 #' @examples
 #' y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
-#' cv <- cv_estimate_rt(y, degree = 3, nfold = 2, nsol = 30)
+#' cv <- cv_estimate_rt(y, degree = 3, nfold = 3, nsol = 30)
 #' f <- fitted(cv)
 #' f <- fitted(cv, which_lambda = cv$lambda[1])
 #' f <- fitted(cv, which_lambda = "lambda.min")
