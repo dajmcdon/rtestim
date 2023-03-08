@@ -9,12 +9,11 @@ fold_calculator(n, nfold)
 \arguments{
 \item{n}{length of the sequence to partition from}
 
-\item{nfold}{Integer. This the number of folds to conduct the leave-kth-out
+\item{nfold}{Integer. This number of folds to conduct the leave-kth-out
 cross validation. For leave-kth-out cross validation, every kth
 observed_counts and their corresponding position (evenly or unevenly
 spaced) are placed into the same fold. The first and last observed_counts are
-not assigned to any folds. Smallest allowable value is `nfold = 2`. It is
-generally not recommended to set `nfold` to be greater than 3.}
+not assigned to any folds. Smallest allowable value is `nfold = 2`.}
 }
 \value{
 a vector of fold index at which the counts are distributed into folds

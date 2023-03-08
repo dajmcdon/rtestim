@@ -87,10 +87,9 @@ plot.poisson_rt <- function(x, which_lambda = NULL, ...) {
     ggplot2::geom_line() +
     ggplot2::theme_bw() +
     ggplot2::scale_colour_viridis_c(trans = "log10")
-
-  print(ncol(Rt))
   if (ncol(Rt) == 1) plt <- plt + ggplot2::theme(legend.position= "none")
-  plt
+
+  print(plt)
 }
 
 #' @method summary cv_poisson_rt
@@ -153,23 +152,20 @@ print.summary.cv_poisson_rt <- function(x,
 #' @param x result of cv_estimate_rt of class `cv_poisson_rt`
 #' @param which_lambda select which Rt's to plot.
 #'
-#' If not provided, the
-#' cross validation score will be plotted. If provided a list of lambda,
-#' the corresponding Rt estimation will be plotted.
+#' If not provided, the cross validation score will be plotted. If provided a
+#' list of lambda, the corresponding Rt estimation will be plotted.
 #'
 #' If provided a string, it
-#' must be either of `lambda.min`, `lambda.1se`, or `cv_scores`.
+#' must be either one of `lambda.min`, `lambda.1se`, or `cv_scores`.
 #'
-#'  * If provided
-#' `lambda.min`, plot Rt which is generated from the lambda that minimizes the
-#' cross validation score.
+#'  * If provided `lambda.min`, plot Rt which is generated from the lambda that
+#'  minimizes the cross validation score.
 #'
-#'  * If provided `lambda.1se`, plot Rt which is generated
-#' from the lambda whose corresponding cross validation score is 1 standard
-#' error away of the minimal cross validation score.
+#'  * If provided `lambda.1se`, plot Rt which is generated from the lambda whose
+#'  corresponding cross validation score is 1 standard error away of the
+#'  minimal cross validation score.
 #'
-#'  * If provided `cv_scores`,
-#' plot the cross validation score.
+#'  * If provided `cv_scores`, plot the cross validation score.
 #'
 #' @param ... Not used.
 #'
@@ -240,20 +236,24 @@ plot.cv_poisson_rt <- function(x,
 #' @param object result of cross validation of type `cv_poisson_rt`
 #' @param which_lambda select which Rt's to output. If not provided, all Rt's
 #' are returned. If provided a list of lambda,the corresponding Rt estimation
-#' will be returned. If provided a string, it must be either one of `lambda.min`
-#' or `lambda.1se`. If provided `lambda.min`, return Rt which is generated from
-#' the lambda that minimizes the cross validation score. If provided
-#' `lambda.1se`, return Rt which is generated from the lambda whose corresponding
-#' cross validation score is 1 standard error away of the minimal cross
-#' validation score.
+#' will be returned.
+#'
+#' If provided a string, it must be either one of `lambda.min` or `lambda.1se`.
+#'
+#'  * If provided `lambda.min`, return Rt which is generated from
+#'  the lambda that minimizes the cross validation score.
+#'
+#'  * If provided `lambda.1se`, return Rt which is generated from the lambda
+#'  whose corresponding cross validation score is 1 standard error away of the
+#'  minimal cross validation score.
 #' @param ... not used.
 #'
 #' @return Rt's estimated from provided lambda
 #' @exportS3Method
 #'
 #' @examples
-#' y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
-#' cv <- cv_estimate_rt(y, degree = 3, nfold = 2, nsol=30)
+#' y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
+#' cv <- cv_estimate_rt(y, degree = 3, nfold = 2, nsol = 30)
 #' f <- fitted(cv)
 #' f <- fitted(cv, which_lambda = cv$lambda[1])
 #' f <- fitted(cv, which_lambda = "lambda.min")

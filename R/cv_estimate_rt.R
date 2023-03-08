@@ -1,28 +1,26 @@
 #' Leave-kth-out cross validation for choosing a optimal parameter lambda
 #'
 #' @inheritParams estimate_rt
-#' @param nfold Integer. This the number of folds to conduct the leave-kth-out
+#' @param nfold Integer. This number of folds to conduct the leave-kth-out
 #' cross validation. For leave-kth-out cross validation, every kth
 #' observed_counts and their corresponding position (evenly or unevenly
 #' spaced) are placed into the same fold. The first and last observed_counts are
-#' not assigned to any folds. Smallest allowable value is `nfold = 2`. It is
-#' generally not recommended to set `nfold` to be greater than 3.
+#' not assigned to any folds. Smallest allowable value is `nfold = 2`.
 #' @param error_measure Metric used to calculate cross validation scores.
-#' Must choose from `mse`, `mae`, and `deviance`.
-#'
-#' `mse` calculate the mean square error; `mae` calculate the mean absolute error;
-#' `deviance` calculate the deviance
-#' @param ... additional parameters passed to `estimate_rt` function
+#' Must be choose from `mse`, `mae`, and `deviance`.
+#' `mse` calculates the mean square error; `mae` calculates the mean absolute error;
+#' `deviance` calculates the deviance
+#' @param ... additional parameters passed to `estimate_rt()` function
 
 #' @return An object with S3 class `"cv_result"`. Among the list components:
+#' * `full_fit` An object with S3 class `"poisson_rt"`, fitted with all
+#' `observed_counts` and `lambda`
 #' * `cv_scores` leave-kth-out cross validation scores
-#' * `lambda.min` lambda which achieved the optimal cv_scores fromcross
-#' validation
-#' * `observed_counts` vector of the observed daily infection counts
-#' * `weighted_past_counts` the weighted sum of past infections counts with
-#'   corresponding serial interval functions (or its Gamma approximation) as
-#'   weights
-#'
+#' * `cv_se` leave-kth-out cross validation standard error
+#' * `lambda.min` lambda which achieved the optimal cross validation score
+#' * `lambda.1se` lambda that gives the optimal cross validation score
+#' within one standard error.
+#' * `lambda` the value of `lambda` used in the algorithm.
 #' @export
 #'
 #' @examples
@@ -56,7 +54,7 @@ cv_estimate_rt <- function(observed_counts,
   n <- length(observed_counts)
 
 
-  # Cross validation (copied from glmgen cv.trendfilter)
+  # Cross validation
   foldid = fold_calculator(n, nfold)
   cvall <- matrix(0, nfold, length(lambda))
 
@@ -95,12 +93,10 @@ cv_estimate_rt <- function(observed_counts,
     pred_observed_counts <- pred_rt * weighted_past_counts[test_idx]
     score <- colMeans(err_fun(observed_counts[test_idx], pred_observed_counts))
     cvall[f,] <- score
-
   }
 
   ### Calculate CV summary
   cv_scores <- colMeans(cvall)
-
   cv_se <- apply(cvall, FUN = stats::sd, MARGIN = 2)/sqrt(nfold)
   i0 <- which.min(cv_scores)
 

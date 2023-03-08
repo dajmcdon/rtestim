@@ -29,18 +29,16 @@ some period of time after having become infectious.
 As in most literature, we assume that this interval follows a gamma
 distribution with some shape and scale.}
 
-\item{nfold}{Integer. This the number of folds to conduct the leave-kth-out
+\item{nfold}{Integer. This number of folds to conduct the leave-kth-out
 cross validation. For leave-kth-out cross validation, every kth
 observed_counts and their corresponding position (evenly or unevenly
 spaced) are placed into the same fold. The first and last observed_counts are
-not assigned to any folds. Smallest allowable value is `nfold = 2`. It is
-generally not recommended to set `nfold` to be greater than 3.}
+not assigned to any folds. Smallest allowable value is `nfold = 2`.}
 
 \item{error_measure}{Metric used to calculate cross validation scores.
-Must choose from `mse`, `mae`, and `deviance`.
-
-`mse` calculate the mean square error; `mae` calculate the mean absolute error;
-`deviance` calculate the deviance}
+Must be choose from `mse`, `mae`, and `deviance`.
+`mse` calculates the mean square error; `mae` calculates the mean absolute error;
+`deviance` calculates the deviance}
 
 \item{x}{a vector of positions at which the counts have been observed. In an
 ideal case, we would observe data at regular intervals (e.g. daily or
@@ -58,17 +56,18 @@ decreasing sequence of `lambda` values than a single (small) value. If
 supplied, the user-defined `lambda` sequence is automatically sorted in
 decreasing order.}
 
-\item{...}{additional parameters passed to `estimate_rt` function}
+\item{...}{additional parameters passed to `estimate_rt()` function}
 }
 \value{
 An object with S3 class `"cv_result"`. Among the list components:
+* `full_fit` An object with S3 class `"poisson_rt"`, fitted with all
+`observed_counts` and `lambda`
 * `cv_scores` leave-kth-out cross validation scores
-* `lambda.min` lambda which achieved the optimal cv_scores fromcross
-validation
-* `observed_counts` vector of the observed daily infection counts
-* `weighted_past_counts` the weighted sum of past infections counts with
-  corresponding serial interval functions (or its Gamma approximation) as
-  weights
+* `cv_se` leave-kth-out cross validation standard error
+* `lambda.min` lambda which achieved the optimal cross validation score
+* `lambda.1se` lambda that gives the optimal cross validation score
+within one standard error.
+* `lambda` the value of `lambda` used in the algorithm.
 }
 \description{
 Leave-kth-out cross validation for choosing a optimal parameter lambda

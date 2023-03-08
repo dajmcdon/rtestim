@@ -11,12 +11,16 @@
 
 \item{which_lambda}{select which Rt's to output. If not provided, all Rt's
 are returned. If provided a list of lambda,the corresponding Rt estimation
-will be returned. If provided a string, it must be either one of `lambda.min`
-or `lambda.1se`. If provided `lambda.min`, return Rt which is generated from
-the lambda that minimizes the cross validation score. If provided
-`lambda.1se`, return Rt which is generated from the lambda whose corresponding
-cross validation score is 1 standard error away of the minimal cross
-validation score.}
+will be returned.
+
+If provided a string, it must be either one of `lambda.min` or `lambda.1se`.
+
+ * If provided `lambda.min`, return Rt which is generated from
+ the lambda that minimizes the cross validation score.
+
+ * If provided `lambda.1se`, return Rt which is generated from the lambda
+ whose corresponding cross validation score is 1 standard error away of the
+ minimal cross validation score.}
 
 \item{...}{not used.}
 }
@@ -27,8 +31,8 @@ Rt's estimated from provided lambda
 Fitted cv_poisson_rt
 }
 \examples{
-y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
-cv <- cv_estimate_rt(y, degree = 3, nfold = 2, nsol=30)
+y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
+cv <- cv_estimate_rt(y, degree = 3, nfold = 2, nsol = 30)
 f <- fitted(cv)
 f <- fitted(cv, which_lambda = cv$lambda[1])
 f <- fitted(cv, which_lambda = "lambda.min")
