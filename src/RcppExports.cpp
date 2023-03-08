@@ -246,6 +246,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// almost_match
+arma::vec almost_match(arma::vec& a, arma::vec& b, double tol);
+RcppExport SEXP _rtestim_almost_match(SEXP aSEXP, SEXP bSEXP, SEXP tolSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec& >::type a(aSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type b(bSEXP);
+    Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
+    rcpp_result_gen = Rcpp::wrap(almost_match(a, b, tol));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_rtestim_admm_testing", (DL_FUNC) &_rtestim_admm_testing, 14},
@@ -262,6 +275,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rtestim_calcDvline_slow", (DL_FUNC) &_rtestim_calcDvline_slow, 5},
     {"_rtestim_calcDTvline_slow", (DL_FUNC) &_rtestim_calcDTvline_slow, 5},
     {"_rtestim_calcDTDvline_slow", (DL_FUNC) &_rtestim_calcDTDvline_slow, 5},
+    {"_rtestim_almost_match", (DL_FUNC) &_rtestim_almost_match, 3},
     {NULL, NULL, 0}
 };
 

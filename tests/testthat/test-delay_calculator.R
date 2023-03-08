@@ -20,19 +20,25 @@ test_that("fill_case_counts work as intended", {
   o1 <- 2*x1
   filled_o1 <- fill_case_counts(x1, o1)
   o1_true <- 2*c(1:9)
-  expect_equal(filled_o1, o1_true)
+  expect_equal(filled_o1$full_counts, o1_true)
 
   # Uneven integer spacing, works with any number of gaps
   x2 <- c(1,3,4,5,7,9,16)
   o2 <- 2*x2
   filled_o2 <- fill_case_counts(x2, o2)
   o2_true <- 2*c(1:16)
-  expect_equal(filled_o2, o2_true)
+  expect_equal(filled_o2$full_counts, o2_true)
 
   # Uneven double spacing, works with any number of gaps
   x3 <- c(1, 1.6, 2.2, 3.4, 4, 5.2, 7, 8.2)
   o3 <- 4*x3
   filled_o3 <- fill_case_counts(x3, o3)
   o3_true <- 4*seq(1, 8.2, 0.6)
-  expect_equal(filled_o3, o3_true)
+  expect_equal(filled_o3$full_counts, o3_true)
+})
+
+test_that("weighted_past_counts has same length as observed_counts", {
+  y <- c(1,3,4,6,7,13)
+  weighted_past_counts <- delay_calculator(y, x = c(1:6))
+  expect_true(length(y) == length(weighted_past_counts))
 })

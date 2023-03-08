@@ -62,5 +62,8 @@ arma::vec calcDTDvline_slow(int n,
                             arma::vec const& x,
                             arma::vec& v,
                             arma::vec& b);
+arma::vec almost_match(arma::vec const& a,
+                       arma::vec const& b,
+                       double tol);
 
 #endif

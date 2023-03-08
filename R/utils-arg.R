@@ -203,3 +203,13 @@ arg_is_sorted = function(..., allow_null = FALSE) {
 
     })
 }
+
+arg_is_logical = function(..., allow_null = FALSE) {
+  handle_arg_list(
+    ...,
+    tests = function(name, value) {
+      if (!is.logical(value) | (is.null(value) & !allow_null))
+        cli_abort("{name} must be TRUE or FALSE")
+
+    })
+}

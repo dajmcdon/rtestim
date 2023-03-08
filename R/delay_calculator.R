@@ -32,15 +32,28 @@ delay_calculator <- function(observed_counts, x = NULL,
 
   regular <- vctrs::vec_unique_count(diff(x)) == 1L
 
+
   if (!regular) {
-    observed_counts <- fill_case_counts(x, observed_counts)
+    helper_result <- fill_case_counts(x, observed_counts)
+    full_counts <- helper_result$full_counts
+    missing_idx <- helper_result$missing_idx
+
+    full_n <- length(full_counts)
+    x <- 1:full_n
+    w <- discretize_gamma(x, dist_gamma[1], dist_gamma[2])
+    cw <- cumsum(w)
+    convolved_seq <- stats::convolve(full_counts, rev(w), type = "open")[1:full_n] / cw
+    convolved_seq <- convolved_seq[!missing_idx]
+
+  } else {
     n <- length(observed_counts)
     x <- 1:n
+    w <- discretize_gamma(x, dist_gamma[1], dist_gamma[2])
+    cw <- cumsum(w)
+    convolved_seq <- stats::convolve(observed_counts, rev(w), type = "open")[1:n] / cw
+
   }
-  w <- discretize_gamma(x, dist_gamma[1], dist_gamma[2])
-  cw <- cumsum(w)
-  convolved_seq <- stats::convolve(observed_counts, rev(w), type = "open")[1:n] / cw
-  c(convolved_seq[1], convolved_seq[1:(n - 1)])
+  return(c(convolved_seq[1], convolved_seq[1:(n - 1)]))
 }
 
 
@@ -75,5 +88,10 @@ fill_case_counts <- function(x, observed_counts) {
   non_missing_idx <- full_x %in% x
   full_case_counts[non_missing_idx] <- observed_counts
 
-  zoo::na.fill(full_case_counts, fill = "extend")
+  output <- list()
+
+  output$full_counts <- zoo::na.fill(full_case_counts, fill = "extend")
+  output$missing_idx <- missing_idx
+
+  return(output)
 }
