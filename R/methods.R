@@ -103,8 +103,6 @@ summary.cv_poisson_rt <- function(object, ...) {
   lambda_output <- c(min(lambda), object$lambda.min, object$lambda.1se,
                      max(lambda))
   lambda_idx <- almost_match(lambda_output, lambda)
-  print(object$lambda.min)
-  print(object$lambda.1se)
   tab <- with(object, data.frame(
     lambda = lambda_output,
     index = lambda_idx,
@@ -192,7 +190,6 @@ plot.cv_poisson_rt <- function(x,
   lambda.1se <- x$lambda.1se
   lambda.min <- x$lambda.min
 
-  print(which_lambda)
 
   if (is.numeric(which_lambda)) {
     return(plot(x$full_fit, which_lambda = which_lambda))
