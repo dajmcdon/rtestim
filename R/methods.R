@@ -258,10 +258,11 @@ plot.cv_poisson_rt <- function(x,
 #' f <- fitted(cv, which_lambda = cv$lambda[1])
 #' f <- fitted(cv, which_lambda = "lambda.min")
 #' f <- fitted(cv, which_lambda = "lambda.1se")
-fitted.cv_poisson_rt <- function(object, which_lambda = NULL, ...) {
+fitted.cv_poisson_rt <- function(object,
+                                 which_lambda = c("lambda.min", "lambda.1se"),
+                                 ...) {
   if (is.character(which_lambda))
-    which_lambda <- match.arg(which_lambda,
-                              c("lambda.min", "lambda.1se"))
+    which_lambda <- match.arg(which_lambda)
   else arg_is_numeric(which_lambda, allow_null = TRUE)
   rlang::check_dots_empty()
 
@@ -295,12 +296,6 @@ fitted.cv_poisson_rt <- function(object, which_lambda = NULL, ...) {
 #' @param which_lambda list of elements whose indices are to be found from `lambda`
 #'
 #' @return list of index of the elements in `which_lambda` from `lambda`
-#' @export
-#'
-#' @examples
-#' lambda <- c(1:20)
-#' which_lambda <- c(1,3,6)
-#' match_lambda(lambda, which_lambda)
 match_lambda <- function(which_lambda, lambda) {
   lambda_idx <- almost_match(which_lambda, lambda)
   n <- length(lambda_idx)

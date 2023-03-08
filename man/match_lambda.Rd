@@ -20,8 +20,3 @@ the indices if all elements in `which_lambda` are in `lambda`. Return
 indices and warning if some elements in `which_lambda` are not in `lambda`.
 Abort the program if no element in `which_lambda` is in `lambda`
 }
-\examples{
-lambda <- c(1:20)
-which_lambda <- c(1,3,6)
-match_lambda(lambda, which_lambda)
-}

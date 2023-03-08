@@ -4,7 +4,7 @@
 \alias{fitted.cv_poisson_rt}
 \title{Fitted cv_poisson_rt}
 \usage{
-\method{fitted}{cv_poisson_rt}(object, which_lambda = NULL, ...)
+\method{fitted}{cv_poisson_rt}(object, which_lambda = c("lambda.min", "lambda.1se"), ...)
 }
 \arguments{
 \item{object}{result of cross validation of type `cv_poisson_rt`}
