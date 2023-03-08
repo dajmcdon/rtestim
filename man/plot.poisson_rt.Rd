@@ -10,8 +10,7 @@
 \item{x}{output of the function [estimate_rt()] of class `poisson_rt`}
 
 \item{which_lambda}{select which Rt's to plot. If not provided,
-all Rt's are plotted. Any lambdas provided must match the values used in
-generating the Rt's.}
+all Rt's are plotted.}
 
 \item{...}{Not used.}
 }
