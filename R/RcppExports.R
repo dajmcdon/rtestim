@@ -57,3 +57,7 @@ calcDTDvline_slow <- function(n, ord, x, v, b) {
     .Call(`_rtestim_calcDTDvline_slow`, n, ord, x, v, b)
 }
 
+almost_match <- function(a, b, tol = 1e-10) {
+    .Call(`_rtestim_almost_match`, a, b, tol)
+}
+

@@ -80,13 +80,17 @@ plot.poisson_rt <- function(x, which_lambda = NULL, ...) {
     Time = rep(x$x, ncol(Rt))
   )
 
-  ggplot2::ggplot(
+  plt <- ggplot2::ggplot(
     df,
     ggplot2::aes(.data$Time, .data$Rt, colour = .data$lambda,
                  group = .data$lambda)) +
     ggplot2::geom_line() +
     ggplot2::theme_bw() +
     ggplot2::scale_colour_viridis_c(trans = "log10")
+
+  print(ncol(Rt))
+  if (ncol(Rt) == 1) plt <- plt + ggplot2::theme(legend.position= "none")
+  plt
 }
 
 #' @method summary cv_poisson_rt
@@ -97,17 +101,19 @@ summary.cv_poisson_rt <- function(object, ...) {
   cv_scores <- object$cv_scores
   lambda <- object$lambda
 
-  lambda_output <- c(min(lambda), object$optimal_lambda, object$lambda_1se,
+  lambda_output <- c(min(lambda), object$lambda.min, object$lambda.1se,
                      max(lambda))
-  lambda_idx <- match(lambda_output, lambda)
-
+  lambda_idx <- almost_match(lambda_output, lambda)
+  print(object$lambda.min)
+  print(object$lambda.1se)
   tab <- with(object, data.frame(
     lambda = lambda_output,
     index = lambda_idx,
     cv_scores = cv_scores[lambda_idx],
     cv_se = object$cv_se[lambda_idx],
-    dof = object$dof[lambda_idx])
+    dof = object$full_fit$dof[lambda_idx])
     )
+
   rownames(tab) <- c("Min Lambda", "CV Minimizer", "1se Lambda", "Max Lambda")
 
   out <- structure(
@@ -127,7 +133,7 @@ print.summary.cv_poisson_rt <- function(x,
 
   lambda_warning = NULL
   if (x$table$index[2] == 1) lambda_warning = "smallest"
-  if (x$table$index[3] == x$table$index[4]) lambda_warning = "largest"
+  if (x$table$index[2] == x$table$index[4]) lambda_warning = "largest"
 
   cat("\nCall: ", deparse(x$call), fill = TRUE)
   cat("\n")
@@ -145,14 +151,24 @@ print.summary.cv_poisson_rt <- function(x,
 #' Plot cv_poisson_rt
 #'
 #' @param x result of cv_estimate_rt of class `cv_poisson_rt`
-#' @param which_lambda select which Rt's to plot. If not provided, the
+#' @param which_lambda select which Rt's to plot.
+#'
+#' If not provided, the
 #' cross validation score will be plotted. If provided a list of lambda,
-#' the corresponding Rt estimation will be plotted. If provided a string, it
-#' must be either of `lambda.min`, `lambda.1se`, or `cv_scores`. If provided
-#' `lambda_min`, plot Rt which is generated from the lambda that minimizes the
-#' cross validation score. If provided `lambda.1se`, plot Rt which is generated
+#' the corresponding Rt estimation will be plotted.
+#'
+#' If provided a string, it
+#' must be either of `lambda.min`, `lambda.1se`, or `cv_scores`.
+#'
+#'  * If provided
+#' `lambda.min`, plot Rt which is generated from the lambda that minimizes the
+#' cross validation score.
+#'
+#'  * If provided `lambda.1se`, plot Rt which is generated
 #' from the lambda whose corresponding cross validation score is 1 standard
-#' error away of the minimal cross validation score. If provided `cv_scores`,
+#' error away of the minimal cross validation score.
+#'
+#'  * If provided `cv_scores`,
 #' plot the cross validation score.
 #'
 #' @param ... Not used.
@@ -161,66 +177,60 @@ print.summary.cv_poisson_rt <- function(x,
 #' @exportS3Method
 #'
 #' @examples
-#' y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
-#' cv <- cv_estimate_rt(y, degree = 1, nfold = 2, nsol=30)
+#' y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
+#' cv <- cv_estimate_rt(y, degree = 1, nfold = 2, nsol = 30)
 #' plot(cv)
 #' plot(cv, which_lambda = cv$lambda[1])
 #' plot(cv, which_lambda = "lambda.min")
 #' plot(cv, which_lambda = "lambda.1se")
-plot.cv_poisson_rt <- function(x, which_lambda = NULL, ...) {
+plot.cv_poisson_rt <- function(x,
+                               which_lambda = c("cv_scores",
+                                                "lambda.min",
+                                                "lambda.1se"), ...) {
 
+  rlang::check_dots_empty()
   if (is.character(which_lambda))
-    which_lambda <- match.arg(which_lambda,
-                              c("lambda.min", "lambda.1se","cv_scores"))
+    which_lambda <- match.arg(which_lambda)
   else arg_is_numeric(which_lambda, allow_null = TRUE)
 
-  lambda <- x$lambda
-  lambda_1se <- x$lambda_1se
-  optimal_lambda <- x$optimal_lambda
-  cv_scores <- x$cv_scores
-  cv_se <- x$cv_se
-  upper = cv_scores + x$cv_se
-  lower = cv_scores - x$cv_se
+  lambda.1se <- x$lambda.1se
+  lambda.min <- x$lambda.min
 
-  if (which_lambda == "cv_scores" || is.null(which_lambda)) {
-    df <- data.frame(
-      cv_scores = cv_scores,
-      lambda = lambda,
-      cv_se = cv_se
-    )
+  print(which_lambda)
 
-    plt_scores <- ggplot2::ggplot(df, ggplot2::aes(x=lambda, y = cv_scores))+
-      ggplot2::geom_errorbar(ggplot2::aes(ymin = lower, ymax = upper,
-                                          width = 0.1))+
-      ggplot2::geom_line() +
-      ggplot2::geom_point(color="darkblue")+
-      ggplot2::geom_vline(xintercept = optimal_lambda, linetype='dotted')+
-      ggplot2::annotate("text", x = optimal_lambda,
-                        y = c(max(cv_scores) + 1 * max(cv_se)),
-                        label = paste0("CV minimizer:\n lambda = ",
-                                       round(optimal_lambda, 2)))+
-      ggplot2::geom_vline(xintercept = lambda_1se, linetype='dotted')+
-      ggplot2::annotate("text", x = lambda_1se,
-                        y = c(max(cv_scores) + 1.5 * max(cv_se)),
-                        label = paste0("1se rule:\n lambda =",
-                                       round(lambda_1se, 2)))+
-      ggplot2::theme_bw() +
-      ggplot2::labs(title="Cross Validation Scores",
-                    x = "Lambda", y = "CV scores")+
-      ggplot2::ylim(c(min(cv_scores) - 2* max(cv_se)),
-                    max(cv_scores) + 2*max(cv_se))+
-      ggplot2::scale_x_log10()
+  if (is.numeric(which_lambda)) {
+    return(plot(x$full_fit, which_lambda = which_lambda))
 
-    return(plt_scores)
+  } else if (which_lambda == "cv_scores" || all(is.null(which_lambda))) {
+      df <- data.frame(
+        cv_scores = x$cv_scores,
+        lambda = x$lambda,
+        cv_se = x$cv_se,
+        upper = x$cv_scores + x$cv_se,
+        lower = x$cv_scores - x$cv_se
+      )
 
-    } else if (is.numeric(which_lambda)) {
-        return(plot(x$full_fit, which_lambda = which_lambda))
+      plt_scores <- ggplot2::ggplot(df)+
+        ggplot2::geom_errorbar(ggplot2::aes(x = .data$lambda,
+                                            y = .data$cv_scores,
+                                            ymin = .data$lower,
+                                            ymax = .data$upper,
+                                            width = 0.1))+
+        ggplot2::geom_point(ggplot2::aes(x = .data$lambda, y = .data$cv_scores),
+                            color="darkblue")+
+        ggplot2::geom_vline(xintercept = lambda.min, linetype='dotted')+
+        ggplot2::geom_vline(xintercept = lambda.1se, linetype='dotted')+
+        ggplot2::theme_bw() +
+        ggplot2::labs(x = "Lambda", y = "CV scores")+
+        ggplot2::scale_x_log10()
+
+      return(plt_scores)
 
     } else if (which_lambda == "lambda.1se") {
-        return(plot(x$full_fit, which_lambda = x$lambda_1se))
+        return(plot(x$full_fit, which_lambda = x$lambda.1se))
 
     } else if (which_lambda == "lambda.min") {
-        return(plot(x$full_fit, which_lambda = x$optimal_lambda))
+        return(plot(x$full_fit, which_lambda = x$lambda.min))
   }
 }
 
@@ -231,7 +241,7 @@ plot.cv_poisson_rt <- function(x, which_lambda = NULL, ...) {
 #' @param which_lambda select which Rt's to output. If not provided, all Rt's
 #' are returned. If provided a list of lambda,the corresponding Rt estimation
 #' will be returned. If provided a string, it must be either one of `lambda.min`
-#' or `lambda.1se`. If provided `lambda_min`, return Rt which is generated from
+#' or `lambda.1se`. If provided `lambda.min`, return Rt which is generated from
 #' the lambda that minimizes the cross validation score. If provided
 #' `lambda.1se`, return Rt which is generated from the lambda whose corresponding
 #' cross validation score is 1 standard error away of the minimal cross
@@ -260,7 +270,7 @@ fitted.cv_poisson_rt <- function(object, which_lambda = NULL, ...) {
 
   if (is.numeric(which_lambda)) {
     lambda_idx <- match_lambda(which_lambda, lambda)
-    return(full_fit$Rt[, match(which_lambda, lambda)])
+    return(full_fit$Rt[, almost_match(which_lambda, lambda)])
 
   } else if (is.null(which_lambda)) {
     return(full_fit$Rt)
@@ -269,7 +279,7 @@ fitted.cv_poisson_rt <- function(object, which_lambda = NULL, ...) {
     return(full_fit$Rt[, which.min(object$cv_scores)])
 
   } else if (which_lambda == "lambda.1se") {
-    return(full_fit$Rt[, match(object$lambda_1se, lambda)])
+    return(full_fit$Rt[, almost_match(object$lambda.1se, lambda)])
   }
 }
 
@@ -292,22 +302,21 @@ fitted.cv_poisson_rt <- function(object, which_lambda = NULL, ...) {
 #' which_lambda <- c(1,3,6)
 #' match_lambda(lambda, which_lambda)
 match_lambda <- function(which_lambda, lambda) {
-  lambda_idx <- match(which_lambda, lambda)
+  lambda_idx <- almost_match(which_lambda, lambda)
   n <- length(lambda_idx)
-  na_loc <- which(is.na(lambda_idx))
+  no_match_loc <- which(lambda_idx == 0)
 
-  if (length(na_loc) > 0) {
-    if (length(na_loc) == n) {
+  if (length(no_match_loc) > 0) {
+    if (length(no_match_loc) == n) {
       cli::cli_abort("No lambda is used to generate Rt in `estimate_rt()`")
     } else {
-      warn_msg <- paste0("The [", toString(na_loc),
+      warn_msg <- paste0("The [", toString(no_match_loc),
                          "]-th lambdas provided are not used to generate Rt",
                          " in `estimate_rt()`")
       cli::cli_warn(warn_msg)
-      lambda_idx <- lambda_idx[-na_loc]
+      lambda_idx <- lambda_idx[-no_match_loc]
     }
   }
   return(lambda_idx)
 }
-
 

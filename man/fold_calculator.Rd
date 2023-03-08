@@ -13,15 +13,12 @@ fold_calculator(n, nfold)
 cross validation. For leave-kth-out cross validation, every kth
 observed_counts and their corresponding position (evenly or unevenly
 spaced) are placed into the same fold. The first and last observed_counts are
-not assigned to any folds. Smallest allowable value if `fold = 2`. It is
-generally not recommended to set `fold` to a large number}
+not assigned to any folds. Smallest allowable value is `nfold = 2`. It is
+generally not recommended to set `nfold` to be greater than 3.}
 }
 \value{
 a vector of fold index at which the counts are distributed into folds
 }
 \description{
 Helper function. Calculate the fold index for each `observed_counts`
-}
-\examples{
-fold_calculator(20, 3)
 }

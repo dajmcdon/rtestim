@@ -9,6 +9,7 @@ cv_estimate_rt(
   degree = 3L,
   dist_gamma = c(2.5, 2.5),
   nfold = 3,
+  error_measure = c("mse", "mae", "deviance"),
   x = NULL,
   lambda = NULL,
   ...
@@ -32,8 +33,14 @@ distribution with some shape and scale.}
 cross validation. For leave-kth-out cross validation, every kth
 observed_counts and their corresponding position (evenly or unevenly
 spaced) are placed into the same fold. The first and last observed_counts are
-not assigned to any folds. Smallest allowable value if `fold = 2`. It is
-generally not recommended to set `fold` to a large number}
+not assigned to any folds. Smallest allowable value is `nfold = 2`. It is
+generally not recommended to set `nfold` to be greater than 3.}
+
+\item{error_measure}{Metric used to calculate cross validation scores.
+Must choose from `mse`, `mae`, and `deviance`.
+
+`mse` calculate the mean square error; `mae` calculate the mean absolute error;
+`deviance` calculate the deviance}
 
 \item{x}{a vector of positions at which the counts have been observed. In an
 ideal case, we would observe data at regular intervals (e.g. daily or
@@ -51,15 +58,13 @@ decreasing sequence of `lambda` values than a single (small) value. If
 supplied, the user-defined `lambda` sequence is automatically sorted in
 decreasing order.}
 
-\item{...}{not used.}
+\item{...}{additional parameters passed to `estimate_rt` function}
 }
 \value{
 An object with S3 class `"cv_result"`. Among the list components:
 * `cv_scores` leave-kth-out cross validation scores
-* `optimal_lambda` lambda which achieved the optimal cv_scores from  cross
+* `lambda.min` lambda which achieved the optimal cv_scores fromcross
 validation
-* `optimal_Rt` the estimated effective reproduction rate, estimated with the
-optimal lambda
 * `observed_counts` vector of the observed daily infection counts
 * `weighted_past_counts` the weighted sum of past infections counts with
   corresponding serial interval functions (or its Gamma approximation) as
@@ -69,7 +74,7 @@ optimal lambda
 Leave-kth-out cross validation for choosing a optimal parameter lambda
 }
 \examples{
-y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
-cv <- cv_estimate_rt(y, degree = 3, nfold = 2, nsol=30)
+y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
+cv <- cv_estimate_rt(y, degree = 3, nfold = 3, nsol = 30)
 cv
 }
