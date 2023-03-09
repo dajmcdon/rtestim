@@ -22,7 +22,7 @@ A vector or matrix of predicted case counts.
 \description{
 Given an object of class `poisson_rt` produced with [estimate_rt()],
 calculate predicted observed cases for the estimated Rt values.
-Note: This function is not indented for "new" or to produce forecasts, but
+Note: This function is not intended for "new x" or to produce forecasts, but
 rather to examine how Rt relates to observables.
 }
 \examples{

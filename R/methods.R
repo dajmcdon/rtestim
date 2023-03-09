@@ -51,7 +51,7 @@ print.poisson_rt <- function(x, digits = min(3, getOption("digits") - 3), ...) {
 #'
 #'
 #' @param x output of the function [estimate_rt()] of class `poisson_rt`
-#' @param which_lambda select which Rt's to plot. If not provided,
+#' @param lambda select which Rt's to plot. If not provided,
 #'   all Rt's are plotted.
 #' @param ... Not used.
 #'
@@ -62,15 +62,15 @@ print.poisson_rt <- function(x, digits = min(3, getOption("digits") - 3), ...) {
 #' y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
 #' out <- estimate_rt(y, lambda = log(c(1.1,1.3,1.5)))
 #' plot(out)
-plot.poisson_rt <- function(x, which_lambda = NULL, ...) {
-  arg_is_numeric(which_lambda, allow_null = TRUE)
+plot.poisson_rt <- function(x, lambda = NULL, ...) {
+  arg_is_numeric(lambda, allow_null = TRUE)
 
   n <- length(x$observed_counts)
-  if (is.null(which_lambda)) {
+  if (is.null(lambda)) {
     Rt <- x$Rt
     lambda <- x$lambda
   } else {
-    Rt <- fitted(x, lambda = which_lambda)
+    Rt <- fitted(x, lambda = lambda)
     lambda <- which_lambda
   }
   k <- length(lambda)
@@ -88,7 +88,7 @@ plot.poisson_rt <- function(x, which_lambda = NULL, ...) {
     ggplot2::geom_line() +
     ggplot2::theme_bw() +
     ggplot2::scale_colour_viridis_c(trans = "log10")
-  if (k == 1) plt <- plt + ggplot2::theme(legend.position= "none")
+  if (k == 1) plt <- plt + ggplot2::theme(legend.position = "none")
   plt
 }
 
@@ -115,7 +115,7 @@ coef.poisson_rt <- fitted.poisson_rt
 #'
 #' Given an object of class `poisson_rt` produced with [estimate_rt()],
 #' calculate predicted observed cases for the estimated Rt values.
-#' Note: This function is not indented for "new" or to produce forecasts, but
+#' Note: This function is not intended for "new x" or to produce forecasts, but
 #' rather to examine how Rt relates to observables.
 #'
 #' @param object An object of class `poisson_rt` produced with [estimate_rt()].

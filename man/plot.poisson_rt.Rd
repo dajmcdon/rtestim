@@ -4,12 +4,12 @@
 \alias{plot.poisson_rt}
 \title{Plot estimated Rt values from a `poisson_rt` object}
 \usage{
-\method{plot}{poisson_rt}(x, which_lambda = NULL, ...)
+\method{plot}{poisson_rt}(x, lambda = NULL, ...)
 }
 \arguments{
 \item{x}{output of the function [estimate_rt()] of class `poisson_rt`}
 
-\item{which_lambda}{select which Rt's to plot. If not provided,
+\item{lambda}{select which Rt's to plot. If not provided,
 all Rt's are plotted.}
 
 \item{...}{Not used.}

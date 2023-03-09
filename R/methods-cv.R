@@ -169,33 +169,52 @@ fitted.cv_poisson_rt <- function(object,
 }
 
 
-#' Find indices of a list of elements from another list
-#'
-#' Find indices of every elements from `which_lambda` in `lambda`. Return
-#' the indices if all elements in `which_lambda` are in `lambda`. Return
-#' indices and warning if some elements in `which_lambda` are not in `lambda`.
-#' Abort the program if no element in `which_lambda` is in `lambda`
-#'
-#' @param lambda list where the indices of elements are to be found from
-#' @param which_lambda list of elements whose indices are to be found from `lambda`
-#'
-#' @return list of index of the elements in `which_lambda` from `lambda`
-match_lambda <- function(which_lambda, lambda) {
-  lambda_idx <- almost_match(which_lambda, lambda)
-  n <- length(lambda_idx)
-  no_match_loc <- which(lambda_idx == 0)
+#' @importFrom stats coef
+#' @export
+coef.cv_poisson_rt <- fitted.cv_poisson_rt
 
-  if (length(no_match_loc) > 0) {
-    if (length(no_match_loc) == n) {
-      cli::cli_abort("No lambda is used to generate Rt in `estimate_rt()`")
-    } else {
-      warn_msg <- paste0("The [", toString(no_match_loc),
-                         "]-th lambdas provided are not used to generate Rt",
-                         " in `estimate_rt()`")
-      cli::cli_warn(warn_msg)
-      lambda_idx <- lambda_idx[-no_match_loc]
-    }
+
+#' Predict observed data using estimated Rt
+#'
+#' Given an object of class `poisson_rt` produced with [estimate_rt()],
+#' calculate predicted observed cases for the estimated Rt values.
+#' Note: This function is not intended for "new x" or to produce forecasts, but
+#' rather to examine how Rt relates to observables.
+#'
+#'
+#' @param object result of cross validation of type `cv_poisson_rt`
+#' @param which_lambda Select which lambdas from the object to use. If not
+#'   provided, all Rt's are returned. Note that new lambdas not originally
+#'   used in the estimation procedure may be provided, but the results will be
+#'   calculated by linearly interpolating the estimated Rt's.
+#'
+#'   The strings `lambda.min` or `lambda.1se` are allowed to choose either
+#'   the lambda that minimizes the cross validation score or the largest lambda
+#'   whose corresponding cross validation score is within 1 standard error of
+#'   the minimal cross validation score.
+#' @param ... not used.
+#'
+#' @return A vector or matrix of predicted case counts.
+#' @export
+#' @examples
+#' y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
+#' cv <- cv_estimate_rt(y, degree = 3, nfold = 3, nsol = 30)
+#' p <- predict(cv)
+#' p <- predict(cv, which_lambda = cv$lambda[1])
+#' p <- predict(cv, which_lambda = "lambda.1se")
+#' p <- predict(cv, which_lambda = NULL)
+#' plot(y)
+#' matlines(p, lty = 2)
+predict.cv_poisson_rt <- function(object,
+                                  which_lambda = c("lambda.min", "lambda.1se"),
+                                  ...) {
+  rlang::check_dots_empty()
+  if (is.character(which_lambda)) {
+    which_lambda <- match.arg(which_lambda)
+    which_lambda <- object[[which_lambda]]
+  } else {
+    arg_is_numeric(which_lambda, allow_null = TRUE)
   }
-  return(lambda_idx)
+  predict(object$full_fit, which_lambda)
 }
 
