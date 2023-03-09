@@ -153,32 +153,19 @@ plot.cv_poisson_rt <- function(
 #' cv <- cv_estimate_rt(y, degree = 3, nfold = 3, nsol = 30)
 #' f <- fitted(cv)
 #' f <- fitted(cv, which_lambda = cv$lambda[1])
-#' f <- fitted(cv, which_lambda = "lambda.min")
 #' f <- fitted(cv, which_lambda = "lambda.1se")
+#' f <- fitted(cv, which_lambda = NULL)
 fitted.cv_poisson_rt <- function(object,
                                  which_lambda = c("lambda.min", "lambda.1se"),
                                  ...) {
-  if (is.character(which_lambda))
-    which_lambda <- match.arg(which_lambda)
-  else arg_is_numeric(which_lambda, allow_null = TRUE)
   rlang::check_dots_empty()
-
-  full_fit <- object$full_fit
-  lambda <- object$lambda
-
-  if (is.numeric(which_lambda)) {
-    lambda_idx <- match_lambda(which_lambda, lambda)
-    return(full_fit$Rt[, almost_match(which_lambda, lambda)])
-
-  } else if (is.null(which_lambda)) {
-    return(full_fit$Rt)
-
-  } else if (which_lambda == "lambda.min") {
-    return(full_fit$Rt[, which.min(object$cv_scores)])
-
-  } else if (which_lambda == "lambda.1se") {
-    return(full_fit$Rt[, almost_match(object$lambda.1se, lambda)])
+  if (is.character(which_lambda)) {
+    which_lambda <- match.arg(which_lambda)
+    which_lambda <- object[[which_lambda]]
+  } else {
+    arg_is_numeric(which_lambda, allow_null = TRUE)
   }
+  fitted(object$full_fit, which_lambda)
 }
 
 
