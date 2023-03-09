@@ -71,6 +71,8 @@ print.summary.cv_poisson_rt <- function(
 #'
 #'  * If provided `cv_scores`, plot the cross validation score.
 #'
+#'  * If NULL, all estimated Rt values are plotted.
+#'
 #' @param ... Not used.
 #'
 #' @return plot of cv scores
@@ -83,34 +85,29 @@ print.summary.cv_poisson_rt <- function(
 #' plot(cv, which_lambda = cv$lambda[1])
 #' plot(cv, which_lambda = "lambda.min")
 #' plot(cv, which_lambda = "lambda.1se")
-plot.cv_poisson_rt <- function(x,
-                               which_lambda = c("cv_scores",
-                                                "lambda.min",
-                                                "lambda.1se"), ...) {
+#' plot(cv, NULL)
+plot.cv_poisson_rt <- function(
+    x, which_lambda = c("cv_scores", "lambda.min", "lambda.1se"), ...) {
 
   rlang::check_dots_empty()
-  if (is.character(which_lambda))
+  plt_scores <- FALSE
+  if (is.character(which_lambda)) {
     which_lambda <- match.arg(which_lambda)
-  else arg_is_numeric(which_lambda, allow_null = TRUE)
+    if (which_lambda == "cv_scores") plt_scores <- TRUE
+    else which_lambda <- x[[which_lambda]]
+  } else {
+    arg_is_numeric(which_lambda, allow_null = TRUE)
+  }
 
-  lambda.1se <- x$lambda.1se
-  lambda.min <- x$lambda.min
-
-  print(which_lambda)
-
-  if (is.numeric(which_lambda)) {
-    return(plot(x$full_fit, which_lambda = which_lambda))
-
-  } else if (which_lambda == "cv_scores" || all(is.null(which_lambda))) {
-    df <- data.frame(
-      cv_scores = x$cv_scores,
-      lambda = x$lambda,
-      cv_se = x$cv_se,
-      upper = x$cv_scores + x$cv_se,
-      lower = x$cv_scores - x$cv_se
-    )
-
-    plt_scores <- ggplot2::ggplot(df)+
+  if (plt_scores) {
+    df <- with(x, data.frame(
+      cv_scores = cv_scores,
+      lambda = lambda,
+      cv_se = cv_se,
+      upper = cv_scores + cv_se,
+      lower = cv_scores - cv_se
+    ))
+    plt <- ggplot2::ggplot(df)+
       ggplot2::geom_errorbar(ggplot2::aes(x = .data$lambda,
                                           y = .data$cv_scores,
                                           ymin = .data$lower,
@@ -118,20 +115,16 @@ plot.cv_poisson_rt <- function(x,
                                           width = 0.1))+
       ggplot2::geom_point(ggplot2::aes(x = .data$lambda, y = .data$cv_scores),
                           color="darkblue")+
-      ggplot2::geom_vline(xintercept = lambda.min, linetype='dotted')+
-      ggplot2::geom_vline(xintercept = lambda.1se, linetype='dotted')+
+      ggplot2::geom_vline(xintercept = x$lambda.min, linetype='dotted')+
+      ggplot2::geom_vline(xintercept = x$lambda.1se, linetype='dotted')+
       ggplot2::theme_bw() +
       ggplot2::labs(x = "Lambda", y = "CV scores")+
       ggplot2::scale_x_log10()
-
-    return(plt_scores)
-
-  } else if (which_lambda == "lambda.1se") {
-    return(plot(x$full_fit, which_lambda = x$lambda.1se))
-
-  } else if (which_lambda == "lambda.min") {
-    return(plot(x$full_fit, which_lambda = x$lambda.min))
+  } else {
+    plt <- plot(x$full_fit, which_lambda = which_lambda)
   }
+
+  return(plt)
 }
 
 

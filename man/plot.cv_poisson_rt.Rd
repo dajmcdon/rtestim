@@ -24,7 +24,9 @@ must be either one of `lambda.min`, `lambda.1se`, or `cv_scores`.
  corresponding cross validation score is 1 standard error away of the
  minimal cross validation score.
 
- * If provided `cv_scores`, plot the cross validation score.}
+ * If provided `cv_scores`, plot the cross validation score.
+
+ * If NULL, all estimated Rt values are plotted.}
 
 \item{...}{Not used.}
 }
@@ -41,4 +43,5 @@ plot(cv)
 plot(cv, which_lambda = cv$lambda[1])
 plot(cv, which_lambda = "lambda.min")
 plot(cv, which_lambda = "lambda.1se")
+plot(cv, NULL)
 }
