@@ -3,26 +3,25 @@
 summary.cv_poisson_rt <- function(object, ...) {
 
   rlang::check_dots_empty()
-  cv_scores <- object$cv_scores
-  lambda <- object$lambda
 
-  lambda_output <- c(min(lambda), object$lambda.min, object$lambda.1se,
-                     max(lambda))
-  lambda_idx <- almost_match(lambda_output, lambda)
-  print(object$lambda.min)
-  print(object$lambda.1se)
   tab <- with(object, data.frame(
-    lambda = lambda_output,
-    index = lambda_idx,
-    cv_scores = cv_scores[lambda_idx],
-    cv_se = object$cv_se[lambda_idx],
-    dof = object$full_fit$dof[lambda_idx])
-  )
-
-  rownames(tab) <- c("Min Lambda", "CV Minimizer", "1se Lambda", "Max Lambda")
+    lambda = lambda,
+    index = seq_along(lambda),
+    cv_scores = cv_scores,
+    cv_se = cv_se,
+    dof = full_fit$dof
+  ))
+  n <- nrow(tab)
+  if (n > 5) {
+    l1 <- which(abs(object$lambda - object$lambda.min) < 1e-10)
+    l2 <- which(abs(object$lambda - object$lambda.1se) < 1e-10)
+    idx <- c(1, l1, l2, n)
+    tab <- tab[idx, ]
+    rownames(tab) <- c("Min Lambda", "CV Minimizer", "1se Lambda", "Max Lambda")
+  }
 
   out <- structure(
-    list(call = object$call, table = tab, degree = object$degree),
+    list(call = object$call, table = tab, degree = object$full_fit$degree),
     class = "summary.cv_poisson_rt")
   out
 }
@@ -30,9 +29,10 @@ summary.cv_poisson_rt <- function(object, ...) {
 
 #' @method print summary.cv_poisson_rt
 #' @export
-print.summary.cv_poisson_rt <- function(x,
-                                        digits = max(3, getOption("digits") - 3),
-                                        ...) {
+print.summary.cv_poisson_rt <- function(
+    x,
+    digits = max(3, getOption("digits") - 3),
+    ...) {
 
   rlang::check_dots_empty()
 
@@ -40,15 +40,13 @@ print.summary.cv_poisson_rt <- function(x,
   if (x$table$index[2] == 1) lambda_warning = "smallest"
   if (x$table$index[2] == x$table$index[4]) lambda_warning = "largest"
 
-  cat("\nCall: ", deparse(x$call), fill = TRUE)
-  cat("\n")
+  cat("\nCall:", deparse(x$call), fill = TRUE)
   cat("\nDegree of the estimated piecewise polynomial curve:", x$degree, "\n")
-  cat("\n")
   if (!is.null(lambda_warning)) {
     cat("Warning: the CV minimum occurred at the", lambda_warning,
         "lambda in the path.\n\n")
   }
-  cat("\nSummary of cross validation from", x$ncv, "lambdas:\n")
+  cat("\nSummary of cross validation across lambda:\n")
   print(x$tab, digits = digits)
   cat("\n")
 }
