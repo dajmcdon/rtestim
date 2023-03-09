@@ -107,18 +107,18 @@ plot.cv_poisson_rt <- function(
       upper = cv_scores + cv_se,
       lower = cv_scores - cv_se
     ))
-    plt <- ggplot2::ggplot(df)+
+    plt <- ggplot2::ggplot(df) +
       ggplot2::geom_errorbar(ggplot2::aes(x = .data$lambda,
                                           y = .data$cv_scores,
                                           ymin = .data$lower,
                                           ymax = .data$upper,
-                                          width = 0.1))+
+                                          width = 0.1)) +
       ggplot2::geom_point(ggplot2::aes(x = .data$lambda, y = .data$cv_scores),
-                          color="darkblue")+
-      ggplot2::geom_vline(xintercept = x$lambda.min, linetype='dotted')+
-      ggplot2::geom_vline(xintercept = x$lambda.1se, linetype='dotted')+
+                          color = "darkblue") +
+      ggplot2::geom_vline(xintercept = x$lambda.min, linetype = 'dotted') +
+      ggplot2::geom_vline(xintercept = x$lambda.1se, linetype = 'dotted') +
       ggplot2::theme_bw() +
-      ggplot2::labs(x = "Lambda", y = "CV scores")+
+      ggplot2::labs(x = "Lambda", y = "CV scores") +
       ggplot2::scale_x_log10()
   } else {
     plt <- plot(x$full_fit, which_lambda = which_lambda)
