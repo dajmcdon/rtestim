@@ -24,12 +24,12 @@ interpolate_lambda <- function(lambda, new_lambda) {
     lambda <- (lambda[1] - lambda) / (lambda[1] - lambda[k])
     sfrac[sfrac < min(lambda)] <- min(lambda)
     sfrac[sfrac > max(lambda)] <- max(lambda)
-    coord <- approx(lambda, seq(lambda), sfrac)$y
+    coord <- stats::approx(lambda, seq(lambda), sfrac)$y
     left <- floor(coord)
     right <- ceiling(coord)
     sfrac <- (sfrac - lambda[right]) / (lambda[left] - lambda[right])
-    sfrac[left==right] <- 1
+    sfrac[left == right] <- 1
     sfrac[abs(lambda[left] - lambda[right]) < .Machine$double.eps] <- 1
   }
-  list(left=left,right=right,frac=sfrac)
+  list(left = left, right = right, frac = sfrac)
 }

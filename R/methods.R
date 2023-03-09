@@ -71,7 +71,6 @@ plot.poisson_rt <- function(x, lambda = NULL, ...) {
     lambda <- x$lambda
   } else {
     Rt <- fitted(x, lambda = lambda)
-    lambda <- which_lambda
   }
   k <- length(lambda)
 
@@ -128,6 +127,7 @@ coef.poisson_rt <- fitted.poisson_rt
 #' @return A vector or matrix of predicted case counts.
 #' @export
 #'
+#' @importFrom stats predict
 #' @examples
 #' y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
 #' out <- estimate_rt(y, nsol = 10)
