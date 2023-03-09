@@ -37,4 +37,6 @@ p <- predict(cv)
 p <- predict(cv, which_lambda = cv$lambda[1])
 p <- predict(cv, which_lambda = "lambda.1se")
 p <- predict(cv, which_lambda = NULL)
+plot(y)
+matlines(p, lty = 2)
 }
