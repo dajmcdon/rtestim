@@ -330,27 +330,3 @@ arma::vec calcDTDvline_slow(int n,
   return b;
 }
 
-
-
-/**
- * Index of every elements from a in b, allowing minor tolerance
- * @param vector of length m
- * @param vector of length n
- */
-// [[Rcpp::export]]
-arma::vec almost_match(arma::vec& a,
-                            arma::vec& b,
-                            double tol = 1e-10) {
-  int m = a.size();
-  int n = b.size();
-  vec c(m);
-  for (int i = 0; i < m; i++) {
-    for (int j = 0; j < n ; j++) {
-      if ( (pow((a[i]-b[j]), 2)) < 1e-10) {
-        c[i] = j+1;
-        break;
-      }
-    }
-  }
-  return c;
-}
