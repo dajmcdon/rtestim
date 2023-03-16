@@ -44,21 +44,20 @@ List rtestim_path(int algo,
   if (lambda.size() == 0 && lambdamax <= 0) {
     arma::vec b(n - korder);
     arma::mat matD(D);                // convert to dense mat to avoid spsolve
-    arma::solve(b, matD.t(), w % y);  // very approximate; for unevenly space?
+    arma::solve(b, matD.t(), w % y);  // very approximate
     lambdamax = arma::norm(b, "inf");
-    lambdamax /= n;
+    lambdamax /= n;  // we solve the problems which are divided by n
   }
   create_lambda(lambda, lambdamin, lambdamax, lambda_min_ratio, nsol);
 
   // ADMM parameters
   double _rho = (rho < 0) ? lambda(0) : rho;
-
+  double mu = 2 * pow(4, korder);
+  int iters = 0;
   // ADMM variables
   arma::vec beta(n, arma::fill::zeros);
   arma::vec alpha(Dk.n_rows, arma::fill::zeros);
   arma::vec u(Dk.n_rows, arma::fill::zeros);
-  double mu = 2 * pow(4, korder);  // unevenly-spaced version?
-  int iters = 0;
 
   // Outer loop to compute solution path
   for (int i = 0; i < nsol; i++) {
@@ -68,14 +67,15 @@ List rtestim_path(int algo,
 
     if (korder == 0) {
       beta = dptf_past(y, lambda(i), w);
+      // this algorithm solves the problem without being divided by n
       niter(i) = 1;
     } else {
       if (i > 0)
         _rho = (rho < 0) ? lambda(i) : rho;
       switch (algo) {
         case 1:
-          admm(maxiter, y, x, w, n, korder, beta, alpha, u, lambda(i), _rho,
-               mu * lambda(i), tolerance, iters);  // add rho_adjust?
+          linear_admm(maxiter, y, x, w, n, korder, beta, alpha, u, lambda(i),
+                      _rho, mu * lambda(i), tolerance, iters);
           break;
         case 2:
           prox_newton(maxiter, n, korder, y, x, w, beta, alpha, u, lambda(i),
@@ -88,11 +88,11 @@ List rtestim_path(int algo,
 
     // Store solution
     if (korder == int(0)) {
-      theta.col(i) = beta;  // the algorithm returns mean (exp of the
-                            // natural parameter)
+      theta.col(i) = beta;
       dof(i) = arma::sum(arma::abs(arma::diff(beta)) > tolerance);
     } else {
-      theta.col(i) = exp(beta);
+      theta.col(i) = exp(beta);  // returns Poisson mean, i.e., exponential of
+                                 // the natural parameter
       dof(i) = arma::sum(arma::abs(arma::diff(alpha)) > tolerance);
     }
 

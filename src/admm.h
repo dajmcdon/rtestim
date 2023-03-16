@@ -3,20 +3,20 @@
 
 double update_pois(double c, double mu, int n);
 
-void admm(int M,
-          arma::vec const& y,
-          arma::vec const& x,
-          arma::vec const& w,
-          int n,
-          int ord,
-          arma::vec& theta,
-          arma::vec& z,
-          arma::vec& u,
-          double lambda,
-          double rho,
-          double mu,
-          double tol,
-          int& iter);
+void linear_admm(int M,
+                 arma::vec const& y,
+                 arma::vec const& x,
+                 arma::vec const& w,
+                 int n,
+                 int ord,
+                 arma::vec& theta,
+                 arma::vec& z,
+                 arma::vec& u,
+                 double lambda,
+                 double rho,
+                 double mu,
+                 double tol,
+                 int& iter);
 
 Rcpp::List admm_testing(int M,
                         arma::vec const& y,

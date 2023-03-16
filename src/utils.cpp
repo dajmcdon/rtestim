@@ -9,15 +9,21 @@ using namespace arma;
  * Generate a (banded) divided difference matrix of an arbitrary order for
  * equally spaced cases.
  * @param n an integer; signal length.
- * @param ord an integer; ord = -1, 0, 1, ... Order of the divided difference
- * matrix. If `ord == -1`, return an identity matrix (of `ord + 2 = 1` band).
- * @return a sparse matrix D
+ * @param ord an integer; ord = -1, 0, 1, 2, ...
+ * @return a sparse matrix D of order `ord + 1`. If `ord == -1`, return an
+ * identity matrix.
  */
 // [[Rcpp::export]]
 arma::sp_mat buildD(int n, int ord) {
-  if (ord < -1) stop("ord must be non-negative."); // ord == -1 results in Id.
-  if (n <= ord + 1) stop("n must be larger than ord + 1.");
+  if (ord + 1 < 0)
+    stop("ord+1 must be non-negative.");
+  if (n <= ord + 1)
+    stop("n must be larger than ord + 1.");
 
+  if (ord == -1) {
+    sp_mat D = speye<sp_mat>(n, n);
+    return D;
+  }
   int c1 = ord + 1;
   int m = n - c1;
   arma::sp_mat D(m, n);
@@ -33,25 +39,32 @@ arma::sp_mat buildD(int n, int ord) {
  * Generate a (banded) divided difference matrix of an arbitrary order for
  * unequally spaced cases.
  * @param n an integer; signal length
- * @param ord an integer; ord = 0, 1, ... Order of the divided difference
- * matrix.
+ * @param ord an integer; ord = -1, 0, 1, ...
  * @param x a vector of signal locations. If no input, return equally spaced
  * matrix.
- * @return a sparse matrix Dmat
+ * @return a sparse matrix Dmat. Unequally-spaced divided difference matrix of
+ * order `ord+1`.
  */
 // [[Rcpp::export]]
 arma::sp_mat buildDx(int n, int ord, const arma::vec& x) {
-  // stop if not: n > ord + 1; ord >= 0 (; n > 1)
-  if (x.size() == 0) {
+  if (ord + 1 < 0)
+    stop("ord + 1 must be non-negative.");
+  if (n <= ord + 1)
+    stop("n must be larger than ord + 1.");
+
+  if (ord == -1 || x.size() == 0) {
     arma::sp_mat Dmat = buildD(n, ord);
     return Dmat;
-  }
-  // stop if not: x.size() == n.size()
-  // x should be in an increasing order (with no replicated numbers)
+  } else if (x.size() == n && !x.is_sorted("strictascend")) {
+    stop("`x` must be in an increasing order with no replicated numbers ");
+  } else if (x.size() != n)
+    stop("x must be NULL or of length n.");
+
   arma::sp_mat D1(n - 1, n);
   D1.diag(0) -= 1;
   D1.diag(1) += 1;
-  if (ord == 0) return D1;          // ord = 0 is the same as usual
+  if (ord == 0)
+    return D1;                      // ord = 0 is the same as usual
   arma::sp_mat Dmat = D1;           // output
   arma::sp_mat delx(n - 1, n - 1);  // diagonal matrix adjusting locations
 
@@ -76,13 +89,19 @@ arma::sp_mat buildDx(int n, int ord, const arma::vec& x) {
  */
 // [[Rcpp::export]]
 arma::sp_mat buildDx_tilde(int n, int ord, const arma::vec& x) {
-  // stop if not: n > ord + 1; ord >= 0 (; n > 1)
+  if (ord < 0)
+    stop("ord must be non-negative.");
+  if (n <= ord + 1)
+    stop("n must be larger than ord + 1.");
+
   if (x.size() == 0) {
     arma::sp_mat Dmat = buildD(n, ord - 1);
     return Dmat;
-  }
-  // stop if not: x.size() == n.size()
-  // x should be in an increasing order (with no replicated numbers)
+  } else if (x.size() == n && !x.is_sorted("strictascend")) {
+    stop("`x` must be in an increasing order with no replicated numbers ");
+  } else if (x.size() != n)
+    stop("x must be NULL or of length n.");
+
   if (ord == 0) {
     arma::sp_mat Dk(n, n);
     Dk.eye();
@@ -207,8 +226,10 @@ double line_search(double s,
     bound *= alpha * s;
 
     // check criteria
-    if (grades <= bound) break;
-    else s *= gamma;
+    if (grades <= bound)
+      break;
+    else
+      s *= gamma;
   }
   return s;
 }
@@ -226,11 +247,13 @@ void calcDvline(int n,
   b = v;
   int fct = 1;
   for (int i = 0; i < ord; i++) {
-    if (i != 0 && x.size() > 0) b /= (x.tail(n - i) - x.head(n - i));
+    if (i != 0 && x.size() > 0)
+      b /= (x.tail(n - i) - x.head(n - i));
     b = b.tail(n - i - 1) - b.head(n - i - 1);
     b.resize(n - i - 1);
   }
-  for (int i = 2; i < ord; i++) fct *= i;
+  for (int i = 2; i < ord; i++)
+    fct *= i;
   b *= fct;
 }
 
@@ -262,13 +285,15 @@ void calcDTvline(int n,
 
   for (int i = ord; i > 0; i--) {
     b(n - i) = b(n - i - 1);
-    for (int j = n - i - 1; j > 0; j--) b(j) = b(j - 1) - b(j);
+    for (int j = n - i - 1; j > 0; j--)
+      b(j) = b(j - 1) - b(j);
     b[0] = -b[0];
     if (i != 1 && x.size() > 0) {
       b.head(n - i + 1) /= (x.tail(n - i + 1) - x.head(n - i + 1));
     }
   }
-  for (int i = 2; i < ord; i++) fct *= i;
+  for (int i = 2; i < ord; i++)
+    fct *= i;
   b *= fct;
 }
 
@@ -299,20 +324,23 @@ void calcDTDvline(int n,
   vec c = v;
   int fct = 1;
   for (int i = 0; i < ord; i++) {
-    if (i != 0 && x.size() > 0) c /= (x.tail(n - i) - x.head(n - i));
+    if (i != 0 && x.size() > 0)
+      c /= (x.tail(n - i) - x.head(n - i));
     c = c.tail(n - i - 1) - c.head(n - i - 1);
     c.resize(n - i - 1);
   }
   b.head(n - ord) = c;
   for (int i = ord; i > 0; i--) {
     b(n - i) = b(n - i - 1);
-    for (int j = n - i - 1; j > 0; j--) b(j) = b(j - 1) - b(j);
+    for (int j = n - i - 1; j > 0; j--)
+      b(j) = b(j - 1) - b(j);
     b[0] = -b[0];
     if (i != 1 && x.size() > 0) {
       b.head(n - i + 1) /= (x.tail(n - i + 1) - x.head(n - i + 1));
     }
   }
-  for (int i = 2; i < ord; i++) fct *= i * i;
+  for (int i = 2; i < ord; i++)
+    fct *= i * i;
   b *= fct;
 }
 
@@ -329,4 +357,3 @@ arma::vec calcDTDvline_slow(int n,
   b = D.t() * D * v;
   return b;
 }
-

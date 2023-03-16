@@ -12,13 +12,14 @@ using namespace Rcpp;
 using namespace arma;
 
 double update_pois(double c, double mu, int n) {
-  // @elvis, explain why this is the solution
-  if (c < 500) {  // deal with potential overflow from big exp(c)
+  // solve x such that exp(x) * x = exp(c) / (mu * n) which is a Lambert_0
+  // function; then let theta = c - x
+  if (c < 500) {
     c -= boost::math::lambert_w0(exp(c) / (mu * n));
-  } else {
+  } else {  // deal with potential overflow from big exp(c)
     // See:
-    // https://en.wikipedia.org/wiki/Lambert_W_function#Asymptotic_expansions We
-    // use the first four terms.
+    // https://en.wikipedia.org/wiki/Lambert_W_function#Asymptotic_expansions
+    // We use the first four terms.
     double la, lb;
     la = c - log(mu * n);
     lb = log(la);
@@ -27,20 +28,20 @@ double update_pois(double c, double mu, int n) {
   return c;
 }
 
-void admm(int M,
-          arma::vec const& y,
-          arma::vec const& x,
-          arma::vec const& w,
-          int n,
-          int ord,
-          arma::vec& theta,
-          arma::vec& z,
-          arma::vec& u,
-          double lambda,
-          double rho,
-          double mu,
-          double tol,
-          int& iter) {
+void linear_admm(int M,
+                 arma::vec const& y,
+                 arma::vec const& x,
+                 arma::vec const& w,
+                 int n,
+                 int ord,
+                 arma::vec& theta,
+                 arma::vec& z,
+                 arma::vec& u,
+                 double lambda,
+                 double rho,
+                 double mu,
+                 double tol,
+                 int& iter) {
   double r_norm, s_norm;
   vec z_old = z;
   double lam_z = lambda / rho;
@@ -62,7 +63,7 @@ void admm(int M,
     c.transform([&](double c) { return update_pois(c, mu, n); });
     theta = c - log(w);
 
-    // update alternating variable:
+    // update auxiliary variable:
     calcDvline(n, ord, x, theta, c4);
     c4 += u;  // c4 = D * theta + u;
     z = dptf(c4, lam_z);
@@ -71,11 +72,11 @@ void admm(int M,
     calcDvline(n, ord, x, theta, c4);  // c4 = D * theta
     u += c4 - z;
 
-    // stopping criteria check:
+    // primal residuals:
     r_norm = sqrt(mean(square(c4 - z)));
     // dual residuals:
     s_norm = rho * sqrt(mean(square(z_old - z)));
-
+    // stopping criteria check:
     if ((r_norm < tol) && (s_norm < tol))
       break;
     // auxiliary variables update:
@@ -99,7 +100,7 @@ List admm_testing(int M,
                   double mu,
                   double tol,
                   int iter) {
-  admm(M, y, x, w, n, ord, theta, z, u, lambda, rho, mu, tol, iter);
+  linear_admm(M, y, x, w, n, ord, theta, z, u, lambda, rho, mu, tol, iter);
   List out =
       List::create(Named("y") = y, Named("n") = n, Named("lambda") = lambda,
                    Named("theta") = exp(theta), Named("z") = z, Named("u") = u,
@@ -139,7 +140,7 @@ arma::vec admm_gauss(int M,
     z -= u;
     calcDTvline(n, ord, x, z, c);  // c = Dt * (z - u)
     theta = W_inv * (W % y + n * rho * c);
-    // solve for alternating variable - z:
+    // solve for auxiliary variable - z:
     calcDvline(n, ord, x, theta, c2);
     c2 += u;  // c2 = D * theta + u;
     z = dptf(c2, lam_z);
