@@ -16,6 +16,7 @@ estimate_rt(
   lambda_min_ratio = 1e-04,
   algo = c("linear_admm", "prox_newton"),
   maxiter = 10000,
+  maxiter_inner = 5L,
   init = NULL
 )
 }
@@ -69,6 +70,9 @@ linearized ADMM; `prox_newton`: proximal newton-based method.}
 
 \item{maxiter}{Integer. Maximum number of iterations for the estimation
 algorithm.}
+
+\item{maxiter_inner}{Integer. Maximum number of iterations for the inner
+loop of proximal Newton method.}
 
 \item{init}{a list of internal configuration parameters of class
 `rt_admm_configuration`.}

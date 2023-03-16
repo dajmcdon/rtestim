@@ -86,8 +86,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // rtestim_path
-List rtestim_path(int algo, arma::vec y, arma::vec x, arma::vec w, int korder, arma::vec lambda, double lambdamax, double lambdamin, int nsol, double rho, int maxiter, double tolerance, double lambda_min_ratio, double ls_alpha, double ls_gamma, int verbose);
-RcppExport SEXP _rtestim_rtestim_path(SEXP algoSEXP, SEXP ySEXP, SEXP xSEXP, SEXP wSEXP, SEXP korderSEXP, SEXP lambdaSEXP, SEXP lambdamaxSEXP, SEXP lambdaminSEXP, SEXP nsolSEXP, SEXP rhoSEXP, SEXP maxiterSEXP, SEXP toleranceSEXP, SEXP lambda_min_ratioSEXP, SEXP ls_alphaSEXP, SEXP ls_gammaSEXP, SEXP verboseSEXP) {
+List rtestim_path(int algo, arma::vec y, arma::vec x, arma::vec w, int korder, arma::vec lambda, double lambdamax, double lambdamin, int nsol, double rho, int maxiter, int maxiter_inner, double tolerance, double lambda_min_ratio, double ls_alpha, double ls_gamma, int verbose);
+RcppExport SEXP _rtestim_rtestim_path(SEXP algoSEXP, SEXP ySEXP, SEXP xSEXP, SEXP wSEXP, SEXP korderSEXP, SEXP lambdaSEXP, SEXP lambdamaxSEXP, SEXP lambdaminSEXP, SEXP nsolSEXP, SEXP rhoSEXP, SEXP maxiterSEXP, SEXP maxiter_innerSEXP, SEXP toleranceSEXP, SEXP lambda_min_ratioSEXP, SEXP ls_alphaSEXP, SEXP ls_gammaSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -102,12 +102,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type nsol(nsolSEXP);
     Rcpp::traits::input_parameter< double >::type rho(rhoSEXP);
     Rcpp::traits::input_parameter< int >::type maxiter(maxiterSEXP);
+    Rcpp::traits::input_parameter< int >::type maxiter_inner(maxiter_innerSEXP);
     Rcpp::traits::input_parameter< double >::type tolerance(toleranceSEXP);
     Rcpp::traits::input_parameter< double >::type lambda_min_ratio(lambda_min_ratioSEXP);
     Rcpp::traits::input_parameter< double >::type ls_alpha(ls_alphaSEXP);
     Rcpp::traits::input_parameter< double >::type ls_gamma(ls_gammaSEXP);
     Rcpp::traits::input_parameter< int >::type verbose(verboseSEXP);
-    rcpp_result_gen = Rcpp::wrap(rtestim_path(algo, y, x, w, korder, lambda, lambdamax, lambdamin, nsol, rho, maxiter, tolerance, lambda_min_ratio, ls_alpha, ls_gamma, verbose));
+    rcpp_result_gen = Rcpp::wrap(rtestim_path(algo, y, x, w, korder, lambda, lambdamax, lambdamin, nsol, rho, maxiter, maxiter_inner, tolerance, lambda_min_ratio, ls_alpha, ls_gamma, verbose));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -252,7 +253,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rtestim_admm_gauss", (DL_FUNC) &_rtestim_admm_gauss, 15},
     {"_rtestim_dptf", (DL_FUNC) &_rtestim_dptf, 2},
     {"_rtestim_dptf_past", (DL_FUNC) &_rtestim_dptf_past, 3},
-    {"_rtestim_rtestim_path", (DL_FUNC) &_rtestim_rtestim_path, 16},
+    {"_rtestim_rtestim_path", (DL_FUNC) &_rtestim_rtestim_path, 17},
     {"_rtestim_buildD", (DL_FUNC) &_rtestim_buildD, 2},
     {"_rtestim_buildDx", (DL_FUNC) &_rtestim_buildDx, 3},
     {"_rtestim_buildDx_tilde", (DL_FUNC) &_rtestim_buildDx_tilde, 3},

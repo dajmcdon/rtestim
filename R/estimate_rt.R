@@ -30,6 +30,8 @@
 #'   decreasing order.
 #' @param maxiter Integer. Maximum number of iterations for the estimation
 #'   algorithm.
+#' @param maxiter_inner Integer. Maximum number of iterations for the inner
+#' loop of proximal Newton method.
 #' @param init a list of internal configuration parameters of class
 #'   `rt_admm_configuration`.
 #' @param dist_gamma Vector of length 2. These are the shape and scale for the
@@ -87,10 +89,11 @@ estimate_rt <- function(observed_counts,
                         lambda_min_ratio = 1e-4,
                         algo = c("linear_admm", "prox_newton"),
                         maxiter = 1e4,
+                        maxiter_inner = 5L,
                         init = NULL) {
   # check arguments are of proper types
   arg_is_nonneg_int(degree)
-  arg_is_pos_int(nsol, maxiter)
+  arg_is_pos_int(nsol, maxiter, maxiter_inner)
   arg_is_scalar(degree, nsol, lambda_min_ratio)
   arg_is_scalar(lambdamin, lambdamax, allow_null = TRUE)
   arg_is_positive(lambdamin, lambdamax, allow_null = TRUE)
@@ -170,6 +173,7 @@ estimate_rt <- function(observed_counts,
     nsol = nsol,
     rho = init$rho,
     maxiter = maxiter,
+    maxiter_inner = maxiter_inner,
     tolerance = init$tolerance,
     lambda_min_ratio = lambda_min_ratio,
     ls_alpha = init$alpha,

@@ -19,6 +19,7 @@ List rtestim_path(int algo,
                   int nsol = 100,
                   double rho = -1,
                   int maxiter = 1e5,
+                  int maxiter_inner = 5L,
                   double tolerance = 1e-3,
                   double lambda_min_ratio = 1e-4,
                   double ls_alpha = 0.5,
@@ -78,9 +79,9 @@ List rtestim_path(int algo,
                       _rho, mu * lambda(i), tolerance, iters);
           break;
         case 2:
-          prox_newton(maxiter, n, korder, y, x, w, beta, alpha, u, lambda(i),
-                      _rho, mu * lambda(i), ls_alpha, ls_gamma, Dk, tolerance,
-                      iters);
+          prox_newton(maxiter, maxiter_inner, n, korder, y, x, w, beta, alpha,
+                      u, lambda(i), _rho, mu * lambda(i), ls_alpha, ls_gamma,
+                      Dk, tolerance, iters);
           break;
       }
       niter(i) = iters + 1;

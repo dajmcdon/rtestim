@@ -34,6 +34,7 @@ Rcpp::List admm_testing(int M,
                         int iter);
 
 arma::vec admm_gauss(int M,
+                     int maxiter_inner,
                      int n,
                      int ord,
                      arma::vec const& y,
@@ -48,7 +49,9 @@ arma::vec admm_gauss(int M,
                      double s_norm,
                      arma::sp_mat const& DD,
                      double tol);
+
 void prox_newton(int M,
+                 int M_inner,
                  int n,
                  int ord,
                  arma::vec const& y,

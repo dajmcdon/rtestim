@@ -165,6 +165,7 @@ arma::vec admm_gauss(int M,
 }
 
 void prox_newton(int M,
+                 int M_inner,
                  int n,
                  int ord,
                  arma::vec const& y,
@@ -208,8 +209,8 @@ void prox_newton(int M,
     // define new(Gaussianized) data for least squares problem
     c1 = gaussianized_data(y, w, theta);
     // solve least squares problem (Gaussian TF)
-    theta = admm_gauss(M, n, ord, c1, x, w, theta, z, u, rho, lam_z, r_norm,
-                       s_norm, DD, tol);
+    theta = admm_gauss(M_inner, n, ord, c1, x, w, theta, z, u, rho, lam_z,
+                       r_norm, s_norm, DD, tol);
 
     // line search for step size
     s = line_search(s, lambda, alpha, gamma, y, x, w, n, ord, theta, theta_old,
