@@ -37,13 +37,13 @@ List rtestim_path(int algo,
   // Build D matrix
   arma::sp_mat D;
   arma::sp_mat Dk;
-  D = buildDx(n, korder - 1, x);
+  D = buildDx(n, korder, x);
   Dk = buildDx_tilde(n, korder, x);
   arma::sp_mat DkDk = Dk.t() * Dk;
 
   // Generate lambda sequence if necessary
   if (lambda.size() == 0 && lambdamax <= 0) {
-    arma::vec b(n - korder);
+    arma::vec b(n - korder - 1);
     arma::mat matD(D);                // convert to dense mat to avoid spsolve
     arma::solve(b, matD.t(), w % y);  // very approximate
     lambdamax = arma::norm(b, "inf");
@@ -67,8 +67,9 @@ List rtestim_path(int algo,
     Rcpp::checkUserInterrupt();
 
     if (korder == 0) {
-      beta = dptf_past(y, lambda(i), w);
-      // this algorithm solves the problem without being divided by n
+      beta = dptf_past(y, lambda(i) * n, w);
+      // this algorithm solves the problem without being divided by n,
+      // and returns mean (i.e., exponential of the natural parameter)
       niter(i) = 1;
     } else {
       if (i > 0)
