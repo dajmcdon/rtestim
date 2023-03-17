@@ -39,6 +39,8 @@ List rtestim_path(int algo,
   Dk = buildDx_tilde(n, korder, x);
   arma::sp_mat DkDk = Dk.t() * Dk;
 
+  arma::mat alp(Dk.n_rows - 1, nsol, arma::fill::zeros);
+
   // Generate lambda sequence if necessary
   if (lambda.size() == 0 && lambdamax <= 0) {
     arma::vec b(n - korder);
@@ -53,7 +55,7 @@ List rtestim_path(int algo,
 
   // ADMM variables
   arma::vec beta(n, arma::fill::zeros);
-  arma::vec alpha(Dk.n_rows, arma::fill::zeros);
+  arma::vec alpha(Dk.n_rows - 1, arma::fill::zeros);
   arma::vec u(Dk.n_rows, arma::fill::zeros);
   double mu = 2 * pow(4, korder);  // unevenly-spaced version?
   int iters = 0;
@@ -86,9 +88,11 @@ List rtestim_path(int algo,
     // Store solution
     if (korder == int(0)) {
       theta.col(i) = beta;
+      alp.col(i) = arma::diff(beta);
       dof(i) = arma::sum(arma::abs(arma::diff(beta)) > tolerance);
     } else {
       theta.col(i) = exp(beta);
+      alp.col(i) = arma::diff(alpha);
       dof(i) = arma::sum(arma::abs(arma::diff(alpha)) > tolerance);
     }
 
@@ -104,7 +108,8 @@ List rtestim_path(int algo,
     Named("Rt") = theta,
     Named("lambda") = lambda,
     Named("degree") = korder + 1,
-    Named("dof") = dof,
-    Named("niter") = niter);
+    Named("dof") = dof + korder + 1,
+    Named("niter") = niter,
+    Named("alp") = alp);
   return out;
 }

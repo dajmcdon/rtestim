@@ -180,19 +180,22 @@ estimate_rt <- function(observed_counts,
     verbose = init$verbose
   )
 
+
   if (length(x) == 0) x <- 1:n
   structure(
     list(
       observed_counts = observed_counts,
       x = x,
       weighted_past_counts = weighted_past_counts,
-      Rt = mod$Rt,
+      Rt = drop(mod$Rt),
       lambda = drop(mod$lambda),
       degree = mod$degree,
       dof = drop(mod$dof),
       niter = drop(mod$niter),
       convergence = (mod$niter < maxiter),
-      call = match.call()
+      call = match.call(),
+      alp = drop(mod$alp),
+      tolerance = init$tolerance
     ),
     class = "poisson_rt"
   )
