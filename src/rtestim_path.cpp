@@ -55,7 +55,7 @@ List rtestim_path(int algo,
 
   // ADMM variables
   arma::vec beta(n, arma::fill::zeros);
-  arma::vec alpha(Dk.n_rows - 1, arma::fill::zeros);
+  arma::vec alpha(Dk.n_rows, arma::fill::zeros);
   arma::vec u(Dk.n_rows, arma::fill::zeros);
   double mu = 2 * pow(4, korder);  // unevenly-spaced version?
   int iters = 0;
@@ -89,12 +89,11 @@ List rtestim_path(int algo,
     if (korder == int(0)) {
       theta.col(i) = beta;
       alp.col(i) = arma::diff(beta);
-      dof(i) = arma::sum(arma::abs(arma::diff(beta)) > tolerance);
     } else {
       theta.col(i) = exp(beta);
       alp.col(i) = arma::diff(alpha);
-      dof(i) = arma::sum(arma::abs(arma::diff(alpha)) > tolerance);
     }
+    dof(i) = arma::sum(alp.col(i) > tolerance);
 
 
     // Verbose handlers
