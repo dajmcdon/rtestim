@@ -37,7 +37,7 @@ double line_search(double s,
                    arma::vec& c2,
                    int M);
 void calcDvline(int n, int ord, arma::vec const& x, arma::vec& v, arma::vec& b);
-arma::vec calcDvline_slow(int n,
+arma::vec calcDvline_test(int n,
                           int ord,
                           arma::vec const& x,
                           arma::vec& v,
@@ -47,7 +47,7 @@ void calcDTvline(int n,
                  arma::vec const& x,
                  arma::vec& v,
                  arma::vec& b);
-arma::vec calcDTvline_slow(int n,
+arma::vec calcDTvline_test(int n,
                            int ord,
                            arma::vec const& x,
                            arma::vec& v,
@@ -57,13 +57,10 @@ void calcDTDvline(int n,
                   arma::vec const& x,
                   arma::vec& v,
                   arma::vec& b);
-arma::vec calcDTDvline_slow(int n,
+arma::vec calcDTDvline_test(int n,
                             int ord,
                             arma::vec const& x,
                             arma::vec& v,
                             arma::vec& b);
-arma::vec almost_match(arma::vec const& a,
-                       arma::vec const& b,
-                       double tol);
 
 #endif

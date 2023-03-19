@@ -49,15 +49,15 @@ line_search <- function(s, lambda, alpha, gamma, y, x, w, n, ord, theta, theta_o
     .Call(`_rtestim_line_search`, s, lambda, alpha, gamma, y, x, w, n, ord, theta, theta_old, c1, c2, M)
 }
 
-calcDvline_slow <- function(n, ord, x, v, b) {
-    .Call(`_rtestim_calcDvline_slow`, n, ord, x, v, b)
+calcDvline_test <- function(n, ord, x, v, b) {
+    .Call(`_rtestim_calcDvline_test`, n, ord, x, v, b)
 }
 
-calcDTvline_slow <- function(n, ord, x, v, b) {
-    .Call(`_rtestim_calcDTvline_slow`, n, ord, x, v, b)
+calcDTvline_test <- function(n, ord, x, v, b) {
+    .Call(`_rtestim_calcDTvline_test`, n, ord, x, v, b)
 }
 
-calcDTDvline_slow <- function(n, ord, x, v, b) {
-    .Call(`_rtestim_calcDTDvline_slow`, n, ord, x, v, b)
+calcDTDvline_test <- function(n, ord, x, v, b) {
+    .Call(`_rtestim_calcDTDvline_test`, n, ord, x, v, b)
 }
 

@@ -229,9 +229,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// calcDvline_slow
-arma::vec calcDvline_slow(int n, int ord, arma::vec const& x, arma::vec& v, arma::vec& b);
-RcppExport SEXP _rtestim_calcDvline_slow(SEXP nSEXP, SEXP ordSEXP, SEXP xSEXP, SEXP vSEXP, SEXP bSEXP) {
+// calcDvline_test
+arma::vec calcDvline_test(int n, int ord, arma::vec const& x, arma::vec& v, arma::vec& b);
+RcppExport SEXP _rtestim_calcDvline_test(SEXP nSEXP, SEXP ordSEXP, SEXP xSEXP, SEXP vSEXP, SEXP bSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -240,13 +240,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::vec const& >::type x(xSEXP);
     Rcpp::traits::input_parameter< arma::vec& >::type v(vSEXP);
     Rcpp::traits::input_parameter< arma::vec& >::type b(bSEXP);
-    rcpp_result_gen = Rcpp::wrap(calcDvline_slow(n, ord, x, v, b));
+    rcpp_result_gen = Rcpp::wrap(calcDvline_test(n, ord, x, v, b));
     return rcpp_result_gen;
 END_RCPP
 }
-// calcDTvline_slow
-arma::vec calcDTvline_slow(int n, int ord, arma::vec const& x, arma::vec& v, arma::vec& b);
-RcppExport SEXP _rtestim_calcDTvline_slow(SEXP nSEXP, SEXP ordSEXP, SEXP xSEXP, SEXP vSEXP, SEXP bSEXP) {
+// calcDTvline_test
+arma::vec calcDTvline_test(int n, int ord, arma::vec const& x, arma::vec& v, arma::vec& b);
+RcppExport SEXP _rtestim_calcDTvline_test(SEXP nSEXP, SEXP ordSEXP, SEXP xSEXP, SEXP vSEXP, SEXP bSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -255,13 +255,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::vec const& >::type x(xSEXP);
     Rcpp::traits::input_parameter< arma::vec& >::type v(vSEXP);
     Rcpp::traits::input_parameter< arma::vec& >::type b(bSEXP);
-    rcpp_result_gen = Rcpp::wrap(calcDTvline_slow(n, ord, x, v, b));
+    rcpp_result_gen = Rcpp::wrap(calcDTvline_test(n, ord, x, v, b));
     return rcpp_result_gen;
 END_RCPP
 }
-// calcDTDvline_slow
-arma::vec calcDTDvline_slow(int n, int ord, arma::vec const& x, arma::vec& v, arma::vec& b);
-RcppExport SEXP _rtestim_calcDTDvline_slow(SEXP nSEXP, SEXP ordSEXP, SEXP xSEXP, SEXP vSEXP, SEXP bSEXP) {
+// calcDTDvline_test
+arma::vec calcDTDvline_test(int n, int ord, arma::vec const& x, arma::vec& v, arma::vec& b);
+RcppExport SEXP _rtestim_calcDTDvline_test(SEXP nSEXP, SEXP ordSEXP, SEXP xSEXP, SEXP vSEXP, SEXP bSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -270,7 +270,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::vec const& >::type x(xSEXP);
     Rcpp::traits::input_parameter< arma::vec& >::type v(vSEXP);
     Rcpp::traits::input_parameter< arma::vec& >::type b(bSEXP);
-    rcpp_result_gen = Rcpp::wrap(calcDTDvline_slow(n, ord, x, v, b));
+    rcpp_result_gen = Rcpp::wrap(calcDTDvline_test(n, ord, x, v, b));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -288,9 +288,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rtestim_create_lambda_test", (DL_FUNC) &_rtestim_create_lambda_test, 5},
     {"_rtestim_gaussianized_data", (DL_FUNC) &_rtestim_gaussianized_data, 3},
     {"_rtestim_line_search", (DL_FUNC) &_rtestim_line_search, 14},
-    {"_rtestim_calcDvline_slow", (DL_FUNC) &_rtestim_calcDvline_slow, 5},
-    {"_rtestim_calcDTvline_slow", (DL_FUNC) &_rtestim_calcDTvline_slow, 5},
-    {"_rtestim_calcDTDvline_slow", (DL_FUNC) &_rtestim_calcDTDvline_slow, 5},
+    {"_rtestim_calcDvline_test", (DL_FUNC) &_rtestim_calcDvline_test, 5},
+    {"_rtestim_calcDTvline_test", (DL_FUNC) &_rtestim_calcDTvline_test, 5},
+    {"_rtestim_calcDTDvline_test", (DL_FUNC) &_rtestim_calcDTDvline_test, 5},
     {NULL, NULL, 0}
 };
 

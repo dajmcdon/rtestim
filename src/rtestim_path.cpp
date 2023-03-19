@@ -7,6 +7,26 @@
 
 using namespace Rcpp;
 
+/**
+ * Path algorithm for weighted Poisson trend filtering
+ * @param algo algorithm index. 1: linearized ADMM, 2: proximal Newton method
+ * @param y observed signals
+ * @param x signal locations
+ * @param w signal weights
+ * @param korder degree of Poisson trend filtering
+ * @param lambda hyperparameter
+ * @param lambdamax max of lambda sequence
+ * @param lambdamin min of lambda sequence
+ * @param nsol length of lambda sequence
+ * @param rho Lagrangian parameter of ADMM
+ * @param maxiter maximum iteration of the algos
+ * @param maxiter_inner maximum iteration of inner loop of proximal Newton
+ * @param tolerance tolerance of stopping criteria
+ * @param lambda_min_ratio ratio of lamdbamax/lambdamin
+ * @param ls_alpha scale adjusting upper bound
+ * @param ls_gamma scale adjusting step size
+ * @param verbose .
+ */
 // [[Rcpp::export]]
 List rtestim_path(int algo,
                   arma::vec y,

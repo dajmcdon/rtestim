@@ -11,6 +11,13 @@
 using namespace Rcpp;
 using namespace arma;
 
+/**
+ * Solving Lambert_0 function for primal step of linearized ADMM
+ * @param c primal variable to be computed
+ * @param mu upper bound for the primal step
+ * @param n signal length
+ * @return updated primal variable
+ */
 double update_pois(double c, double mu, int n) {
   // solve x such that exp(x) * x = exp(c) / (mu * n) which is a Lambert_0
   // function; then let theta = c - x
@@ -84,7 +91,9 @@ void linear_admm(int M,
   }
 }
 
-// This is a wrapper around the void function to use in test_that()
+/**
+ * This is a wrapper around the void function to use in test_that()
+ */
 // [[Rcpp::export]]
 List linear_admm_testing(int M,
                          arma::vec const& y,
@@ -108,6 +117,25 @@ List linear_admm_testing(int M,
   return out;
 }
 
+/**
+ * ADMM for Gaussian trend filtering
+ * @param M maximum iteration of the algos
+ * @param n signal length
+ * @param ord degree of Poisson trend filtering
+ * @param y observed signals
+ * @param x signal locations
+ * @param w signal weights
+ * @param theta primal variable of length `n`
+ * @param z auxiliary variable of length `n-ord`
+ * @param u dual variable of length `n-ord`
+ * @param rho Lagrangian parameter of ADMM
+ * @param lam_z hyperparameter of the auxiliary step of ADMM
+ * @param r_norm primal residual
+ * @param s_norm dual residual
+ * @param DD D^T * D
+ * @param tol tolerance of stopping criteria
+ * @return updated primal variable
+ */
 // [[Rcpp::export]]
 arma::vec admm_gauss(int M,
                      int n,
@@ -239,7 +267,9 @@ void prox_newton(int M,
   }
 }
 
-// This is a wrapper around the void function to use in test_that()
+/**
+ * This is a wrapper around the void function to use in test_that()
+ */
 // [[Rcpp::export]]
 List prox_newton_testing(int M,
                          int M_inner,

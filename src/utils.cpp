@@ -115,6 +115,14 @@ arma::sp_mat buildDx_tilde(int n, int ord, const arma::vec& x) {
   return Dk;
 }
 
+/**
+ * Compute lambda sequence
+ * @param lambda hyperparameter
+ * @param lambdamax max of lambda sequence
+ * @param lambdamin min of lambda sequence
+ * @param lambda_min_ratio ratio of lamdbamax/lambdamin
+ * @param nsol length of lambda sequence
+ */
 void create_lambda(arma::vec& lambda,
                    double& lambdamin,
                    double& lambdamax,
@@ -138,6 +146,9 @@ void create_lambda(arma::vec& lambda,
   }
 }
 
+/**
+ * A wrapper for unit testing
+ */
 // [[Rcpp::export()]]
 arma::vec create_lambda_test(arma::vec lambda,
                              double lambdamin,
@@ -149,7 +160,11 @@ arma::vec create_lambda_test(arma::vec lambda,
 }
 
 /**
- * define Gaussianized signals for gaussian tf
+ * Compute Gaussianized signals for proximal Newton algorithm
+ * @param y observed signals
+ * @param w weights
+ * @param theta primal variable
+ * @return gaussianized signals
  */
 // [[Rcpp::export]]
 arma::vec gaussianized_data(arma::vec const& y,
@@ -166,6 +181,15 @@ arma::vec gaussianized_data(arma::vec const& y,
   return c;
 }
 
+/**
+ * Compute Poisson loss
+ * @param y observed signals
+ * @param w signal weights
+ * @param theta primal variable
+ * @param lambda hyperparameter
+ * @param Dv D*theta
+ * @return Poisson loss
+ */
 double pois_obj(arma::vec const& y,
                 arma::vec const& w,
                 arma::vec& theta,
@@ -177,11 +201,24 @@ double pois_obj(arma::vec const& y,
 }
 
 /**
- * solve for step size of IRLS
- * @param s step size
- * @param alpha scale adjusting upper bound
- * @param gamma scale adjusting step size
- * @param y Gaussianized signals
+ * Compute step size using backtracking line search for proximal Newton
+ * algorithm
+ * @param s step size to be returned
+ * @param lambda hyperparameter
+ * @param alpha scale in (0,0.5] adjusting upper bound. alpha=0.5 is
+ * recommended.
+ * @param gamma scale in (0,1) adjusting step size. gamma=0.9 is recommended.
+ * @param y Gaussianized signals returned by `gaussianized_data`
+ * @param x signal locations
+ * @param w signal weights
+ * @param n signal length
+ * @param ord degree of trend filtering
+ * @param theta primal variable updated by `admm_gauss`
+ * @param theta_old primal variable before using `admm_gauss`
+ * @param c1 a buffer of length `n-ord`
+ * @param c2 a buffer of length `n-ord`
+ * @param M maximum iteration
+ * @return step size
  */
 // [[Rcpp::export]]
 double line_search(double s,
@@ -234,10 +271,13 @@ double line_search(double s,
   return s;
 }
 
-/*
- * calculate b = D * v in place
- * @param v vec of size n
- * @param b vec of size (n - ord)
+/**
+ * Calculate b = D * v in place
+ * @param n signal length
+ * @param ord degree of the Poisson trend filtering problem
+ * @param x signal locations
+ * @param v vector of size n
+ * @param b vector of size (n - ord); a buffer storing results
  */
 void calcDvline(int n,
                 int ord,
@@ -257,11 +297,11 @@ void calcDvline(int n,
   b *= fct;
 }
 
-/*
- * for testing `calcDvline`
+/**
+ * A wrapper for testing `calcDvline`
  */
 // [[Rcpp::export]]
-arma::vec calcDvline_slow(int n,
+arma::vec calcDvline_test(int n,
                           int ord,
                           arma::vec const& x,
                           arma::vec& v,
@@ -271,9 +311,10 @@ arma::vec calcDvline_slow(int n,
   return b;
 }
 
-/*
- * calculate b = D^T * v in place
- * @param b vec of length n
+/**
+ * Calculate b = D^T * v in place
+ * @param v vec of length `n-ord`
+ * @param b vec of length n; a buffer storing results
  */
 void calcDTvline(int n,
                  int ord,
@@ -298,10 +339,10 @@ void calcDTvline(int n,
 }
 
 /*
- * for testing `calcDTvline`
+ * A wrapper for testing `calcDTvline`
  */
 // [[Rcpp::export]]
-arma::vec calcDTvline_slow(int n,
+arma::vec calcDTvline_test(int n,
                            int ord,
                            arma::vec const& x,
                            arma::vec& v,
@@ -311,10 +352,10 @@ arma::vec calcDTvline_slow(int n,
   return b;
 }
 
-/*
- * calculate b = D^T * D * v in place
+/**
+ * Calculate b = D^T * D * v in place
  * @param v vec of length n
- * @param b vec of length n
+ * @param b vec of length n; a buffer storing results
  */
 void calcDTDvline(int n,
                   int ord,
@@ -345,10 +386,10 @@ void calcDTDvline(int n,
 }
 
 /*
- * for testing `calcDTDvline`
+ * A wrapper for testing `calcDTDvline`
  */
 // [[Rcpp::export]]
-arma::vec calcDTDvline_slow(int n,
+arma::vec calcDTDvline_test(int n,
                             int ord,
                             arma::vec const& x,
                             arma::vec& v,
