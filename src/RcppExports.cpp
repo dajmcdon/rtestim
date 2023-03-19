@@ -11,9 +11,9 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// admm_testing
-List admm_testing(int M, arma::vec const& y, arma::vec const& x, arma::vec const& w, int n, int ord, arma::vec theta, arma::vec z, arma::vec u, double lambda, double rho, double mu, double tol, int iter);
-RcppExport SEXP _rtestim_admm_testing(SEXP MSEXP, SEXP ySEXP, SEXP xSEXP, SEXP wSEXP, SEXP nSEXP, SEXP ordSEXP, SEXP thetaSEXP, SEXP zSEXP, SEXP uSEXP, SEXP lambdaSEXP, SEXP rhoSEXP, SEXP muSEXP, SEXP tolSEXP, SEXP iterSEXP) {
+// linear_admm_testing
+List linear_admm_testing(int M, arma::vec const& y, arma::vec const& x, arma::vec const& w, int n, int ord, arma::vec theta, arma::vec z, arma::vec u, double lambda, double rho, double mu, double tol, int iter);
+RcppExport SEXP _rtestim_linear_admm_testing(SEXP MSEXP, SEXP ySEXP, SEXP xSEXP, SEXP wSEXP, SEXP nSEXP, SEXP ordSEXP, SEXP thetaSEXP, SEXP zSEXP, SEXP uSEXP, SEXP lambdaSEXP, SEXP rhoSEXP, SEXP muSEXP, SEXP tolSEXP, SEXP iterSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -31,7 +31,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type mu(muSEXP);
     Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
     Rcpp::traits::input_parameter< int >::type iter(iterSEXP);
-    rcpp_result_gen = Rcpp::wrap(admm_testing(M, y, x, w, n, ord, theta, z, u, lambda, rho, mu, tol, iter));
+    rcpp_result_gen = Rcpp::wrap(linear_admm_testing(M, y, x, w, n, ord, theta, z, u, lambda, rho, mu, tol, iter));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -57,6 +57,33 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::sp_mat const& >::type DD(DDSEXP);
     Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
     rcpp_result_gen = Rcpp::wrap(admm_gauss(M, n, ord, y, x, w, theta, z, u, rho, lam_z, r_norm, s_norm, DD, tol));
+    return rcpp_result_gen;
+END_RCPP
+}
+// prox_newton_testing
+List prox_newton_testing(int M, int M_inner, int n, int ord, arma::vec const& y, arma::vec const& x, arma::vec const& w, arma::vec& theta, arma::vec& z, arma::vec& u, double lambda, double rho, double alpha, double gamma, arma::sp_mat const& D, double tol, int iter);
+RcppExport SEXP _rtestim_prox_newton_testing(SEXP MSEXP, SEXP M_innerSEXP, SEXP nSEXP, SEXP ordSEXP, SEXP ySEXP, SEXP xSEXP, SEXP wSEXP, SEXP thetaSEXP, SEXP zSEXP, SEXP uSEXP, SEXP lambdaSEXP, SEXP rhoSEXP, SEXP alphaSEXP, SEXP gammaSEXP, SEXP DSEXP, SEXP tolSEXP, SEXP iterSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type M(MSEXP);
+    Rcpp::traits::input_parameter< int >::type M_inner(M_innerSEXP);
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    Rcpp::traits::input_parameter< int >::type ord(ordSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type y(ySEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type w(wSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type z(zSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type u(uSEXP);
+    Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
+    Rcpp::traits::input_parameter< double >::type rho(rhoSEXP);
+    Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
+    Rcpp::traits::input_parameter< double >::type gamma(gammaSEXP);
+    Rcpp::traits::input_parameter< arma::sp_mat const& >::type D(DSEXP);
+    Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
+    Rcpp::traits::input_parameter< int >::type iter(iterSEXP);
+    rcpp_result_gen = Rcpp::wrap(prox_newton_testing(M, M_inner, n, ord, y, x, w, theta, z, u, lambda, rho, alpha, gamma, D, tol, iter));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -249,8 +276,9 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_rtestim_admm_testing", (DL_FUNC) &_rtestim_admm_testing, 14},
+    {"_rtestim_linear_admm_testing", (DL_FUNC) &_rtestim_linear_admm_testing, 14},
     {"_rtestim_admm_gauss", (DL_FUNC) &_rtestim_admm_gauss, 15},
+    {"_rtestim_prox_newton_testing", (DL_FUNC) &_rtestim_prox_newton_testing, 17},
     {"_rtestim_dptf", (DL_FUNC) &_rtestim_dptf, 2},
     {"_rtestim_dptf_past", (DL_FUNC) &_rtestim_dptf_past, 3},
     {"_rtestim_rtestim_path", (DL_FUNC) &_rtestim_rtestim_path, 17},
