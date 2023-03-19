@@ -158,11 +158,10 @@ arma::vec gaussianized_data(arma::vec const& y,
   int n = y.size();
   vec c(n);
   for (int i = 0; i < n; i++) {
-    if (w(i) * exp(theta(i)) > 1e-3) {
-      c(i) = y(i) * exp(-theta(i)) / w(i) - 1 + theta(i);
-    } else {  // deal with overflow using approximation
-      c(i) = y(i) - exp(theta(i)) / w(i) + theta(i);
-    }
+    if (w[i] * exp(theta[i]) > 1e-3)
+      c[i] = y[i] * exp(-theta[i]) / w[i] - 1 + theta[i];
+    else  // deal with overflow using approximation
+      c[i] = y[i] - exp(theta[i]) / w[i] + theta[i];
   }
   return c;
 }
@@ -199,34 +198,35 @@ double line_search(double s,
                    arma::vec& c1,
                    arma::vec& c2,
                    int M) {
-  vec gradient(n);
-  double grades;
-  vec dir = theta - theta_old;
-
-  // initialize upper bound
-  c1 = dir % (w % exp(theta) - y);
-  double bound = mean(c1);
-  c1.set_size(c2.size());
   calcDvline(n, ord, x, theta, c1);      // c1 = D * theta
   calcDvline(n, ord, x, theta_old, c2);  // c2 = D * theta_old
-  bound += lambda * (norm(c1, 1) - norm(c2, 1));
+  double bound;
+  double gradient;
+  double grad_h;
+  vec grad_g(n);
+  vec Dv(n);
+  vec dir = theta - theta_old;  // proximal Newton direction
+  s = 1;                        // initialize step size
 
-  s = 1;
   for (int i = 0; i < M; i++) {
     // compute gradient/ grades
-    gradient = -s * dir % y + w % exp(theta_old + s * dir) - w % exp(theta_old);
+    grad_g = -s * dir % y + w % exp(theta_old + s * dir) - w % exp(theta_old);
     if (i > 0) {
-      calcDvline(n, ord, x, dir, c1);  // c1 = D * dir;
-      c1 *= s;
-      c1 += c2;  // if s=1, c1 stays same
+      Dv = c1 - c2;
+      Dv *= s;
+      Dv += c2;  // if s=1, Dv stays same
     }
-    grades = mean(gradient) + lambda * (norm(c1, 1) - norm(c2, 1));
+    grad_h = lambda * (norm(Dv, 1) - norm(c2, 1));
+    gradient = mean(grad_g) + grad_h;
 
-    // adjust upper bound
-    bound *= alpha * s;
+    // compute upper bound
+    Dv = dir % (w % exp(theta_old) - y);
+    bound = mean(Dv) * s;
+    bound += grad_h;
+    bound *= alpha;
 
     // check criteria
-    if (grades <= bound)
+    if (gradient <= bound)
       break;
     else
       s *= gamma;

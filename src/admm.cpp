@@ -86,20 +86,20 @@ void linear_admm(int M,
 
 // This is a wrapper around the void function to use in test_that()
 // [[Rcpp::export]]
-List admm_testing(int M,
-                  arma::vec const& y,
-                  arma::vec const& x,
-                  arma::vec const& w,
-                  int n,
-                  int ord,
-                  arma::vec theta,
-                  arma::vec z,
-                  arma::vec u,
-                  double lambda,
-                  double rho,
-                  double mu,
-                  double tol,
-                  int iter) {
+List linear_admm_testing(int M,
+                         arma::vec const& y,
+                         arma::vec const& x,
+                         arma::vec const& w,
+                         int n,
+                         int ord,
+                         arma::vec theta,
+                         arma::vec z,
+                         arma::vec u,
+                         double lambda,
+                         double rho,
+                         double mu,
+                         double tol,
+                         int iter) {
   linear_admm(M, y, x, w, n, ord, theta, z, u, lambda, rho, mu, tol, iter);
   List out =
       List::create(Named("y") = y, Named("n") = n, Named("lambda") = lambda,
@@ -176,29 +176,28 @@ void prox_newton(int M,
                  arma::vec& u,
                  double lambda,
                  double rho,
-                 double mu,
                  double alpha,
                  double gamma,
                  arma::sp_mat const& D,
                  double tol,
                  int& iter) {
-  double s;             // step size
-  vec obj_list(M + 1);  // objective list for each iterate
-  double obj = 1e4;     // initialize it to be large
-  vec theta_old(n);     // a buffer for line search
-  double lam_z = lambda / rho;
-  sp_mat const DD = D.t() * D;
   int m = z.size();
-  vec c1(n);  // a buffer
-  vec c2(m);  // a buffer
+  int iter_best = 0;
+  double s;  // step size
+  double lam_z = lambda / rho;
   double r_norm = 0.0;
   double s_norm = 0.0;
+  double obj = 1e4;     // initialize it to be large
+  vec obj_list(M + 1);  // objective list for each iterate
+  vec theta_old(n);     // a buffer for line search
+  vec c1(n);            // a buffer
+  vec c2(m);            // a buffer
+  vec Dv(m);
+  sp_mat const DD = D.t() * D;
 
   // initialize objective
-  vec Dv(m);
   obj = pois_obj(y, w, theta, lambda, Dv);
   obj_list[0] = obj;
-  int iter_best = 0;
 
   for (iter = 0; iter < M; iter++) {
     if (iter % 1000 == 0)
@@ -222,7 +221,7 @@ void prox_newton(int M,
     theta += (1 - s) * theta_old;
 
     // compute objective
-    Dv = D * theta;
+    calcDvline(n, ord, x, theta, Dv);  // Dv = D * theta;
     obj = pois_obj(y, w, theta, lambda, Dv);
     obj_list[iter + 1] = obj;
     // check stopping criteria
@@ -238,4 +237,32 @@ void prox_newton(int M,
     if (iter >= iter_best + 4 && iter_best != 0)  // adjust the iterate steps
       break;
   }
+}
+
+// This is a wrapper around the void function to use in test_that()
+// [[Rcpp::export]]
+List prox_newton_testing(int M,
+                         int M_inner,
+                         int n,
+                         int ord,
+                         arma::vec const& y,
+                         arma::vec const& x,
+                         arma::vec const& w,
+                         arma::vec& theta,
+                         arma::vec& z,
+                         arma::vec& u,
+                         double lambda,
+                         double rho,
+                         double alpha,
+                         double gamma,
+                         arma::sp_mat const& D,
+                         double tol,
+                         int iter) {
+  prox_newton(M, M_inner, n, ord, y, x, w, theta, z, u, lambda, rho, alpha,
+              gamma, D, tol, iter);
+  List out =
+      List::create(Named("y") = y, Named("n") = n, Named("lambda") = lambda,
+                   Named("theta") = exp(theta), Named("z") = z, Named("u") = u,
+                   Named("niter") = iter + 1);
+  return out;
 }
