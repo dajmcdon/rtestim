@@ -18,8 +18,8 @@ necessary.}
 \item{...}{additional arguments for methods. Unused.}
 }
 \value{
-A list with containing the estimated `Rt` at the chosen `lambda`,
- and `lower` and `upper` confidence limits corresponding to `level`
+A `data.frame` containing the estimated `Rt` at the chosen `lambda`,
+ and confidence limits corresponding to `level`
 }
 \description{
 Create an approximate confidence band for the Rt estimate. Note that the
@@ -28,6 +28,6 @@ variance computation is approximate.
 \examples{
 y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
 out <- estimate_rt(y, nsol = 10)
-confband(out, out$lambda[2])
-confband(out, out$lambda[2], level = c(0.95, 0.8, 0.5))
+head(confband(out, out$lambda[2]))
+head(confband(out, out$lambda[2], level = c(0.95, 0.8, 0.5)))
 }

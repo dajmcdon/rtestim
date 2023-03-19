@@ -1,7 +1,8 @@
-interpolate_mat <- function(mat, lam_list, lambda) {
+interpolate_mat <- function(mat, lam_list, lambda, take_log = FALSE) {
   m <- length(lambda)
-  log_mat <- log(mat)
-  out <- log_mat[,lam_list$left, drop = FALSE] %*% diag(lam_list$frac, m, m) +
-    log_mat[,lam_list$right, drop = FALSE] %*% diag(1 - lam_list$frac, m, m)
-  drop(exp(out))
+  if (take_log) mat <- log(mat)
+  out <- mat[,lam_list$left, drop = FALSE] %*% diag(lam_list$frac, m, m) +
+    mat[,lam_list$right, drop = FALSE] %*% diag(1 - lam_list$frac, m, m)
+  if (take_log) out <- exp(out)
+  drop(out)
 }

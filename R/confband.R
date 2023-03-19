@@ -12,15 +12,15 @@
 #'   necessary.
 #' @param ... additional arguments for methods. Unused.
 #'
-#' @return A list with containing the estimated `Rt` at the chosen `lambda`,
-#'  and `lower` and `upper` confidence limits corresponding to `level`
+#' @return A `data.frame` containing the estimated `Rt` at the chosen `lambda`,
+#'  and confidence limits corresponding to `level`
 #' @export
 #'
 #' @examples
 #' y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
 #' out <- estimate_rt(y, nsol = 10)
-#' confband(out, out$lambda[2])
-#' confband(out, out$lambda[2], level = c(0.95, 0.8, 0.5))
+#' head(confband(out, out$lambda[2]))
+#' head(confband(out, out$lambda[2], level = c(0.95, 0.8, 0.5)))
 confband <- function(object, lambda, level = 0.95, ...) {
   UseMethod("confband")
 }
@@ -51,7 +51,7 @@ confband.poisson_rt <- function(object, lambda, level = 0.95, ...) {
 
   y <- object$observed_counts
   n <- length(y)
-  rhat <- fitted(object, lambda)
+  Rt <- fitted(object, lambda)
   yhat <- predict(object, lambda)
   knots <- find_knots(object, lambda)
   Ds <- Matrix::bdiag(lapply(knots$lens, nbd, ord = object$degree))
@@ -66,22 +66,16 @@ confband.poisson_rt <- function(object, lambda, level = 0.95, ...) {
   covs <- diag(Matrix::solve(
     Matrix::Diagonal(n, yhat) + lambda * Matrix::crossprod(Ds)
   )) * rhat^2
-  lower <- drop(outer(sqrt(covs), stats::qt((1 - level) / 2, n - knots$dof)))
-  upper <- drop(outer(sqrt(covs), stats::qt(level / 2, n - knots$dof)))
-  return(list(
-    Rt = rhat,
-    lower = pmax(rhat + lower, 0),
-    upper = pmax(rhat + upper, 0)
-  ))
+  a <- (1 - level) / 2
+  a <- c(a, rev(1 - a))
+  cb <- outer(sqrt(covs), stats::qt(a, n - knots$dof))
+  cb <- pmax(Rt + cb, 0)
+  colnames(cb) <- fmt_perc(a)
+  vctrs::vec_cbind(Rt = Rt, cb)
 }
 
-
-
-interpolate_mat <- function(mat, lam_list, lambda) {
-  m <- length(lambda)
-  log_mat <- log(mat)
-  out <- log_mat[,lam_list$left, drop = FALSE] %*% diag(lam_list$frac, m, m) +
-    log_mat[,lam_list$right, drop = FALSE] %*% diag(1 - lam_list$frac, m, m)
-  drop(exp(out))
+fmt_perc <- function(probs, digits = 3) {
+  paste(
+    format(100 * probs, trim = TRUE, scientific = FALSE, digits = digits),
+    "%")
 }
-

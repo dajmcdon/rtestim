@@ -16,13 +16,14 @@ find_knots <- function(object, lambda, ...) {
   UseMethod("find_knots")
 }
 
+#' @export
 find_knots.poisson_rt <- function(object, lambda, ...) {
   rlang::check_dots_empty()
   arg_is_scalar(lambda)
   arg_is_numeric(lambda)
 
   lam_list <- interpolate_lambda(object$lambda, lambda)
-  alp <- interpolate_mat(object$alp, lam_list, lambda)
+  alp <- interpolate_mat(object$alp, lam_list, lambda, take_log = FALSE)
   dof <- object$dof
   dof <- dof[lam_list$left] * lam_list$frac +
     dof[lam_list$right] * (1 - lam_list$frac)

@@ -99,7 +99,7 @@ fitted.poisson_rt <- function(object, lambda = NULL, ...) {
   if (is.null(lambda)) return(object$Rt)
 
   lam_list <- interpolate_lambda(object$lambda, lambda)
-  interpolate_mat(object$Rt, lam_list, lambda)
+  interpolate_mat(object$Rt, lam_list, lambda, take_log = TRUE)
 }
 
 #' @importFrom stats coef
