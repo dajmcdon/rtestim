@@ -22,6 +22,7 @@ find_knots.poisson_rt <- function(object, lambda, ...) {
   arg_is_scalar(lambda)
   arg_is_numeric(lambda)
 
+  n <- length(object$observed_counts)
   lam_list <- interpolate_lambda(object$lambda, lambda)
   alp <- interpolate_mat(object$alp, lam_list, lambda, take_log = FALSE)
   dof <- object$dof

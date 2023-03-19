@@ -30,4 +30,7 @@ y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
 out <- estimate_rt(y, nsol = 10)
 head(confband(out, out$lambda[2]))
 head(confband(out, out$lambda[2], level = c(0.95, 0.8, 0.5)))
+
+cv <- cv_estimate_rt(y, nfold = 3, nsol = 30)
+head(confband(cv, "lambda.min", c(0.5, 0.9)))
 }

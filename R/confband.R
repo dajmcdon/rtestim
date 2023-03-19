@@ -21,14 +21,18 @@
 #' out <- estimate_rt(y, nsol = 10)
 #' head(confband(out, out$lambda[2]))
 #' head(confband(out, out$lambda[2], level = c(0.95, 0.8, 0.5)))
+#'
+#' cv <- cv_estimate_rt(y, nfold = 3, nsol = 30)
+#' head(confband(cv, "lambda.min", c(0.5, 0.9)))
 confband <- function(object, lambda, level = 0.95, ...) {
   UseMethod("confband")
 }
 
 #' @export
-confband.cv_poisson_rt <- function(object,
-                                   lambda = c("lambda.min", "lambda.1se"),
-                                   level = 0.95, ...) {
+confband.cv_poisson_rt <- function(
+    object,
+    lambda = c("lambda.min", "lambda.1se"),
+    level = 0.95, ...) {
   rlang::check_dots_empty()
   arg_is_probabilities(level)
   if (is.character(lambda)) lambda <- object[[match.arg(lambda)]]
@@ -65,7 +69,7 @@ confband.poisson_rt <- function(object, lambda, level = 0.95, ...) {
   #   d. Need Var(y) * g'(theta)^2 -->
   covs <- diag(Matrix::solve(
     Matrix::Diagonal(n, yhat) + lambda * Matrix::crossprod(Ds)
-  )) * rhat^2
+  )) * Rt^2
   a <- (1 - level) / 2
   a <- c(a, rev(1 - a))
   cb <- outer(sqrt(covs), stats::qt(a, n - knots$dof))
