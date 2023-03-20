@@ -61,14 +61,16 @@ void linear_admm(int M,
   for (iter = 0; iter < M; iter++) {
     if (iter % 1000 == 0)
       Rcpp::checkUserInterrupt();
-    // update primal variable:
-    calcDTDvline(n, ord, x, theta, c2);  // c2 = DD * theta
-    z -= u;
-    calcDTvline(n, ord, x, z, c3);  // c3 = Dt * (z - u)
-    c = y / n - rho * c2 + rho * c3 + mu * theta;
-    c = c / mu + log(w);
-    c.transform([&](double c) { return update_pois(c, mu, n); });
-    theta = c - log(w);
+    if (!(iter == 0 && sum(theta != zeros(n)))) {
+      // update primal variable:
+      calcDTDvline(n, ord, x, theta, c2);  // c2 = DD * theta
+      z -= u;
+      calcDTvline(n, ord, x, z, c3);  // c3 = Dt * (z - u)
+      c = y / n - rho * c2 + rho * c3 + mu * theta;
+      c = c / mu + log(w);
+      c.transform([&](double c) { return update_pois(c, mu, n); });
+      theta = c - log(w);
+    }
 
     // update auxiliary variable:
     calcDvline(n, ord, x, theta, c4);
@@ -95,20 +97,20 @@ void linear_admm(int M,
  * This is a wrapper around the void function to use in test_that()
  */
 // [[Rcpp::export]]
-List linear_admm_testing(int M,
-                         arma::vec const& y,
-                         arma::vec const& x,
-                         arma::vec const& w,
-                         int n,
-                         int ord,
-                         arma::vec theta,
-                         arma::vec z,
-                         arma::vec u,
-                         double lambda,
-                         double rho,
-                         double mu,
-                         double tol,
-                         int iter) {
+Rcpp::List linear_admm_testing(int M,
+                               arma::vec const& y,
+                               arma::vec const& x,
+                               arma::vec const& w,
+                               int n,
+                               int ord,
+                               arma::vec theta,
+                               arma::vec z,
+                               arma::vec u,
+                               double lambda,
+                               double rho,
+                               double mu,
+                               double tol,
+                               int iter) {
   linear_admm(M, y, x, w, n, ord, theta, z, u, lambda, rho, mu, tol, iter);
   List out =
       List::create(Named("y") = y, Named("n") = n, Named("lambda") = lambda,
@@ -164,10 +166,12 @@ arma::vec admm_gauss(int M,
   for (int iter = 0; iter < M; iter++) {
     if (iter % 1000 == 0)
       Rcpp::checkUserInterrupt();
-    // solve for primal variable - theta:
-    z -= u;
-    calcDTvline(n, ord, x, z, c);  // c = Dt * (z - u)
-    theta = W_inv * (W % y + n * rho * c);
+    if (!(iter == 0 && sum(theta != zeros(n)))) {
+      // solve for primal variable - theta:
+      z -= u;
+      calcDTvline(n, ord, x, z, c);  // c = Dt * (z - u)
+      theta = W_inv * (W % y + n * rho * c);
+    }
     // solve for auxiliary variable - z:
     calcDvline(n, ord, x, theta, c2);
     c2 += u;  // c2 = D * theta + u;
@@ -271,23 +275,23 @@ void prox_newton(int M,
  * This is a wrapper around the void function to use in test_that()
  */
 // [[Rcpp::export]]
-List prox_newton_testing(int M,
-                         int M_inner,
-                         int n,
-                         int ord,
-                         arma::vec const& y,
-                         arma::vec const& x,
-                         arma::vec const& w,
-                         arma::vec& theta,
-                         arma::vec& z,
-                         arma::vec& u,
-                         double lambda,
-                         double rho,
-                         double alpha,
-                         double gamma,
-                         arma::sp_mat const& D,
-                         double tol,
-                         int iter) {
+Rcpp::List prox_newton_testing(int M,
+                               int M_inner,
+                               int n,
+                               int ord,
+                               arma::vec const& y,
+                               arma::vec const& x,
+                               arma::vec const& w,
+                               arma::vec& theta,
+                               arma::vec& z,
+                               arma::vec& u,
+                               double lambda,
+                               double rho,
+                               double alpha,
+                               double gamma,
+                               arma::sp_mat const& D,
+                               double tol,
+                               int iter) {
   prox_newton(M, M_inner, n, ord, y, x, w, theta, z, u, lambda, rho, alpha,
               gamma, D, tol, iter);
   List out =

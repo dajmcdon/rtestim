@@ -2,7 +2,6 @@
 #define __ADMM_H
 
 double update_pois(double c, double mu, int n);
-
 void linear_admm(int M,
                  arma::vec const& y,
                  arma::vec const& x,
@@ -17,7 +16,6 @@ void linear_admm(int M,
                  double mu,
                  double tol,
                  int& iter);
-
 Rcpp::List linear_admm_testing(int M,
                                arma::vec const& y,
                                arma::vec const& x,
@@ -32,7 +30,6 @@ Rcpp::List linear_admm_testing(int M,
                                double mu,
                                double tol,
                                int iter);
-
 arma::vec admm_gauss(int M,
                      int maxiter_inner,
                      int n,
@@ -49,7 +46,6 @@ arma::vec admm_gauss(int M,
                      double s_norm,
                      arma::sp_mat const& DD,
                      double tol);
-
 void prox_newton(int M,
                  int M_inner,
                  int n,
