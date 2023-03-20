@@ -12,7 +12,7 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // linear_admm_testing
-List linear_admm_testing(int M, arma::vec const& y, arma::vec const& x, arma::vec const& w, int n, int ord, arma::vec theta, arma::vec z, arma::vec u, double lambda, double rho, double mu, double tol, int iter);
+Rcpp::List linear_admm_testing(int M, arma::vec const& y, arma::vec const& x, arma::vec const& w, int n, int ord, arma::vec theta, arma::vec z, arma::vec u, double lambda, double rho, double mu, double tol, int iter);
 RcppExport SEXP _rtestim_linear_admm_testing(SEXP MSEXP, SEXP ySEXP, SEXP xSEXP, SEXP wSEXP, SEXP nSEXP, SEXP ordSEXP, SEXP thetaSEXP, SEXP zSEXP, SEXP uSEXP, SEXP lambdaSEXP, SEXP rhoSEXP, SEXP muSEXP, SEXP tolSEXP, SEXP iterSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -61,7 +61,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // prox_newton_testing
-List prox_newton_testing(int M, int M_inner, int n, int ord, arma::vec const& y, arma::vec const& x, arma::vec const& w, arma::vec& theta, arma::vec& z, arma::vec& u, double lambda, double rho, double alpha, double gamma, arma::sp_mat const& D, double tol, int iter);
+Rcpp::List prox_newton_testing(int M, int M_inner, int n, int ord, arma::vec const& y, arma::vec const& x, arma::vec const& w, arma::vec& theta, arma::vec& z, arma::vec& u, double lambda, double rho, double alpha, double gamma, arma::sp_mat const& D, double tol, int iter);
 RcppExport SEXP _rtestim_prox_newton_testing(SEXP MSEXP, SEXP M_innerSEXP, SEXP nSEXP, SEXP ordSEXP, SEXP ySEXP, SEXP xSEXP, SEXP wSEXP, SEXP thetaSEXP, SEXP zSEXP, SEXP uSEXP, SEXP lambdaSEXP, SEXP rhoSEXP, SEXP alphaSEXP, SEXP gammaSEXP, SEXP DSEXP, SEXP tolSEXP, SEXP iterSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -275,6 +275,8 @@ BEGIN_RCPP
 END_RCPP
 }
 
+RcppExport SEXP run_testthat_tests(SEXP);
+
 static const R_CallMethodDef CallEntries[] = {
     {"_rtestim_linear_admm_testing", (DL_FUNC) &_rtestim_linear_admm_testing, 14},
     {"_rtestim_admm_gauss", (DL_FUNC) &_rtestim_admm_gauss, 15},
@@ -291,6 +293,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rtestim_calcDvline_test", (DL_FUNC) &_rtestim_calcDvline_test, 5},
     {"_rtestim_calcDTvline_test", (DL_FUNC) &_rtestim_calcDTvline_test, 5},
     {"_rtestim_calcDTDvline_test", (DL_FUNC) &_rtestim_calcDTDvline_test, 5},
+    {"run_testthat_tests", (DL_FUNC) &run_testthat_tests, 1},
     {NULL, NULL, 0}
 };
 
