@@ -31,7 +31,7 @@ for (i in 1:3) {
   )
   # print(cbind(head(exp(lin_mod$theta)),head(exp(pro_mod$theta))))
   test_that("test two algorithms equal for k=0", {
-    expect_equal(exp(lin_mod$theta[, 1]), exp(lin_mod$theta[, 1]), tolerance = .1)
+    expect_equal(lin_mod$theta[, 1], pro_mod$theta[, 1], tolerance = .1)
   })
 }
 
@@ -51,7 +51,7 @@ for (i in 1:3) {
     u, lambda, rho, alpha, gamma, D, tol, iter
   )
   test_that("test two algorithms equal for k=1", {
-    expect_equal(exp(lin_mod$theta[, 1]), exp(lin_mod$theta[, 1]), tolerance = .1)
+    expect_equal(lin_mod$theta[, 1], pro_mod$theta[, 1], tolerance = .1)
   })
 }
 
@@ -71,6 +71,6 @@ for (i in 1:3) {
     alpha, gamma, D, tol, iter
   )
   test_that("test two algorithms equal for k=2", {
-    expect_equal(exp(lin_mod$theta[, 1]), exp(lin_mod$theta[, 1]), tolerance = .1)
+    expect_equal(lin_mod$theta[, 1], pro_mod$theta[, 1], tolerance = .1)
   })
 }
