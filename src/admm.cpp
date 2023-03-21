@@ -61,16 +61,15 @@ void linear_admm(int M,
   for (iter = 0; iter < M; iter++) {
     if (iter % 1000 == 0)
       Rcpp::checkUserInterrupt();
-    if (!(iter == 0 && sum(theta != zeros(n)))) {
-      // update primal variable:
-      calcDTDvline(n, ord, x, theta, c2);  // c2 = DD * theta
-      z -= u;
-      calcDTvline(n, ord, x, z, c3);  // c3 = Dt * (z - u)
-      c = y / n - rho * c2 + rho * c3 + mu * theta;
-      c = c / mu + log(w);
-      c.transform([&](double c) { return update_pois(c, mu, n); });
-      theta = c - log(w);
-    }
+
+    // update primal variable:
+    calcDTDvline(n, ord, x, theta, c2);  // c2 = DD * theta
+    z -= u;
+    calcDTvline(n, ord, x, z, c3);  // c3 = Dt * (z - u)
+    c = y / n - rho * c2 + rho * c3 + mu * theta;
+    c = c / mu + log(w);
+    c.transform([&](double c) { return update_pois(c, mu, n); });
+    theta = c - log(w);
 
     // update auxiliary variable:
     calcDvline(n, ord, x, theta, c4);
@@ -166,12 +165,11 @@ arma::vec admm_gauss(int M,
   for (int iter = 0; iter < M; iter++) {
     if (iter % 1000 == 0)
       Rcpp::checkUserInterrupt();
-    if (!(iter == 0 && sum(theta != zeros(n)))) {
-      // solve for primal variable - theta:
-      z -= u;
-      calcDTvline(n, ord, x, z, c);  // c = Dt * (z - u)
-      theta = W_inv * (W % y + n * rho * c);
-    }
+    // solve for primal variable - theta:
+    z -= u;
+    calcDTvline(n, ord, x, z, c);  // c = Dt * (z - u)
+    theta = W_inv * (W % y + n * rho * c);
+
     // solve for auxiliary variable - z:
     calcDvline(n, ord, x, theta, c2);
     c2 += u;  // c2 = D * theta + u;
