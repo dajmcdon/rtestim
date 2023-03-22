@@ -1,9 +1,3 @@
-<<<<<<< Updated upstream
-#' @method summary poisson_rt
-#' @export
-=======
-
-
 #' Print `poisson_rt` object
 #' @description print the `poisson_rt` object
 #' @param x output of function `estimate_rt` of class `poisson_rt`
@@ -33,7 +27,6 @@ print.poisson_rt <- function(x, ...) {
 #' y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
 #' out <- estimate_rt(y, lambda = log(c(1.1,1.3,1.5)))
 #' summary(out)
->>>>>>> Stashed changes
 summary.poisson_rt <- function(object, ...) {
   rlang::check_dots_empty()
   ns <- length(object$lambda)
