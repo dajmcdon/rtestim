@@ -1,5 +1,39 @@
+<<<<<<< Updated upstream
 #' @method summary poisson_rt
 #' @export
+=======
+
+
+#' Print `poisson_rt` object
+#' @description print the `poisson_rt` object
+#' @param x output of function `estimate_rt` of class `poisson_rt`
+#' @param ...
+#'
+#' @return status of the `poisson_rt` object
+#' @exportS3Method print poisson_rt
+#' @usage \method{print}{poisson_rt}(x, \dots)
+#' @examples
+#' y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
+#' out <- estimate_rt(y, lambda = log(c(1.1,1.3,1.5)))
+#' out
+print.poisson_rt <- function(x, ...) {
+  cat("Algorithm terminated\n")
+  if (all(x$convergence)) cat("All runs converged!\n")
+  cat("Degree of the piecewise polynomial curve fitted:", x$degree, "\n")
+}
+
+#' Summary of the `poisson_rt` object
+#' @description summarize the `poisson_rt` object in a table
+#' @param object output of function `estimate_rt` of class `poisson_rt`
+#' @param ...
+#'
+#' @return summary of the `poisson_rt` object in a table
+#' @exportS3Method summary poisson_rt
+#' @examples
+#' y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
+#' out <- estimate_rt(y, lambda = log(c(1.1,1.3,1.5)))
+#' summary(out)
+>>>>>>> Stashed changes
 summary.poisson_rt <- function(object, ...) {
   rlang::check_dots_empty()
   ns <- length(object$lambda)
