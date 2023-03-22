@@ -121,7 +121,7 @@ plot.cv_poisson_rt <- function(
       ggplot2::labs(x = "Lambda", y = "CV scores") +
       ggplot2::scale_x_log10()
   } else {
-    plt <- plot(x$full_fit, which_lambda = which_lambda)
+    plt <- plot(x$full_fit, which_lambda)
   }
 
   return(plt)
