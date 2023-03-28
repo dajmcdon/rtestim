@@ -8,7 +8,7 @@ estimate_rt(
   observed_counts,
   degree = 3L,
   dist_gamma = c(2.5, 2.5),
-  x = NULL,
+  x = 1:n,
   lambda = NULL,
   nsol = 100L,
   lambdamin = NULL,
