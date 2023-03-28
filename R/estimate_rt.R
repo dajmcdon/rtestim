@@ -154,7 +154,10 @@ estimate_rt <- function(observed_counts,
     if (lambdamin > 0 && lambdamax > 0 && lambdamin >= lambdamax) {
       cli::cli_abort("{msg} lambdamin must be < lambdamax.")
     }
+    lambda <- double(nsol)
   }
+  if (length(lambda) != nsol) nsol <- length(lambda)
+  lambda <- sort(lambda)
 
   # check algorithm
   algo <- match(algo, c("linear_admm", "prox_newton"))

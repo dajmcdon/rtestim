@@ -32,11 +32,13 @@ cv_estimate_rt <- function(observed_counts,
                            dist_gamma = c(2.5, 2.5),
                            nfold = 3,
                            error_measure = c("mse", "mae", "deviance"),
-                           x = NULL,
+                           x = 1:n,
                            lambda = NULL,
                            ...) {
 
   arg_is_pos_int(nfold)
+  n <- length(observed_counts)
+
   if (nfold == 1) cli::cli_abort("nfold must be greater than 1")
 
   ## Run program one time to create lambda

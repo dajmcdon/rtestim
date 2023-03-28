@@ -88,11 +88,7 @@ List rtestim_path(int algo,
       switch (algo) {
         case 1:
           admm(maxiter, y, x, w, n, korder, beta, alpha, u, lambda[i], _rho,
-<<<<<<< HEAD
-               _mu, tolerance, iters);
-=======
                _mu, tolerance, iters);  // add rho_adjust?
->>>>>>> 8741503 (linearized works, irls crashes R)
           break;
         case 2:
           irls_admm(maxiter, n, korder, y, x, w, beta, alpha, u, lambda[i],

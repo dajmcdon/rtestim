@@ -10,7 +10,7 @@ cv_estimate_rt(
   dist_gamma = c(2.5, 2.5),
   nfold = 3,
   error_measure = c("mse", "mae", "deviance"),
-  x = NULL,
+  x = 1:n,
   lambda = NULL,
   ...
 )
