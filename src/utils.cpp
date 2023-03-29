@@ -44,7 +44,6 @@ void create_lambda(NumericVector& lambda,
                    double& lambdamax,
                    double& lambda_min_ratio,
                    int& nsol) {
-
   if (all(lambda == 0).is_false()) {
     lambdamin = min(lambda);
     lambdamax = max(lambda);
@@ -57,12 +56,14 @@ void create_lambda(NumericVector& lambda,
     if (lambdamin < lmpad) {
       p = pow(lambdamax / lmpad, 1 / (ns - 2));
       lambda(1) = lmpad;
-      for (int i = 2; i < nsol; i++) lambda[i] = lambda[i - 1] * p;
+      for (int i = 2; i < nsol; i++)
+        lambda[i] = lambda[i - 1] * p;
       lambda(0) = lambdamin;
     } else {
       p = pow(lambdamax / lambdamin, 1 / (ns - 1));
       lambda(0) = lambdamin;
-      for (int i = 1; i < nsol; i++) lambda[i] += lambda[i - 1] * p;
+      for (int i = 1; i < nsol; i++)
+        lambda[i] += lambda[i - 1] * p;
     }
   }
 }
