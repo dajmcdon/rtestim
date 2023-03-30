@@ -1,5 +1,7 @@
 #include <RcppArmadillo.h>
 #include <boost/math/special_functions/lambert_w.hpp>
+#include <boost/math/tools/roots.hpp>
+
 #include "dptf.h"
 #include "utils.h"
 #include "admm.h"
@@ -10,6 +12,18 @@
 
 using namespace Rcpp;
 using namespace arma;
+using boost::math::tools::newton_raphson_iterate;
+template <class T>
+
+
+struct fun{
+
+  vec b1, b2, b3;
+
+  vec operator()(vec x) {
+    return b1 * exp(x) + b2 * x * exp(x) + b3 * x;
+  }
+};
 
 double update_pois(double c, double mu, int n) {
   // @elvis, explain why this is the solution
@@ -49,18 +63,41 @@ void admm(int M,
   vec c3(n);
   vec c4(z.size());
 
+  vec b1(n);
+  vec b2(n);
+  vec b3(n);
+  vec r(n);
+  r.fill(10);
+
   // start of iteration:
   for (iter = 0; iter < M; iter++) {
     if (iter % 1000 == 0)
       Rcpp::checkUserInterrupt();
     // update primal variable:
+
+    // calcDTDvline(n, ord, x, theta, c2);  // c2 = DD * theta
+    // z -= u;
+    // calcDTvline(n, ord, x, z, c3);  // c3 = Dt * (z - u)
+    // c = y / n - rho * c2 + rho * c3 + mu * theta;
+    // c = c / mu + log(w);
+    // c.transform([&](double c) { return update_pois(c, mu, n); });
+    // theta = c - log(w);
+
     calcDTDvline(n, ord, x, theta, c2);  // c2 = DD * theta
     z -= u;
     calcDTvline(n, ord, x, z, c3);  // c3 = Dt * (z - u)
-    c = y / n - rho * c2 + rho * c3 + mu * theta;
-    c = c / mu + log(w);
-    c.transform([&](double c) { return update_pois(c, mu, n); });
-    theta = c - log(w);
+    c = r - rho * c2 + rho * c3 + mu * theta;
+    b1 = c * r;
+    b2 = -mu * 0.1;
+    b3 = mu;
+
+    auto equation = [&](double x_val) {
+      arma::vec exp_x = arma::exp(x_val * x);
+      return arma::dot(b1, x * exp_x) + arma::dot(b2, exp_x) + arma::dot(b3, x);
+    };
+
+    vec root = boost::math::tools::bracket_and_solve_root(equation, 1.0, 1e-6);
+
 
     // update alternating variable:
     calcDvline(n, ord, x, theta, c4);
