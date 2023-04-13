@@ -26,6 +26,12 @@ summary.cv_poisson_rt <- function(object, ...) {
   out
 }
 
+#' @method print cv_poisson_rt
+#' @export
+print.cv_poisson_rt <- function(x, ...) {
+  print(summary(x, ...))
+}
+
 
 #' @method print summary.cv_poisson_rt
 #' @export

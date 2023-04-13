@@ -8,7 +8,7 @@ estimate_rt(
   observed_counts,
   degree = 3L,
   dist_gamma = c(2.5, 2.5),
-  x = NULL,
+  x = 1:n,
   lambda = NULL,
   nsol = 100L,
   lambdamin = NULL,
@@ -16,7 +16,6 @@ estimate_rt(
   lambda_min_ratio = 1e-04,
   algo = c("linear_admm", "prox_newton"),
   maxiter = 10000,
-  maxiter_inner = 5L,
   init = NULL
 )
 }
@@ -71,9 +70,6 @@ linearized ADMM; `prox_newton`: proximal newton-based method.}
 \item{maxiter}{Integer. Maximum number of iterations for the estimation
 algorithm.}
 
-\item{maxiter_inner}{Integer. Maximum number of iterations for the inner
-loop of proximal Newton method.}
-
 \item{init}{a list of internal configuration parameters of class
 `rt_admm_configuration`.}
 }
@@ -85,7 +81,7 @@ An object with S3 class `poisson_rt`. Among the list components:
 * `Rt` the estimated effective reproduction rate. This is a matrix with
     each column corresponding to one value of `lambda`.
 * `lambda` the value of `lambda` actually used in the algorithm.
-* `degree` degree of the piecewise polynomial curve to be estimated.
+* `degree` degree of the estimated piecewise polynomial curve.
 * `niter` the required number of iterations for each value of `lambda`
 * `convergence` if number of iterations for each value of `lambda` is less
     than the maximum number of iterations for the estimation algorithm.
@@ -104,7 +100,7 @@ at day \eqn{i}, \eqn{\lambda} is the smoothness penalty, and \eqn{D^{(k+1)}}
 is the \eqn{(k+1)}-th order difference matrix.
 }
 \examples{
-y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
+y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
 out <- estimate_rt(y, nsol = 10)
 plot(out)
 

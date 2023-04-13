@@ -30,8 +30,6 @@
 #'   decreasing order.
 #' @param maxiter Integer. Maximum number of iterations for the estimation
 #'   algorithm.
-#' @param maxiter_inner Integer. Maximum number of iterations for the inner
-#' loop of proximal Newton method.
 #' @param init a list of internal configuration parameters of class
 #'   `rt_admm_configuration`.
 #' @param dist_gamma Vector of length 2. These are the shape and scale for the
@@ -64,7 +62,7 @@
 #' * `Rt` the estimated effective reproduction rate. This is a matrix with
 #'     each column corresponding to one value of `lambda`.
 #' * `lambda` the value of `lambda` actually used in the algorithm.
-#' * `degree` degree of the piecewise polynomial curve to be estimated.
+#' * `degree` degree of the estimated piecewise polynomial curve.
 #' * `niter` the required number of iterations for each value of `lambda`
 #' * `convergence` if number of iterations for each value of `lambda` is less
 #'     than the maximum number of iterations for the estimation algorithm.
@@ -72,7 +70,7 @@
 #' @export
 #'
 #' @examples
-#' y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
+#' y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
 #' out <- estimate_rt(y, nsol = 10)
 #' plot(out)
 #'
@@ -81,7 +79,7 @@
 estimate_rt <- function(observed_counts,
                         degree = 3L,
                         dist_gamma = c(2.5, 2.5),
-                        x = NULL,
+                        x = 1:n,
                         lambda = NULL,
                         nsol = 100L,
                         lambdamin = NULL,
@@ -89,23 +87,36 @@ estimate_rt <- function(observed_counts,
                         lambda_min_ratio = 1e-4,
                         algo = c("linear_admm", "prox_newton"),
                         maxiter = 1e4,
-                        maxiter_inner = 5L,
                         init = NULL) {
   # check arguments are of proper types
   arg_is_nonneg_int(degree)
-  arg_is_pos_int(nsol, maxiter, maxiter_inner)
+  arg_is_pos_int(nsol, maxiter)
   arg_is_scalar(degree, nsol, lambda_min_ratio)
   arg_is_scalar(lambdamin, lambdamax, allow_null = TRUE)
   arg_is_positive(lambdamin, lambdamax, allow_null = TRUE)
   arg_is_positive(lambda_min_ratio, dist_gamma)
   arg_is_length(2, dist_gamma)
   algo <- match.arg(algo)
+  n <- length(observed_counts)
+
+  # check that x is a sorted, double vector of length n
+  arg_is_numeric(x)
+  arg_is_length(n, x)
+  if (is.unsorted(x)) {
+    ord <- order(x)
+    x <- x[ord]
+    observed_counts <- observed_counts[ord]
+  }
+  # x <- (x - x[1]) / (diff(range(x)) + 1) * n  + 1 # handle possibly odd spacings
+
 
   # create weighted past cases
-  if (any(observed_counts < 0))
+  if (any(observed_counts < 0)) {
     cli::cli_abort("`observed_counts` must be non-negative")
-  if (observed_counts[1] == 0 || is.na(observed_counts[1]))
+  }
+  if (observed_counts[1] == 0 || is.na(observed_counts[1])) {
     cli::cli_abort("`observed_counts` must start with positive count")
+  }
   weighted_past_counts <- delay_calculator(observed_counts, x, dist_gamma)
 
   # initialize parameters and variables
@@ -123,16 +134,12 @@ estimate_rt <- function(observed_counts,
   }
 
   # check that degree is less than data length
-  n <- length(observed_counts)
-  if (degree + 1 >= n)
-    cli::cli_abort("`degree` must be less than observed data length minus 1.")
-
-  # check that observed counts are non-negative
-  if (any(observed_counts < 0))
-    cli::cli_abort("`observed_counts` must be non-negative.")
+  if (degree + 1 >= n) {
+    cli::cli_abort("`degree + 1` must be less than observed data length.")
+  }
 
   # checks on lambda, lambdamin, lambdamax
-  if (is.null(lambda)) lambda <- double(0) # prep for create_lambda
+  if (is.null(lambda)) lambda <- double(nsol) # prep for create_lambda
   if (is.null(lambdamin)) lambdamin <- -1.0
   if (is.null(lambdamax)) lambdamax <- -1.0
   if (length(lambda) == 0) {
@@ -143,19 +150,10 @@ estimate_rt <- function(observed_counts,
     if (lambdamin > 0 && lambdamax > 0 && lambdamin >= lambdamax) {
       cli::cli_abort("{msg} lambdamin must be < lambdamax.")
     }
+    lambda <- double(nsol)
   }
-
-  # check that x is a double vector of length 0 or n
-  arg_is_numeric(x, allow_null = TRUE)
-  if (!is.null(x)) {
-    arg_is_length(n, x)
-    ord <- order(x)
-    x <- x[ord]
-    observed_counts <- observed_counts[ord]
-    x <- (x - x[1]) / diff(range(x)) * n # handle possibly odd spacings
-  } else {
-    x <- double(0)
-  }
+  if (length(lambda) != nsol) nsol <- length(lambda)
+  lambda <- sort(lambda)
 
   # check algorithm
   algo <- match(algo, c("linear_admm", "prox_newton"))
@@ -166,14 +164,15 @@ estimate_rt <- function(observed_counts,
     observed_counts,
     x,
     weighted_past_counts,
-    degree,
+    init$degree,
     lambda = lambda,
     lambdamax = lambdamax,
     lambdamin = lambdamin,
     nsol = nsol,
     rho = init$rho,
     maxiter = maxiter,
-    maxiter_inner = maxiter_inner,
+    maxiter_inner = init$maxiter_inner,
+    maxiter_line = init$maxiter_line,
     tolerance = init$tolerance,
     lambda_min_ratio = lambda_min_ratio,
     ls_alpha = init$alpha,
@@ -181,7 +180,6 @@ estimate_rt <- function(observed_counts,
     verbose = init$verbose
   )
 
-  if (length(x) == 0) x <- 1:n
   structure(
     list(
       observed_counts = observed_counts,
@@ -212,16 +210,20 @@ estimate_rt <- function(observed_counts,
 #' @param primal_var initial values of log(Rt)
 #' @param auxi_var auxiliary variable in the ADMM algorithm
 #' @param dual_var dual variable in the ADMM algorithm
-#' @param rho double. An ADMM parameter; coefficient of augmented term in the
+#' @param rho Double. An ADMM parameter; coefficient of augmented term in the
 #' Lagrangian function.
-#' @param rho_adjust double. An ADMM parameter; adjusted coefficient of
+#' @param rho_adjust Double. An ADMM parameter; adjusted coefficient of
 #' augmented term in the Lagrangian function.
 #' @param alpha Double. A parameter adjusting upper bound in line search algorithm
 #'   in `prox_newton` algorithm.
 #' @param gamma Double. A parameter adjusting step size in line search algorithm
 #'   in `prox_newton` algorithm.
-#' @param tolerance double. Tolerance of ADMM convergence.
-#' @param verbose integer.
+#' @param tolerance Double. Tolerance of ADMM convergence.
+#' @param maxiter_inner Integer. Maximum number of iterations for the inner
+#' loop of proximal Newton method.
+#' @param maxiter_line Integer. Maximum number of iterations for the linesearch
+#' algorithm in the proximal Newton method.
+#' @param verbose Integer.
 #'
 #' @return a list of model parameters with class `rt_admm_configuration`
 #'
@@ -237,16 +239,20 @@ configure_rt_admm <- function(observed_counts,
                               alpha = 0.5,
                               gamma = 0.9,
                               tolerance = 1e-4,
+                              maxiter_inner = 5L,
+                              maxiter_line = 5L,
                               verbose = 0) {
   n <- length(observed_counts)
-  arg_is_scalar(degree, rho, rho_adjust, alpha, gamma, tolerance, verbose)
+  arg_is_scalar(degree, rho, rho_adjust, alpha, gamma, tolerance, verbose,
+                maxiter_inner, maxiter_line)
   arg_is_positive(alpha, gamma, tolerance)
   arg_is_numeric(rho, rho_adjust, tolerance)
+  arg_is_pos_int(maxiter_inner, maxiter_line)
   arg_is_nonneg_int(degree, verbose)
   if (alpha >= 1) cli::cli_abort("`alpha` must be in (0, 1).")
   if (gamma > 1) cli::cli_abort("`gamma` must be in (0, 1].")
   if (degree + 1 >= n) {
-    cli::cli_abort("`degree` must be less than observed data length minus 1.")
+    cli::cli_abort("`degree + 1` must be less than observed data length.")
   }
 
   if (is.null(primal_var)) {
@@ -256,11 +262,17 @@ configure_rt_admm <- function(observed_counts,
   } else {
     arg_is_length(n, primal_var)
   }
-  if (is.null(auxi_var)) auxi_var <- double(n - degree)
-  else arg_is_length(n - degree, auxi_var)
+  if (is.null(auxi_var)) {
+    auxi_var <- double(n - degree)
+  } else {
+    arg_is_length(n - degree, auxi_var)
+  }
 
-  if (is.null(dual_var)) dual_var <- double(n - degree)
-  else arg_is_length(n - degree, dual_var)
+  if (is.null(dual_var)) {
+    dual_var <- double(n - degree)
+  } else {
+    arg_is_length(n - degree, dual_var)
+  }
 
   structure(
     list(
@@ -273,6 +285,8 @@ configure_rt_admm <- function(observed_counts,
       tolerance = tolerance,
       alpha = alpha,
       gamma = gamma,
+      maxiter_inner = maxiter_inner,
+      maxiter_line = maxiter_line,
       verbose = verbose
     ),
     class = "rt_admm_configuration"

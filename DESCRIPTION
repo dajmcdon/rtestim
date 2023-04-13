@@ -10,6 +10,7 @@ Authors@R: c(
 Description: More about what it does (maybe more than one line) Use four
     spaces when indenting paragraphs within the Description.
 License: MIT + file LICENSE
+URL: https://dajmcdon.github.io/rtestim/
 Depends: 
     Matrix
 Imports: 
@@ -26,11 +27,11 @@ Suggests:
     xml2
 LinkingTo: 
     BH,
+    dspline,
     Rcpp,
-    RcppArmadillo,
-    testthat
+    testthat,
+    RcppEigen
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.2.3
-URL: https://dajmcdon.github.io/rtestim/
