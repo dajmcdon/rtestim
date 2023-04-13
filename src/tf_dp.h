@@ -344,16 +344,18 @@ void tf_dp_past(int n, double* y, double* past, double lam, double* beta) {
   double* tm;
   double* tp;
   double* lamv;
+  double* yw;
+  yw = (double*)malloc(n * sizeof(double));
 
   for (i = 0; i < n; i++) {
-    y[i] = y[i] / past[i];
+    yw[i] = y[i] / past[i];
   }
   /* Take care of a few trivial cases */
   if (n == 0)
     return;
   if (n == 1 || lam == 0) {
     for (i = 0; i < n; i++)
-      beta[i] = y[i];
+      beta[i] = yw[i];
     return;
   }
 
@@ -371,20 +373,20 @@ void tf_dp_past(int n, double* y, double* past, double lam, double* beta) {
   }
 
   /* We step through the first iteration manually */
-  tm[0] = -lamv[0] + y[0];
-  tp[0] = lamv[0] + y[0];
+  tm[0] = -lamv[0] + yw[0];
+  tp[0] = lamv[0] + yw[0];
   l = n - 1;
   r = n;
   x[l] = tm[0];
   x[r] = tp[0];
   a[l] = 1;
-  b[l] = -y[0] + lamv[1];
+  b[l] = -yw[0] + lamv[1];
   a[r] = -1;
-  b[r] = y[0] + lamv[1];
+  b[r] = yw[0] + lamv[1];
   afirst = 1;
-  bfirst = -y[1] - lamv[1];
+  bfirst = -yw[1] - lamv[1];
   alast = -1;
-  blast = y[1] - lamv[1];
+  blast = yw[1] - lamv[1];
 
   /* Now iterations 2 through n-1 */
   for (k = 1; k < n - 1; k++) {
@@ -460,6 +462,8 @@ void tf_dp_past(int n, double* y, double* past, double lam, double* beta) {
   free(b);
   free(tm);
   free(tp);
+  free(yw);
+  free(lamv);
 }
 
 /**

@@ -53,8 +53,6 @@ cv_estimate_rt <- function(observed_counts,
   if (is.null(lambda)) lambda <- full_data_fit$lambda
   weighted_past_counts <- full_data_fit$weighted_past_counts
   x <- full_data_fit$x
-  n <- length(observed_counts)
-
 
   # Cross validation
   foldid = fold_calculator(n, nfold)
@@ -70,22 +68,32 @@ cv_estimate_rt <- function(observed_counts,
                       devy[y == 0] <- 0
                       2 * (devr - devy) })
 
-
   for (f in 1:nfold) {
     ### train test splits
     train_idx <- which(foldid != f)
     test_idx <- which(foldid == f)
 
-    ### Run solver with the training set
-    mod <- estimate_rt(
-      observed_counts = observed_counts[train_idx],
-      x = x[train_idx],
-      degree = degree,
-      lambda = lambda,
-      ...)
+    ## Run solver with the training set
+    #mod <- estimate_rt(
+    #  observed_counts = observed_counts[train_idx],
+    #  x = x[train_idx],
+    #  degree = degree,
+    #  lambda = lambda,
+    #  ...)
+    mod_list <- list()
+    mod_Rt <- matrix(nrow=length(train_idx), ncol=length(lambda))
+    for(i in 1:length(lambda)){
+      mod_list[[i]] <- estimate_rt(
+        observed_counts = observed_counts[train_idx],
+        x = x[train_idx],
+        degree = degree,
+        lambda = lambda[i],
+        ...)
+      mod_Rt[,i] <- mod_list[[i]]$Rt[,1]
+    }
 
     ### Predict training value ###
-    pred_rt <- pred_kth_rt(mod$Rt,
+    pred_rt <- pred_kth_rt(mod_Rt, #mod$Rt,
                            n = n,
                            train_idx = train_idx,
                            test_idx = test_idx,

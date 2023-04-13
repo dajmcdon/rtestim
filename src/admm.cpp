@@ -1,15 +1,22 @@
-#include <RcppArmadillo.h>
+#include <RcppEigen.h>
+#include <Eigen/Sparse>
 #include <boost/math/special_functions/lambert_w.hpp>
 #include "dptf.h"
 #include "utils.h"
 #include "admm.h"
 
-// [[Rcpp::depends(RcppArmadillo)]]
+typedef Eigen::COLAMDOrdering<int> Ord;
+
+using Eigen::SparseMatrix;
+using Eigen::SparseQR;
+using Eigen::VectorXd;
+SparseQR<SparseMatrix<double>, Ord> qradmm;
+
+// [[Rcpp::depends(RcppEigen)]]
 // [[Rcpp::depends(BH)]]
 // [[Rcpp::plugins("cpp11")]]
 
 using namespace Rcpp;
-using namespace arma;
 
 /**
  * Solving Lambert_0 function for primal step of linearized ADMM
@@ -22,7 +29,8 @@ double update_pois(double c, double mu, int n) {
   // solve x such that exp(x) * x = exp(c) / (mu * n) which is a Lambert_0
   // function; then let theta = c - x
   if (c < 500) {
-    c -= boost::math::lambert_w0(exp(c) / (mu * n));
+    double cz = exp(c) / (mu * n);
+    c -= boost::math::lambert_w0(cz);
   } else {  // deal with potential overflow from big exp(c)
     // See:
     // https://en.wikipedia.org/wiki/Lambert_W_function#Asymptotic_expansions
@@ -35,54 +43,52 @@ double update_pois(double c, double mu, int n) {
   return c;
 }
 
-void linear_admm(int M,
-          NumericVector const& y,
-          NumericVector const& x,
-          NumericVector const& w,
-          int n,
-          int ord,
-          NumericVector& theta,
-          NumericVector& z,
-          NumericVector& u,
-          double lambda,
-          double rho,
-          double mu,
-          double tol,
-          int& iter) {
+void linear_admm(int& M,
+                 NumericVector const& y,
+                 NumericVector const& x,
+                 NumericVector const& w,
+                 int n,
+                 int ord,
+                 NumericVector& theta,
+                 NumericVector& z,
+                 NumericVector& u,
+                 double lambda,
+                 double rho,
+                 double mu,
+                 double tol,
+                 int& iter) {
   double r_norm, s_norm;
-  vec z_old = z;
+  NumericVector z_old = clone(z);
   double lam_z = lambda / rho;
-  vec c(n);  // a buffer
-  vec c2(n);
-  vec c3(n);
-  vec c4(z.size());
+  NumericVector tmp_n(n);
+  NumericVector tmp_m(z.size());
 
   // start of iteration:
   for (iter = 0; iter < M; iter++) {
-    if (iter % 1000 == 0)
+    if (iter % 100 == 0)
       Rcpp::checkUserInterrupt();
     // update primal variable:
-    calcDTDvline(n, ord, x, theta, c2);  // c2 = DD * theta
-    z -= u;
-    calcDTvline(n, ord, x, z, c3);  // c3 = Dt * (z - u)
-    c = y / n - rho * c2 + rho * c3 + mu * theta;
-    c = c / mu + log(w);
-    c.transform([&](double c) { return update_pois(c, mu, n); });
-    theta = c - log(w);
+    tmp_n = doDtDv(theta, ord, x);
+    tmp_n = y / n - rho * tmp_n + rho * doDtv(z - u, ord, x) + mu * theta;
+    tmp_n = tmp_n / mu + log(w);
+    for (int it = 0; it < n; it++)
+      tmp_n(it) = update_pois(tmp_n(it), mu, n);
+    theta = tmp_n - log(w);
 
     // update alternating variable:
-    calcDvline(n, ord, x, theta, c4);
-    c4 += u;  // c4 = D * theta + u;
-    z = dptf(c4, lam_z);
+    tmp_m = doDv(theta, ord, x);
+    tmp_m += u;
+    z = dptf(tmp_m, lam_z);
 
     // update dual variable:
-    calcDvline(n, ord, x, theta, c4);  // c4 = D * theta
-    u += c4 - z;
+    tmp_m = doDv(theta, ord, x);
+    u += tmp_m - z;
 
     // stopping criteria check:
-    r_norm = sqrt(mean(square(c4 - z)));
+    r_norm = sqrt(mean(pow(tmp_m - z, 2)));
     // dual residuals:
-    s_norm = rho * sqrt(mean(square(z_old - z)));
+    s_norm = rho * sqrt(mean(pow(z_old - z, 2)));
+
     if ((r_norm < tol) && (s_norm < tol))
       break;
     // auxiliary variables update:
@@ -100,19 +106,19 @@ Rcpp::List linear_admm_testing(int M,
                                NumericVector const& w,
                                int n,
                                int ord,
-                               NumericVector& theta,
-                               NumericVector& z,
-                               NumericVector& u,
+                               NumericVector theta,
+                               NumericVector z,
+                               NumericVector u,
                                double lambda,
                                double rho,
                                double mu,
                                double tol,
-                               int& iter) {
+                               int iter) {
   linear_admm(M, y, x, w, n, ord, theta, z, u, lambda, rho, mu, tol, iter);
   List out =
       List::create(Named("y") = y, Named("n") = n, Named("lambda") = lambda,
                    Named("theta") = exp(theta), Named("z") = z, Named("u") = u,
-                   Named("niter") = iter + 1);
+                   Named("niter") = iter);
   return out;
 }
 
@@ -136,52 +142,57 @@ Rcpp::List linear_admm_testing(int M,
  * @return updated primal variable
  */
 // [[Rcpp::export]]
-arma::vec admm_gauss(int M,
-                     int n,
-                     int ord,
-                     arma::vec const& y,
-                     arma::vec const& x,
-                     arma::vec const& w,
-                     arma::vec& theta,
-                     arma::vec& z,
-                     arma::vec& u,
-                     double rho,
-                     double lam_z,
-                     double r_norm,
-                     double s_norm,
-                     arma::sp_mat const& DD,
-                     double tol) {
-  vec W = exp(theta);
-  mat dDD(DD);
-  dDD *= n * rho;
-  dDD.diag() += W;
-  mat W_inv = inv(dDD);
-  vec c(n);
-  vec c2(z.size());
-  vec z_old(z);
+Rcpp::NumericVector admm_gauss(int M,
+                               int n,
+                               int ord,
+                               Rcpp::NumericVector const& y,
+                               Rcpp::NumericVector const& x,
+                               Rcpp::NumericVector const& w,
+                               Rcpp::NumericVector& theta,
+                               Rcpp::NumericVector& z,
+                               Rcpp::NumericVector& u,
+                               double rho,
+                               double lam_z,
+                               double r_norm,
+                               double s_norm,
+                               Eigen::SparseMatrix<double> const& DD,
+                               double tol) {
+  NumericVector z_old = clone(z);
+  NumericVector tmp_n(n);
+  NumericVector tmp_m(z.size());
+  NumericVector Dth(z.size());
+  VectorXd tmp_theta(n);
+  VectorXd etheta = nvec_to_evec(theta);
+  SparseMatrix<double> cDD = DD * n * rho;  // a copy that doesn't change
+  // cDD.diagonal() += etheta.exp();
+  for (int i = 0; i < n; i++) {
+    cDD.diagonal()(i) += exp(etheta(i));
+  }
+  qradmm.compute(cDD);
+  NumericVector W = exp(theta);  // fix the weights
 
   for (int iter = 0; iter < M; iter++) {
-    if (iter % 1000 == 0)
+    if (iter % 50 == 0)
       Rcpp::checkUserInterrupt();
     // solve for primal variable - theta:
-    z -= u;
-    calcDTvline(n, ord, x, z, c);  // c = Dt * (z - u)
-    theta = W_inv * (W % y + n * rho * c);
+    tmp_n = doDtv(z - u, ord, x) * n * rho;
+    tmp_n += W * y;
+    tmp_theta = nvec_to_evec(tmp_n);
+    tmp_theta = qradmm.solve(tmp_theta);
+    theta = evec_to_nvec(tmp_theta);
+    // solve for alternating variable - z:
+    Dth = doDv(theta, ord, x);
+    tmp_m = Dth + u;
+    z = dptf(tmp_m, lam_z);
 
-    // solve for auxiliary variable - z:
-    calcDvline(n, ord, x, theta, c2);
-    c2 += u;  // c2 = D * theta + u;
-    z = dptf(c2, lam_z);
     // update dual variable - u:
-    calcDvline(n, ord, x, theta, c2);
-    u += c2 - z;  // u += D * theta - z;
+    u += Dth - z;
 
     // primal residuals:
-    r_norm = sqrt(mean(square(c2 - z)));
+    r_norm = sqrt(mean(pow(Dth - z, 2)));
     // dual residuals:
-    z_old -= z;
-    calcDTvline(n, ord, x, z_old, c);  // c = Dt * (z_old - z);
-    s_norm = rho * sqrt(mean(square(c)));
+    tmp_n = doDtv(z - z_old, ord, x);
+    s_norm = rho * sqrt(mean(pow(tmp_n, 2)));
     // stopping criteria check:
     if (r_norm < tol && s_norm < tol)
       break;
@@ -193,77 +204,70 @@ arma::vec admm_gauss(int M,
 }
 
 void prox_newton(int& M,
-               int n,
-               int ord,
-               NumericVector const& y,
-               NumericVector const& x,
-               NumericVector const& w,
-               NumericVector& theta,
-               NumericVector& z,
-               NumericVector& u,
-               double lambda,
-               double rho,
-               double alpha,
-               double gamma,
-               Eigen::SparseMatrix<double> const& DD,
-               double tol,
-               int Minner,
-               int& iter) {
-  double s;             // step size
+                 int Minner,
+                 int n,
+                 int ord,
+                 Rcpp::NumericVector const& y,
+                 Rcpp::NumericVector const& x,
+                 Rcpp::NumericVector const& w,
+                 Rcpp::NumericVector& theta,
+                 Rcpp::NumericVector& z,
+                 Rcpp::NumericVector& u,
+                 double lambda,
+                 double rho,
+                 double alpha,
+                 double gamma,
+                 Eigen::SparseMatrix<double> const& DD,
+                 double tol,
+                 int Mline,
+                 int& iter) {
+  double s;                       // step size
   NumericVector obj_list(M + 1);  // objective list for each iterate
-  double obj = 1e4;     // initialize it to be large
+  double obj = 1e4;               // initialize it to be large
   NumericVector theta_old(n);     // a buffer for line search
   double lam_z = lambda / rho;
   double r_norm = 0.0;
   double s_norm = 0.0;
-  double obj = 1e4;     // initialize it to be large
-  vec obj_list(M + 1);  // objective list for each iterate
-  vec theta_old(n);     // a buffer for line search
-  vec c1(n);            // a buffer
-  vec c2(m);            // a buffer
-  vec Dv(m);
-  sp_mat const DD = D.t() * D;
 
   // initialize objective
-  obj = pois_obj(y, w, theta, lambda, Dv);
-  obj_list[0] = obj;
+  obj = pois_obj(ord, y, x, w, theta, lambda);
+  obj_list(0) = obj;
+  int iter_best = 0;
 
   for (iter = 0; iter < M; iter++) {
-    if (iter % 1000 == 0)
+    if (iter % 50 == 0)
       Rcpp::checkUserInterrupt();
-
     theta_old = theta;
 
     // define new(Gaussianized) data for least squares problem
-    c1 = gaussianized_data(y, w, theta);
+    NumericVector std_y = gaussianized_data(y, w, theta);
     // solve least squares problem (Gaussian TF)
-    theta = admm_gauss(M_inner, n, ord, c1, x, w, theta, z, u, rho, lam_z,
+    theta = admm_gauss(Minner, n, ord, std_y, x, w, theta, z, u, rho, lam_z,
                        r_norm, s_norm, DD, tol);
 
     // line search for step size
     s = line_search(s, lambda, alpha, gamma, y, x, w, n, ord, theta, theta_old,
-                    c1, c2, M);
+                    Mline);
     if (s < 0)
       break;
     // update theta
-    theta *= s;
-    theta += (1 - s) * theta_old;
+    theta = theta * s + (1 - s) * theta_old;
 
     // compute objective
-    calcDvline(n, ord, x, theta, Dv);  // Dv = D * theta;
-    obj = pois_obj(y, w, theta, lambda, Dv);
-    obj_list[iter + 1] = obj;
+    obj = pois_obj(ord, y, x, w, theta, lambda);
+    obj_list(iter + 1) = obj;
     // check stopping criteria
-    if (obj < obj_list[iter_best]) {
-      if (obj_list[iter_best] - obj <= fabs(obj_list[iter_best]) * tol) {
-        obj_list[iter_best] = obj;
+    if (obj < obj_list(iter_best)) {
+      if (obj_list(iter_best) - obj <= abs(obj_list(iter_best)) * tol) {
+        obj_list(iter_best) = obj;
         iter_best = iter + 1;
         break;
       }
-      obj_list[iter_best] = obj;
+      obj_list(iter_best) = obj;
       iter_best = iter + 1;
     }
-    if (iter >= iter_best + 4 && iter_best != 0)  // adjust the iterate steps
+    // adjust the iterate steps
+    if (iter >= iter_best + 4 && iter_best != 0)
       break;
   }
 }
@@ -273,27 +277,28 @@ void prox_newton(int& M,
  */
 // [[Rcpp::export]]
 Rcpp::List prox_newton_testing(int M,
-                               int M_inner,
+                               int Minner,
                                int n,
                                int ord,
-                               arma::vec const& y,
-                               arma::vec const& x,
-                               arma::vec const& w,
-                               arma::vec& theta,
-                               arma::vec& z,
-                               arma::vec& u,
+                               Rcpp::NumericVector const& y,
+                               Rcpp::NumericVector const& x,
+                               Rcpp::NumericVector const& w,
+                               Rcpp::NumericVector& theta,
+                               Rcpp::NumericVector& z,
+                               Rcpp::NumericVector& u,
                                double lambda,
                                double rho,
                                double alpha,
                                double gamma,
-                               arma::sp_mat const& D,
+                               Eigen::SparseMatrix<double> const& DD,
                                double tol,
+                               int Mline,
                                int iter) {
-  prox_newton(M, M_inner, n, ord, y, x, w, theta, z, u, lambda, rho, alpha,
-              gamma, D, tol, iter);
+  prox_newton(M, Minner, n, ord, y, x, w, theta, z, u, lambda, rho, alpha,
+              gamma, DD, tol, Mline, iter);
   List out =
       List::create(Named("y") = y, Named("n") = n, Named("lambda") = lambda,
                    Named("theta") = exp(theta), Named("z") = z, Named("u") = u,
-                   Named("niter") = iter + 1);
+                   Named("niter") = iter);
   return out;
 }

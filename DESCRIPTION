@@ -29,8 +29,7 @@ LinkingTo:
     BH,
     dspline,
     Rcpp,
-    RcppArmadillo,
-    testthat
+    testthat,
     RcppEigen
 Config/testthat/edition: 3
 Encoding: UTF-8

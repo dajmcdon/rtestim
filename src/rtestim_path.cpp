@@ -13,7 +13,6 @@ SparseQR<SparseMatrix<double>, Ord> qr;
 
 // [[Rcpp::depends(RcppEigen)]]
 
-
 using namespace Rcpp;
 
 // [[Rcpp::export]]
@@ -32,7 +31,8 @@ List rtestim_path(int algo,
                   double lambda_min_ratio = 1e-4,
                   double ls_alpha = 0.5,
                   double ls_gamma = 0.9,
-                  int maxiter_inner = 30,
+                  int maxiter_inner = 3,
+                  int maxiter_line = 5,
                   int verbose = 0) {
   int n = y.size();
 
@@ -44,19 +44,20 @@ List rtestim_path(int algo,
   // Build D matrices as needed
   Eigen::SparseMatrix<double> D;
   Eigen::SparseMatrix<double> Dk;
+  Eigen::SparseMatrix<double> DkDk;
   D = get_D(korder, x);
   qr.compute(D.transpose());
   int m = n;
   if (korder > 0) {
     Dk = get_Dtil(korder, x);
-    Eigen::SparseMatrix<double> DkDk = Dk.transpose() * Dk;
+    DkDk = Dk.transpose() * Dk;
     m = Dk.rows();
   }
   // Generate lambda sequence if necessary
-  if (abs(lambda[n-1]) < tolerance / 100 && lambdamax <= 0) {
+  if (abs(lambda[nsol - 1]) < tolerance / 100 && lambdamax <= 0) {
     VectorXd b(n - korder);
     VectorXd wy = nvec_to_evec(w * y);
-    b = qr.solve(wy); // very approximate;
+    b = qr.solve(wy);  // very approximate;
     NumericVector bp = evec_to_nvec(b);
     lambdamax = max(abs(bp)) / n;
   }
@@ -76,31 +77,32 @@ List rtestim_path(int algo,
 
   // Outer loop to compute solution path
   for (int i = 0; i < nsol; i++) {
-    if (verbose > 0) Rcout << ".";
+    if (verbose > 0)
+      Rcout << ".";
     Rcpp::checkUserInterrupt();
 
     if (korder == 0) {
       beta = dptf_past(y, lambda[i], w);
-      niter[i] = 1;
+      niter[i] = 0;
     } else {
       _rho = (rho < 0) ? lambda[i] : rho;
       _mu = mu * lambda[i];
       switch (algo) {
         case 1:
-          admm(maxiter, y, x, w, n, korder, beta, alpha, u, lambda[i], _rho,
-               _mu, tolerance, iters);  // add rho_adjust?
+          linear_admm(maxiter, y, x, w, n, korder, beta, alpha, u, lambda[i],
+                      _rho, _mu, tolerance, iters);
           break;
         case 2:
-          irls_admm(maxiter, n, korder, y, x, w, beta, alpha, u, lambda[i],
-                    _rho, ls_alpha, ls_gamma, Dk, tolerance,
-                    maxiter_inner, iters);
+          prox_newton(maxiter, maxiter_inner, n, korder, y, x, w, beta, alpha,
+                      u, lambda[i], _rho, ls_alpha, ls_gamma, DkDk, tolerance,
+                      maxiter_line, iters);
           break;
       }
-      niter[i] = iters + 1;
-      maxiter -= iters;
-      if (maxiter < 0) nsols = i + 1;
+      niter[i] = iters;
+      maxiter -= iters + 1;
+      if (maxiter < 0)
+        nsols = i + 1;  // why not nsols -= 1;
     }
-
 
     // Store solution
     if (korder == int(0)) {
@@ -111,22 +113,22 @@ List rtestim_path(int algo,
       dof[i] = sum(abs(diff(alpha)) > tolerance);
     }
 
-
     // Verbose handlers
-    if (verbose > 1) Rcout << niter(i);
-    if (verbose > 2) Rcout << "(" << lambda(i) << ")";
-    if (verbose > 0) Rcout << std::endl;
-    if (maxiter < 0) break;
+    if (verbose > 1)
+      Rcout << niter(i);
+    if (verbose > 2)
+      Rcout << "(" << lambda(i) << ")";
+    if (verbose > 0)
+      Rcout << std::endl;
+    if (maxiter < 0)
+      break;
   }
 
-
   // Return
-  List out = List::create(
-    Named("Rt") = theta(_, Range(0, nsols-1)),
-    Named("lambda") = lambda[Range(0, nsols-1)],
-    Named("degree") = korder + 1,
-    Named("dof") = dof[Range(0, nsols - 1)],
-    Named("niter") = niter[Range(0, nsols-1)]
-  );
+  List out = List::create(Named("Rt") = theta(_, Range(0, nsols - 1)),
+                          Named("lambda") = lambda[Range(0, nsols - 1)],
+                          Named("degree") = korder,
+                          Named("dof") = dof[Range(0, nsols - 1)],
+                          Named("niter") = niter[Range(0, nsols - 1)]);
   return out;
 }

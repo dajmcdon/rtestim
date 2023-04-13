@@ -1,5 +1,4 @@
 #include <Eigen/Sparse>
-#include <Rcpp.h>
 #include <RcppEigen.h>
 #include <dspline.h>
 #include "utils.h"
@@ -145,7 +144,7 @@ double line_search(double s,
   NumericVector dir = theta - theta_old;
   double bound;
   double gradient;
-  double grad_h;
+  double grad_h = 0.0;
   NumericVector grad_g(n);
   NumericVector Dv(n);
 
