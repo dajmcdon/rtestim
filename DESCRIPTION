@@ -1,7 +1,7 @@
 Type: Package
 Package: rtestim
 Title: What the Package Does (Title Case)
-Version: 0.0.0.9000
+Version: 0.0.1
 Authors@R: c(
     person("Daniel J.", "McDonald", , "daniel@stat.ubc.ca", role = c("aut", "cre")),
     person("Zhenglun", "Cai", , "zhenglun.cai@stat.ubc.ca", role = "aut"),
