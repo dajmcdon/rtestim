@@ -11,7 +11,6 @@ using Eigen::SparseQR;
 using Eigen::VectorXd;
 SparseQR<SparseMatrix<double>, Ord> qr;
 
-// [[Rcpp::depends(RcppEigen)]]
 
 using namespace Rcpp;
 

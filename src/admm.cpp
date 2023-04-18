@@ -12,10 +12,6 @@ using Eigen::SparseQR;
 using Eigen::VectorXd;
 SparseQR<SparseMatrix<double>, Ord> qradmm;
 
-// [[Rcpp::depends(RcppEigen)]]
-// [[Rcpp::depends(BH)]]
-// [[Rcpp::plugins("cpp11")]]
-
 using namespace Rcpp;
 
 /**

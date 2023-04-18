@@ -14,9 +14,6 @@ using Eigen::SparseMatrix;
 using Eigen::SparseQR;
 using Eigen::VectorXd;
 
-// [[Rcpp::depends(RcppEigen)]]
-// [[Rcpp::depends(BH)]]
-// [[Rcpp::plugins("cpp11")]]
 
 using namespace Rcpp;
 

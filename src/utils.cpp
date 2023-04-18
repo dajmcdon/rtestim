@@ -3,9 +3,6 @@
 #include <dspline.h>
 #include "utils.h"
 
-// [[Rcpp::depends(RcppEigen)]]
-// [[Rcpp::depends(dspline)]]
-
 using namespace Rcpp;
 using Eigen::VectorXd;
 
