@@ -3,8 +3,10 @@
 #include <Rmath.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "tf_dp.h"
 #include "dptf.h"
+extern "C" {
+  #include "tf_dp.h"
+}
 
 /**
  * Filter mean (i.e., exponential of natural parameter) trend for 0th-order

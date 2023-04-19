@@ -1,9 +1,10 @@
 #include <RcppEigen.h>
 #include <Eigen/Sparse>
 #include <boost/math/special_functions/lambert_w.hpp>
-#include "dptf.h"
 #include "utils.h"
 #include "admm.h"
+#include "dptf.h"
+
 
 typedef Eigen::COLAMDOrdering<int> Ord;
 

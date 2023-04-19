@@ -1,8 +1,9 @@
 #include <Eigen/Sparse>
 #include <RcppEigen.h>
-#include "dptf.h"
 #include "admm.h"
 #include "utils.h"
+#include "dptf.h"
+
 
 typedef Eigen::COLAMDOrdering<int> Ord;
 
