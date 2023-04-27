@@ -50,8 +50,8 @@ counts at days up until $t$. The parameters of the discretized serial interval
 distribution are defaulted to the probability density function of a Gamma 
 distribution with values $2.5$ for both the scale and shape parameters,
 and the order of the difference operator is set to $3$. A sequence of smoothness 
-penalty $\lambda$, if no $\lambda$ is provided, is calculated internally based 
-on case counts.
+penalty $\lambda$, if no $\lambda$ is provided, is calculated internally by the
+algorithm.
 
 # Example - synthetic dataset
 
@@ -76,7 +76,7 @@ RtEstim generates a sequence of $\Rtseq$s from a range of $\lambda$ values,
 where each $\Rtseq$ corresponds to a specific $\lambda$ value. If no $\lambda$ 
 value is supplied by the user, RtEstim will automatically calculate a sequence 
 of $\lambda$ values. The additional parameter `nsol = 20` specify the number of 
-$\lambda$s to be generated.
+$\lambda$s for which the $\Rtseq$ is calculated
 
 
 ## Cross Validation
@@ -108,7 +108,7 @@ gives minimum mean cross-validated error, called `lambda.min`, and the one on th
 right gives the most regularized model such that the cross-validated error is 
 within one standard error of the minimum, called `lambda.1se`.
 
-Users may wish to visualize the $\Rtseq$ which minimizes the cross-validation 
+Users may wish to visualize the particular $\Rtseq$ which minimizes the cross-validation 
 errors with the following command
 
 ```{r}
@@ -116,7 +116,7 @@ plot(mod_cv, which_lambda = 'lambda.min')
 ```
 
 
-# Uneven Reporting Frequency
+## Uneven Reporting Frequency
 
 Ideally, case counts are observed at regular intervals, such as daily or 
 weekly. RtEstim also accommodates scenarios in which cases are reported 
@@ -135,5 +135,52 @@ We can then fit the model by passing the observation time point as `x`
 mod <- estimate_rt(observed_counts = case_counts, x = observation_time)
 plot(mod)
 ```
+
+
+## Changing degree of difference operator
+
+The degree of the difference operator $k$ is defaulted 3 for the algorithm, which
+corresponds to a piecewise exponential estimation of the $\Rtseq$. To estimate
+$\Rtseq$ with piecewise constant $\Rtseq$ for example, use the command
+
+```{r}
+mod <- estimate_rt(observed_counts = case_counts, degree = 1,
+                   lambda = seq(10, 50, 5))
+plot(mod)
+```
+
+
+## Choosing optimization algorithm
+
+The default algorithm to optimize the objective equation is the linearized 
+Alternating Direction Method of Multiplier (linearized ADMM). We could instead
+use the Iterative Re-weighted Least Square ADMM (IRLS ADMM) as
+
+```{r}
+# Takes too long, perhaps an issue?
+# mod <- estimate_rt(observed_counts = case_counts, algo = "irls_admm")
+plot(mod)
+```
+
+
+# Example - Canadian Covid-19 cases
+
+We first retrieve the Covid-19 data from \textit{OpenCovid.ca}
+
+```{r}
+library(httr)
+library(jsonlite)
+
+res <- GET(url = "https://api.opencovid.ca/timeseries?",
+           query = list('fmt' = 'csv',
+                        'geo' = 'can',
+                        'stat' = 'cases'))
+covid_ca <- httr::content(res)
+```
+
+```{r}
+mod_cv <- cv_estimate_rt(observed_counts = covid_ca)
+```
+
 
 
