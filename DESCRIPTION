@@ -20,6 +20,7 @@ Imports:
     magrittr,
     methods,
     Rcpp,
+    readr,
     rlang,
     vctrs,
     zoo
