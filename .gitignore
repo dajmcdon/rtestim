@@ -10,3 +10,4 @@ src/*.dll
 *.Rapp.history
 .vscode
 docs
+inst/doc

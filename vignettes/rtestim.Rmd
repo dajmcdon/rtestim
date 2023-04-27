@@ -1,0 +1,139 @@
+---
+title: "Rtestim Package Vignette"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Rtestim Package Vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 5
+)
+```
+
+```{r setup}
+library(rtestim)
+```
+
+\newcommand{\argmin}{\mathop{\mathrm{argmin}}}
+\newcommand{\Rtseq}{\mathop{\{R_t\}_{t=1}^n}}
+
+# Overview
+
+This vignette provides a few examples to demonstrate the usage of RtEstim to 
+estimate the effective reproduction number $R_t$.
+
+RtEstim find the sequence of $R_t$, $\Rtseq$ of an infectious disease by solving 
+the following penalized Poisson regression
+\begin{equation} \label{eq:objective_fn}
+    \hat{\theta} = \argmin_{\theta} \frac{1}{n} \sum_{t=1}^n \left(e^{\theta_{t}}x_t - y_t\theta_{t}\right) + \lambda \Vert D^{(k)} \theta \Vert_1
+\end{equation}
+where $y_t$ is the new case counts at day $t$, $\theta_{t} = \log(R_t)$ is the 
+natural logarithm of $R_t$ at time $t$, $D^{(k)}$ is the $k$-th order difference 
+operator, and $\lambda$ is the penalty which ensures smoothness of the $R_t$ sequence.
+
+In particular
+
+\begin{equation}
+x_t = \sum_{a = 1}^m y_{t-a} w_a
+\end{equation}
+
+is the weighted past counts at $t$, calculated by convolving past $m$ days of
+new infection with the discretized serial interval distribution $w$ of length $m$.
+
+To compute $\Rtseq$ with RtEstim, the minimal information needed is the new case
+counts at days up until $t$. The parameters of the discretized serial interval
+distribution are defaulted to the probability density function of a Gamma 
+distribution with values $2.5$ for both the scale and shape parameters,
+and the order of the difference operator is set to $3$. A sequence of smoothness 
+penalty $\lambda$, if no $\lambda$ is provided, is calculated internally based 
+on case counts.
+
+# Example - synthetic dataset
+
+## Quick start
+
+We first demonstrate the usage of the package on a synthetic dataset, where the
+new daily case counts are generated as a sequence of integers that starts from 1. 
+
+```{r}
+case_counts <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
+plot(case_counts, xlab = "Time", ylab = "Case Counts")
+```
+
+We fit the model and visualize the resulting $\Rtseq$ with the following functions
+
+```{r}
+mod <- estimate_rt(observed_counts = case_counts, nsol = 20)
+plot(mod)
+```
+
+RtEstim generates a sequence of $\Rtseq$s from a range of $\lambda$ values,
+where each $\Rtseq$ corresponds to a specific $\lambda$ value. If no $\lambda$ 
+value is supplied by the user, RtEstim will automatically calculate a sequence 
+of $\lambda$ values. The additional parameter `nsol = 20` specify the number of 
+$\lambda$s to be generated.
+
+
+## Cross Validation
+
+RtEstim is also equipped with a leave-every-k-th-out cross validation, which 
+selects an optimal $\lambda$ which minimizes the cross-validation error. Instead 
+of providing a sequence of $\lambda$'s, we rely on the algorithm again to provide
+it for us by specifying `nsol = 20` in the command below.
+
+```{r}
+mod_cv <- cv_estimate_rt(observed_counts = case_counts, nsol = 20)
+```
+
+The following command plots the cross validation errors of each $\lambda$ in an 
+ascending order
+
+```{r}
+plot(mod_cv)
+```
+
+The plot above displays vertical lines that correspond to the cross-validation scores 
+for specific values of $\lambda$. The blue point at the center of each line 
+represents the mean score for that value of $\lambda$ across all cross-validation
+folds. The top and bottom caps of each line indicate one cross-validation 
+standard error above and below the mean score for the given value of $\lambda$ 
+across all cross-validation folds. Two special values of $\lambda$'s are 
+highlighted with dashed lines. The one on the left represents the $\lambda$ that
+gives minimum mean cross-validated error, called `lambda.min`, and the one on the
+right gives the most regularized model such that the cross-validated error is 
+within one standard error of the minimum, called `lambda.1se`.
+
+Users may wish to visualize the $\Rtseq$ which minimizes the cross-validation 
+errors with the following command
+
+```{r}
+plot(mod_cv, which_lambda = 'lambda.min')
+```
+
+
+# Uneven Reporting Frequency
+
+Ideally, case counts are observed at regular intervals, such as daily or 
+weekly. RtEstim also accommodates scenarios in which cases are reported 
+with uneven intervals. To demonstrate this, we generate a sequence of integers
+representing the days at which we observe the case counts
+
+```{r}
+observation_incr <- rpois(101, lambda = 1)
+observation_incr[observation_incr == 0] = 1
+observation_time <- cumsum(observation_incr)
+```
+
+We can then fit the model by passing the observation time point as `x`
+
+```{r}
+mod <- estimate_rt(observed_counts = case_counts, x = observation_time)
+plot(mod)
+```
+
+
