@@ -34,7 +34,7 @@ the following penalized Poisson regression
 \end{equation}
 where $y_t$ is the new case counts at day $t$, $\theta_{t} = \log(R_t)$ is the 
 natural logarithm of $R_t$ at time $t$, $D^{(k)}$ is the $k$-th order difference 
-operator, and $\lambda$ is the penalty which ensures smoothness of the $R_t$ sequence.
+operator, and $\lambda$ is the penalty which ensures smoothness of the $\Rtseq$
 
 In particular
 
@@ -48,10 +48,10 @@ new infection with the discretized serial interval distribution $w$ of length $m
 To compute $\Rtseq$ with RtEstim, the minimal information needed is the new case
 counts at days up until $t$. The parameters of the discretized serial interval
 distribution are defaulted to the probability density function of a Gamma 
-distribution with values $2.5$ for both the scale and shape parameters,
-and the order of the difference operator is set to $3$. A sequence of smoothness 
-penalty $\lambda$, if no $\lambda$ is provided, is calculated internally by the
-algorithm.
+distribution with values $2.5$ for both the scale and shape parameters, discretized
+at integers inputs, of size $t-1$. The order of the difference operator is defaulted 
+to $3$. The sequence of smoothness penalty $\lambda$, if no $\lambda$ is provided, 
+is calculated internally by the algorithm.
 
 # Example - synthetic dataset
 
@@ -141,7 +141,7 @@ plot(mod)
 
 The degree of the difference operator $k$ is defaulted 3 for the algorithm, which
 corresponds to a piecewise exponential estimation of the $\Rtseq$. To estimate
-$\Rtseq$ with piecewise constant $\Rtseq$ for example, use the command
+$\Rtseq$ with piecewise constant curves for example, use the command
 
 ```{r}
 mod <- estimate_rt(observed_counts = case_counts, degree = 1,
@@ -159,7 +159,7 @@ use the Iterative Re-weighted Least Square ADMM (IRLS ADMM) as
 ```{r}
 # Takes too long, perhaps an issue?
 # mod <- estimate_rt(observed_counts = case_counts, algo = "irls_admm")
-plot(mod)
+# plot(mod)
 ```
 
 
@@ -176,10 +176,14 @@ res <- GET(url = "https://api.opencovid.ca/timeseries?",
                         'geo' = 'can',
                         'stat' = 'cases'))
 covid_ca <- httr::content(res)
+covid_ca <- covid_ca[9:nrow(covid_ca),] # start from non-zero case counts
 ```
 
+Then the model is fitted with
 ```{r}
-mod_cv <- cv_estimate_rt(observed_counts = covid_ca)
+mod_cv <- cv_estimate_rt(observed_counts = covid_ca$value_daily, lambdamin = 10,
+                         nsol = 20)
+plot(mod_cv, 'lambda.min')
 ```
 
 
