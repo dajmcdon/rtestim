@@ -169,9 +169,8 @@ We first retrieve the Covid-19 data from \textit{OpenCovid.ca}
 
 ```{r}
 library(httr)
-library(jsonlite)
 
-res <- GET(url = "https://api.opencovid.ca/timeseries?",
+res <- httr::GET(url = "https://api.opencovid.ca/timeseries?",
            query = list('fmt' = 'csv',
                         'geo' = 'can',
                         'stat' = 'cases'))
