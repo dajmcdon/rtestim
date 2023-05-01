@@ -17,6 +17,7 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(rtestim)
+library(httr)
 ```
 
 \newcommand{\argmin}{\mathop{\mathrm{argmin}}}
@@ -168,8 +169,6 @@ use the Iterative Re-weighted Least Square ADMM (IRLS ADMM) as
 We first retrieve the Covid-19 data from \textit{OpenCovid.ca}
 
 ```{r}
-library(httr)
-
 res <- httr::GET(url = "https://api.opencovid.ca/timeseries?",
            query = list('fmt' = 'csv',
                         'geo' = 'can',
