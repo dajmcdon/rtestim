@@ -15,6 +15,7 @@ Depends:
 Imports: 
     cli,
     ggplot2,
+    httr,
     magrittr,
     methods,
     Rcpp,
