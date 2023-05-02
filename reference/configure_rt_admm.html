@@ -12,7 +12,7 @@ vector of counts or an rt_admm_configuration object (and overwrite)"><!-- mathja
     
     <a class="navbar-brand me-2" href="../index.html">rtestim</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,6 +57,8 @@ vector of counts or an rt_admm_configuration object (and overwrite)</p>
 <span>  alpha <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  gamma <span class="op">=</span> <span class="fl">0.9</span>,</span>
 <span>  tolerance <span class="op">=</span> <span class="fl">1e-04</span>,</span>
+<span>  maxiter_inner <span class="op">=</span> <span class="fl">5L</span>,</span>
+<span>  maxiter_line <span class="op">=</span> <span class="fl">5L</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="fl">0</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -69,7 +71,7 @@ vector of counts or an rt_admm_configuration object (and overwrite)</p>
 
 <dt>degree</dt>
 <dd><p>Integer. Degree of the piecewise polynomial curve to be
-estimated. For example, `degree = 1` corresponds to a piecewise constant
+estimated. For example, `degree = 0` corresponds to a piecewise constant
 curve.</p></dd>
 
 
@@ -92,31 +94,41 @@ weights</p></dd>
 
 
 <dt>rho</dt>
-<dd><p>double. An ADMM parameter; coefficient of augmented term in the
+<dd><p>Double. An ADMM parameter; coefficient of augmented term in the
 Lagrangian function.</p></dd>
 
 
 <dt>rho_adjust</dt>
-<dd><p>double. An ADMM parameter; adjusted coefficient of
+<dd><p>Double. An ADMM parameter; adjusted coefficient of
 augmented term in the Lagrangian function.</p></dd>
 
 
 <dt>alpha</dt>
 <dd><p>Double. A parameter adjusting upper bound in line search algorithm
-in `irls_admm` algorithm.</p></dd>
+in `prox_newton` algorithm.</p></dd>
 
 
 <dt>gamma</dt>
 <dd><p>Double. A parameter adjusting step size in line search algorithm
-in `irls_admm` algorithm.</p></dd>
+in `prox_newton` algorithm.</p></dd>
 
 
 <dt>tolerance</dt>
-<dd><p>double. Tolerance of ADMM convergence.</p></dd>
+<dd><p>Double. Tolerance of ADMM convergence.</p></dd>
+
+
+<dt>maxiter_inner</dt>
+<dd><p>Integer. Maximum number of iterations for the inner
+loop of proximal Newton method.</p></dd>
+
+
+<dt>maxiter_line</dt>
+<dd><p>Integer. Maximum number of iterations for the linesearch
+algorithm in the proximal Newton method.</p></dd>
 
 
 <dt>verbose</dt>
-<dd><p>integer.</p></dd>
+<dd><p>Integer.</p></dd>
 
 </dl></div>
     <div class="section level2">
