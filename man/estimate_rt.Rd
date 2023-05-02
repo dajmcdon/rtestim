@@ -8,13 +8,13 @@ estimate_rt(
   observed_counts,
   degree = 3L,
   dist_gamma = c(2.5, 2.5),
-  x = NULL,
+  x = 1:n,
   lambda = NULL,
   nsol = 100L,
   lambdamin = NULL,
   lambdamax = NULL,
   lambda_min_ratio = 1e-04,
-  algo = c("linear_admm", "irls_admm"),
+  algo = c("linear_admm", "prox_newton"),
   maxiter = 10000,
   init = NULL
 )
@@ -23,7 +23,7 @@ estimate_rt(
 \item{observed_counts}{vector of the observed daily infection counts}
 
 \item{degree}{Integer. Degree of the piecewise polynomial curve to be
-estimated. For example, `degree = 1` corresponds to a piecewise constant
+estimated. For example, `degree = 0` corresponds to a piecewise constant
 curve.}
 
 \item{dist_gamma}{Vector of length 2. These are the shape and scale for the
@@ -65,8 +65,7 @@ A very small value will lead to the solution `Rt = log(observed_counts)`.
 This argument has no effect if there is user-defined `lambda` sequence.}
 
 \item{algo}{the algorithm to be used in computation. `linear_admm`:
-linearized ADMM; `irls_admm`: iteratively reweighted least squares with
-standard ADMM.}
+linearized ADMM; `prox_newton`: proximal newton-based method.}
 
 \item{maxiter}{Integer. Maximum number of iterations for the estimation
 algorithm.}
@@ -82,7 +81,7 @@ An object with S3 class `poisson_rt`. Among the list components:
 * `Rt` the estimated effective reproduction rate. This is a matrix with
     each column corresponding to one value of `lambda`.
 * `lambda` the value of `lambda` actually used in the algorithm.
-* `degree` degree of the piecewise polynomial curve to be estimated.
+* `degree` degree of the estimated piecewise polynomial curve.
 * `niter` the required number of iterations for each value of `lambda`
 * `convergence` if number of iterations for each value of `lambda` is less
     than the maximum number of iterations for the estimation algorithm.
@@ -101,10 +100,10 @@ at day \eqn{i}, \eqn{\lambda} is the smoothness penalty, and \eqn{D^{(k+1)}}
 is the \eqn{(k+1)}-th order difference matrix.
 }
 \examples{
-y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
+y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
 out <- estimate_rt(y, nsol = 10)
 plot(out)
 
-out0 <- estimate_rt(y, degree = 1L, nsol = 10)
+out0 <- estimate_rt(y, degree = 0L, nsol = 10)
 plot(out0)
 }

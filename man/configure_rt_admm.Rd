@@ -16,6 +16,8 @@ configure_rt_admm(
   alpha = 0.5,
   gamma = 0.9,
   tolerance = 1e-04,
+  maxiter_inner = 5L,
+  maxiter_line = 5L,
   verbose = 0
 )
 }
@@ -23,7 +25,7 @@ configure_rt_admm(
 \item{observed_counts}{vector of the observed daily infection counts}
 
 \item{degree}{Integer. Degree of the piecewise polynomial curve to be
-estimated. For example, `degree = 1` corresponds to a piecewise constant
+estimated. For example, `degree = 0` corresponds to a piecewise constant
 curve.}
 
 \item{weighted_past_counts}{the weighted sum of past infections counts with
@@ -36,21 +38,27 @@ weights}
 
 \item{dual_var}{dual variable in the ADMM algorithm}
 
-\item{rho}{double. An ADMM parameter; coefficient of augmented term in the
+\item{rho}{Double. An ADMM parameter; coefficient of augmented term in the
 Lagrangian function.}
 
-\item{rho_adjust}{double. An ADMM parameter; adjusted coefficient of
+\item{rho_adjust}{Double. An ADMM parameter; adjusted coefficient of
 augmented term in the Lagrangian function.}
 
 \item{alpha}{Double. A parameter adjusting upper bound in line search algorithm
-in `irls_admm` algorithm.}
+in `prox_newton` algorithm.}
 
 \item{gamma}{Double. A parameter adjusting step size in line search algorithm
-in `irls_admm` algorithm.}
+in `prox_newton` algorithm.}
 
-\item{tolerance}{double. Tolerance of ADMM convergence.}
+\item{tolerance}{Double. Tolerance of ADMM convergence.}
 
-\item{verbose}{integer.}
+\item{maxiter_inner}{Integer. Maximum number of iterations for the inner
+loop of proximal Newton method.}
+
+\item{maxiter_line}{Integer. Maximum number of iterations for the linesearch
+algorithm in the proximal Newton method.}
+
+\item{verbose}{Integer.}
 }
 \value{
 a list of model parameters with class `rt_admm_configuration`
