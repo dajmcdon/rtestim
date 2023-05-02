@@ -20,6 +20,7 @@ Imports:
     httr,
     magrittr,
     methods,
+    pandoc,
     Rcpp,
     readr,
     rlang,
