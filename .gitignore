@@ -11,3 +11,5 @@ src/*.dll
 .vscode
 docs
 inst/doc
+/doc/
+/Meta/
