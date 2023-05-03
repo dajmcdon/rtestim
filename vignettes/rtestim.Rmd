@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(rtestim)
-library(httr)
+# library(httr)
 ```
 
 \newcommand{\argmin}{\mathop{\mathrm{argmin}}}

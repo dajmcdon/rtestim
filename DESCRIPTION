@@ -24,7 +24,6 @@ Imports:
     vctrs,
     zoo
 Suggests: 
-    xml2
     knitr,
     rmarkdown,
     testthat (>= 3.0.0),
@@ -42,5 +41,4 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.2.3
 SystemRequirements: C++11
-URL: https://dajmcdon.github.io/rtestim/
 VignetteBuilder: knitr
