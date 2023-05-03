@@ -17,12 +17,9 @@ Depends:
 Imports: 
     cli,
     ggplot2,
-    httr,
     magrittr,
     methods,
-    pandoc,
     Rcpp,
-    readr,
     rlang,
     vctrs,
     zoo
