@@ -166,22 +166,22 @@ use the Iterative Re-weighted Least Square ADMM (IRLS ADMM) as
 
 # Example - Canadian Covid-19 cases
 
-We first retrieve the Covid-19 data from \textit{OpenCovid.ca}
+<!-- We first retrieve the Covid-19 data from \textit{OpenCovid.ca} -->
 
 ```{r}
-res <- httr::GET(url = "https://api.opencovid.ca/timeseries?",
-           query = list('fmt' = 'csv',
-                        'geo' = 'can',
-                        'stat' = 'cases'))
-covid_ca <- httr::content(res)
-covid_ca <- covid_ca[9:nrow(covid_ca),] # start from non-zero case counts
+# res <- httr::GET(url = "https://api.opencovid.ca/timeseries?",
+#            query = list('fmt' = 'csv',
+#                         'geo' = 'can',
+#                         'stat' = 'cases'))
+# covid_ca <- httr::content(res)
+# covid_ca <- covid_ca[9:nrow(covid_ca),] # start from non-zero case counts
 ```
 
 Then the model is fitted with
 ```{r}
-mod_cv <- cv_estimate_rt(observed_counts = covid_ca$value_daily, lambdamin = 10,
-                         nsol = 20)
-plot(mod_cv, 'lambda.min')
+# mod_cv <- cv_estimate_rt(observed_counts = covid_ca$value_daily, lambdamin = 10,
+#                          nsol = 20)
+# plot(mod_cv, 'lambda.min')
 ```
 
 
