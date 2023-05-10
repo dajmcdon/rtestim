@@ -10,7 +10,7 @@ cv_estimate_rt(
   dist_gamma = c(2.5, 2.5),
   nfold = 3,
   error_measure = c("mse", "mae", "deviance"),
-  x = NULL,
+  x = 1:n,
   lambda = NULL,
   ...
 )
@@ -19,7 +19,7 @@ cv_estimate_rt(
 \item{observed_counts}{vector of the observed daily infection counts}
 
 \item{degree}{Integer. Degree of the piecewise polynomial curve to be
-estimated. For example, `degree = 1` corresponds to a piecewise constant
+estimated. For example, `degree = 0` corresponds to a piecewise constant
 curve.}
 
 \item{dist_gamma}{Vector of length 2. These are the shape and scale for the

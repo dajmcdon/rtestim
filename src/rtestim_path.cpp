@@ -1,19 +1,27 @@
-#include <RcppArmadillo.h>
-#include "dptf.h"
+#include <Eigen/Sparse>
+#include <RcppEigen.h>
 #include "admm.h"
 #include "utils.h"
+#include "dptf.h"
 
-// [[Rcpp::depends(RcppArmadillo)]]
+
+typedef Eigen::COLAMDOrdering<int> Ord;
+
+using Eigen::SparseMatrix;
+using Eigen::SparseQR;
+using Eigen::VectorXd;
+SparseQR<SparseMatrix<double>, Ord> qr;
+
 
 using namespace Rcpp;
 
 // [[Rcpp::export]]
 List rtestim_path(int algo,
-                  arma::vec y,
-                  arma::vec x,  // positions
-                  arma::vec w,  // weighted past cases
+                  NumericVector y,
+                  NumericVector x,  // positions
+                  NumericVector w,  // weighted past cases
                   int korder,
-                  arma::vec lambda,
+                  NumericVector lambda,
                   double lambdamax = -1,
                   double lambdamin = -1,
                   int nsol = 100,
@@ -23,92 +31,105 @@ List rtestim_path(int algo,
                   double lambda_min_ratio = 1e-4,
                   double ls_alpha = 0.5,
                   double ls_gamma = 0.9,
+                  int maxiter_inner = 3,
+                  int maxiter_line = 5,
                   int verbose = 0) {
-  int n = y.n_elem;
-  if (lambda.size() > 0) nsol = lambda.size();
+  int n = y.size();
 
   // Placeholders for solutions
-  arma::mat theta(n, nsol);
-  arma::vec niter(nsol);
-  arma::vec dof(nsol);
+  NumericMatrix theta(n, nsol);
+  NumericVector niter(nsol);
+  NumericVector dof(nsol);
 
-  // Build D matrix
-  arma::sp_mat D;
-  arma::sp_mat Dk;
-  D = buildDx(n, korder - 1, x);
-  Dk = buildDx_tilde(n, korder, x);
-  arma::sp_mat DkDk = Dk.t() * Dk;
-
-  arma::mat alp(Dk.n_rows - 1, nsol, arma::fill::zeros);
+  // Build D matrices as needed
+  Eigen::SparseMatrix<double> D;
+  Eigen::SparseMatrix<double> Dk;
+  Eigen::SparseMatrix<double> DkDk;
+  D = get_D(korder, x);
+  qr.compute(D.transpose());
+  int m = n;
+  if (korder > 0) {
+    Dk = get_Dtil(korder, x);
+    DkDk = Dk.transpose() * Dk;
+    m = Dk.rows();
+  }
 
   // Generate lambda sequence if necessary
-  if (lambda.size() == 0 && lambdamax <= 0) {
-    arma::vec b(n - korder);
-    arma::mat matD(D);                // convert to dense mat to avoid spsolve
-    arma::solve(b, matD.t(), w % y);  // very approximate; for unevenly space?
-    lambdamax = arma::norm(b, "inf");
+  if (abs(lambda[nsol - 1]) < tolerance / 100 && lambdamax <= 0) {
+    VectorXd b(n - korder);
+    VectorXd wy = nvec_to_evec(w * y);
+    b = qr.solve(wy);  // very approximate;
+    NumericVector bp = evec_to_nvec(b);
+    lambdamax = max(abs(bp)) / n;
   }
   create_lambda(lambda, lambdamin, lambdamax, lambda_min_ratio, nsol);
 
   // ADMM parameters
-  double _rho = (rho < 0) ? lambda(0) : rho;
+  double _rho;
+  double _mu;
 
   // ADMM variables
-  arma::vec beta(n, arma::fill::zeros);
-  arma::vec alpha(Dk.n_rows, arma::fill::zeros);
-  arma::vec u(Dk.n_rows, arma::fill::zeros);
+  NumericVector beta(n);
+  NumericVector alpha(m);
+  NumericVector u(m);
   double mu = 2 * pow(4, korder);  // unevenly-spaced version?
   int iters = 0;
+  int nsols = nsol;
 
   // Outer loop to compute solution path
   for (int i = 0; i < nsol; i++) {
-    if (verbose > 0) Rcout << ".";
+    if (verbose > 0)
+      Rcout << ".";
     Rcpp::checkUserInterrupt();
 
     if (korder == 0) {
-      beta = dptf_past(y, lambda(i), w);
-      niter(i) = 1;
+      beta = dptf_past(y, lambda[i], w);
+      niter[i] = 0;
     } else {
-      if (i > 0) _rho = (rho < 0) ? lambda(i) : rho;
+      _rho = (rho < 0) ? lambda[i] : rho;
+      _mu = mu * lambda[i];
       switch (algo) {
         case 1:
-          admm(maxiter, y, x, w, n, korder, beta, alpha, u, lambda(i), _rho,
-               mu * lambda(i), tolerance, iters);  // add rho_adjust?
+          linear_admm(maxiter, y, x, w, n, korder, beta, alpha, u, lambda[i],
+                      _rho, _mu, tolerance, iters);
           break;
         case 2:
-          irls_admm(maxiter, n, korder, y, x, w, beta, alpha, u, lambda(i),
-                    _rho, mu * lambda(i), ls_alpha, ls_gamma, Dk, tolerance,
-                    iters);
+          prox_newton(maxiter, maxiter_inner, n, korder, y, x, w, beta, alpha,
+                      u, lambda[i], _rho, ls_alpha, ls_gamma, DkDk, tolerance,
+                      maxiter_line, iters);
           break;
       }
-      niter(i) = iters + 1;
+      niter[i] = iters;
+      maxiter -= iters + 1;
+      if (maxiter < 0)
+        nsols = i + 1;  // why not nsols -= 1;
     }
-
 
     // Store solution
     if (korder == int(0)) {
-      theta.col(i) = beta;
-      alp.col(i) = arma::diff(beta);
+      theta(_, i) = beta;
+      dof[i] = sum(abs(diff(beta)) > tolerance);
     } else {
-      theta.col(i) = exp(beta);
-      alp.col(i) = arma::diff(alpha);
+      theta(_, i) = exp(beta);
+      dof[i] = sum(abs(diff(alpha)) > tolerance);
     }
-    dof(i) = arma::sum(alp.col(i) > tolerance);
-
 
     // Verbose handlers
-    if (verbose > 1) Rcout << niter(i);
-    if (verbose > 2) Rcout << "(" << lambda(i) << ")";
-    if (verbose > 0) Rcout << std::endl;
+    if (verbose > 1)
+      Rcout << niter(i);
+    if (verbose > 2)
+      Rcout << "(" << lambda(i) << ")";
+    if (verbose > 0)
+      Rcout << std::endl;
+    if (maxiter < 0)
+      break;
   }
 
   // Return
-  List out = List::create(
-    Named("Rt") = theta,
-    Named("lambda") = lambda,
-    Named("degree") = korder + 1,
-    Named("dof") = dof + korder + 1,
-    Named("niter") = niter,
-    Named("alp") = alp);
+  List out = List::create(Named("Rt") = theta(_, Range(0, nsols - 1)),
+                          Named("lambda") = lambda[Range(0, nsols - 1)],
+                          Named("degree") = korder,
+                          Named("dof") = dof[Range(0, nsols - 1)],
+                          Named("niter") = niter[Range(0, nsols - 1)]);
   return out;
 }

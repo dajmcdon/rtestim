@@ -36,15 +36,14 @@ confband.cv_poisson_rt <- function(
   rlang::check_dots_empty()
   arg_is_probabilities(level)
   if (is.character(lambda)) lambda <- object[[match.arg(lambda)]]
-  else arg_is_numeric(lambda)
+  else arg_is_numeric_scalar(lambda)
   confband(object$full_fit, lambda = lambda, level = level)
 }
 
 #' @export
 confband.poisson_rt <- function(object, lambda, level = 0.95, ...) {
   rlang::check_dots_empty()
-  arg_is_numeric(lambda)
-  arg_is_scalar(lambda)
+  arg_is_numeric_scalar(lambda)
   arg_is_probabilities(level)
   level <- sort(level, decreasing = TRUE)
 

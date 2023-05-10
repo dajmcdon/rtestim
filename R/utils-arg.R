@@ -121,6 +121,11 @@ arg_is_numeric = function(..., allow_null = FALSE) {
   )
 }
 
+arg_is_numeric_scalar = function(..., allow_null = FALSE, allow_na = FALSE) {
+  arg_is_numeric(..., allow_null = allow_null)
+  arg_is_scalar(..., allow_null = allow_null, allow_na = allow_na)
+}
+
 
 arg_is_lgl = function(..., allow_null = FALSE, allow_na = FALSE, allow_empty = TRUE) {
   handle_arg_list(
