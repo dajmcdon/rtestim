@@ -39,7 +39,7 @@ List rtestim_path(int algo,
   // Placeholders for solutions
   NumericMatrix theta(n, nsol);
   NumericVector niter(nsol);
-  NumericVector dof(nsol);
+  NumericVector nknots(nsol);
 
   // Build D matrices as needed
   Eigen::SparseMatrix<double> D;
@@ -53,6 +53,7 @@ List rtestim_path(int algo,
     DkDk = Dk.transpose() * Dk;
     m = Dk.rows();
   }
+  NumericMatrix alp(m - 1, nsol);
 
   // Generate lambda sequence if necessary
   if (abs(lambda[nsol - 1]) < tolerance / 100 && lambdamax <= 0) {
@@ -108,11 +109,12 @@ List rtestim_path(int algo,
     // Store solution
     if (korder == int(0)) {
       theta(_, i) = beta;
-      dof[i] = sum(abs(diff(beta)) > tolerance);
+      alp(_, i) = diff(beta);
     } else {
       theta(_, i) = exp(beta);
-      dof[i] = sum(abs(diff(alpha)) > tolerance);
+      alp(_, i) = diff(alpha);
     }
+    nknots[i] = sum(abs(alp(_, i)) > tolerance);
 
     // Verbose handlers
     if (verbose > 1)
@@ -126,10 +128,13 @@ List rtestim_path(int algo,
   }
 
   // Return
-  List out = List::create(Named("Rt") = theta(_, Range(0, nsols - 1)),
-                          Named("lambda") = lambda[Range(0, nsols - 1)],
-                          Named("degree") = korder,
-                          Named("dof") = dof[Range(0, nsols - 1)],
-                          Named("niter") = niter[Range(0, nsols - 1)]);
+  List out = List::create(
+    Named("Rt") = theta(_, Range(0, nsols - 1)),
+    Named("lambda") = lambda[Range(0, nsols - 1)],
+    Named("degree") = korder,
+    Named("nknots") = nknots[Range(0, nsols - 1)],
+    Named("niter") = niter[Range(0, nsols - 1)],
+    Named("alp") = alp(_, Range(0, nsols - 1))
+  );
   return out;
 }

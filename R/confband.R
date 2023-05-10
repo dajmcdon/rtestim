@@ -47,9 +47,10 @@ confband.poisson_rt <- function(object, lambda, level = 0.95, ...) {
   arg_is_probabilities(level)
   level <- sort(level, decreasing = TRUE)
 
-  nbd <- function(n, ord) {
+  nbd <- function(piece, ord) {
+    n <- length(piece)
     if (n < ord + 1) return(Matrix::Diagonal(n, x = 0))
-    buildD(n, ord)
+    get_D(ord, piece)
   }
 
   y <- object$observed_counts
@@ -57,7 +58,7 @@ confband.poisson_rt <- function(object, lambda, level = 0.95, ...) {
   Rt <- fitted(object, lambda)
   yhat <- predict(object, lambda)
   knots <- find_knots(object, lambda)
-  Ds <- Matrix::bdiag(lapply(knots$lens, nbd, ord = object$degree))
+  Ds <- Matrix::bdiag(lapply(knots$pieces, nbd, ord = object$degree))
   # The procedure for this approximation:
   # 0. Pretend we knew the knots (and lambda is fixed + known) --> Ds
   # 1. pretend we had used ||Ds r||_2^2 with the same lambda
@@ -78,7 +79,7 @@ confband.poisson_rt <- function(object, lambda, level = 0.95, ...) {
 }
 
 fmt_perc <- function(probs, digits = 3) {
-  paste(
+  paste0(
     format(100 * probs, trim = TRUE, scientific = FALSE, digits = digits),
     "%")
 }
