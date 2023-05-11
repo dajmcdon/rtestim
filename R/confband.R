@@ -121,8 +121,8 @@ print.rt_confidence_band <- function(x, ...) {
 plot.rt_confidence_band <- function(x, colour = "#3A448F", ...) {
   x$x <- attr(x, "xval")
   CIs <- names(x)[grep("[0-9]", names(x))]
-  plt <- ggplot2::ggplot(x, aes(x = x)) +
-    ggplot2::geom_line(aes(y = Rt), colour = colour) +
+  plt <- ggplot2::ggplot(x, ggplot2::aes(x = x)) +
+    ggplot2::geom_line(ggplot2::aes(y = .data$Rt), colour = colour) +
     ggplot2::theme_bw()
 
   plot_cis(plt, CIs, colour)
@@ -146,7 +146,7 @@ plot_cis <- function(plot, CIs, fill = "#3A448F",
       plot <- plot +
         ggplot2::geom_ribbon(
           ggplot2::aes(ymin = .data[[bottom]], ymax = .data[[top]]),
-          fill = fill,alpha = alpha
+          fill = fill, alpha = alpha
         )
     }
   }

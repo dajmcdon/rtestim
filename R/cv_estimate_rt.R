@@ -105,8 +105,10 @@ cv_estimate_rt <- function(observed_counts,
       cv_scores = cv_scores,
       cv_se = cv_se,
       lambda = lambda,
-      lambda.min = lambda[which.min(cv_scores)],
-      lambda.1se = max(lambda[cv_scores <= cv_scores[i0] + cv_se[i0]]),
+      lambda.min = lambda[i0],
+      lambda.1se = max(
+        lambda[cv_scores <= cv_scores[i0] + cv_se[i0]],
+        na.rm = TRUE),
       call = match.call()
     ),
     class = "cv_poisson_rt"
