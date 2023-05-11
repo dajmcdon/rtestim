@@ -86,8 +86,7 @@ void linear_admm(int& M,
     // dual residuals:
     s_norm = rho * sqrt(mean(pow(z_old - z, 2)));
 
-    if ((r_norm < tol) && (s_norm < tol))
-      break;
+    if ((r_norm < tol) && (s_norm < tol)) break;
     // auxiliary variables update:
     z_old = z;
   }

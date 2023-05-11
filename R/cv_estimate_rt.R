@@ -25,12 +25,12 @@
 #'
 #' @examples
 #' y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
-#' cv <- cv_estimate_rt(y, degree = 3, nfold = 3, nsol = 30)
+#' cv <- cv_estimate_rt(y, degree = 3, nfold = 3, nsol = 20, maxiter = 1e6)
 #' cv
 cv_estimate_rt <- function(observed_counts,
                            degree = 3L,
                            dist_gamma = c(2.5, 2.5),
-                           nfold = 3,
+                           nfold = 3L,
                            error_measure = c("mse", "mae", "deviance"),
                            x = 1:n,
                            lambda = NULL,
@@ -42,7 +42,7 @@ cv_estimate_rt <- function(observed_counts,
   if (nfold == 1) cli::cli_abort("nfold must be greater than 1")
 
   ## Run program one time to create lambda
-  full_data_fit <- estimate_rt(
+  full_fit <- estimate_rt(
     observed_counts = observed_counts,
     degree = degree,
     x = x,
@@ -50,13 +50,12 @@ cv_estimate_rt <- function(observed_counts,
     ...)
 
   ## Use values from the full data fit
-  if (is.null(lambda)) lambda <- full_data_fit$lambda
-  weighted_past_counts <- full_data_fit$weighted_past_counts
-  x <- full_data_fit$x
+  if (is.null(lambda)) lambda <- full_fit$lambda
+  weighted_past_counts <- full_fit$weighted_past_counts
 
   # Cross validation
-  foldid = fold_calculator(n, nfold)
-  cvall <- matrix(0, nfold, length(lambda))
+  foldid <- fold_calculator(n, nfold)
+  cvall <- matrix(NA, n, length(lambda))
 
   error_measure <- match.arg(error_measure)
   err_fun <- switch(error_measure,
@@ -74,45 +73,35 @@ cv_estimate_rt <- function(observed_counts,
     test_idx <- which(foldid == f)
 
     ## Run solver with the training set
-    #mod <- estimate_rt(
-    #  observed_counts = observed_counts[train_idx],
-    #  x = x[train_idx],
-    #  degree = degree,
-    #  lambda = lambda,
-    #  ...)
-    mod_list <- list()
-    mod_Rt <- matrix(nrow=length(train_idx), ncol=length(lambda))
-    for(i in 1:length(lambda)){
-      mod_list[[i]] <- estimate_rt(
-        observed_counts = observed_counts[train_idx],
-        x = x[train_idx],
-        degree = degree,
-        lambda = lambda[i],
-        ...)
-      mod_Rt[,i] <- mod_list[[i]]$Rt[,1]
-    }
-
+    mod <- estimate_rt(
+      observed_counts = observed_counts[train_idx],
+      x = x[train_idx],
+      degree = degree,
+      lambda = lambda)
+      #...)
     ### Predict training value ###
-    pred_rt <- pred_kth_rt(mod_Rt, #mod$Rt,
-                           n = n,
-                           train_idx = train_idx,
-                           test_idx = test_idx,
-                           train_x = x[train_idx],
-                           test_x = x[test_idx])
+    pred_rt <- pred_kth_rt(
+      mod$Rt,
+      n = n,
+      train_idx = train_idx,
+      test_idx = test_idx,
+      train_x = x[train_idx],
+      test_x = x[test_idx])
 
-    pred_observed_counts <- pred_rt * weighted_past_counts[test_idx]
-    score <- colMeans(err_fun(observed_counts[test_idx], pred_observed_counts))
-    cvall[f,] <- score
+    pred_counts <- pred_rt * weighted_past_counts[test_idx]
+    errs <- err_fun(observed_counts[test_idx], pred_counts)
+    cvall[test_idx, 1:ncol(errs)] <- errs
   }
 
   ### Calculate CV summary
-  cv_scores <- colMeans(cvall)
-  cv_se <- apply(cvall, FUN = stats::sd, MARGIN = 2)/sqrt(nfold)
+  cv_scores <- colMeans(cvall, na.rm = TRUE)
+  cv_se <- apply(cvall, 2, stats::sd, na.rm = TRUE)
+  cv_se <- cv_se / sqrt(apply(cvall, 2, function(x) sum(!is.na(x))))
   i0 <- which.min(cv_scores)
 
   structure(
     list(
-      full_fit = full_data_fit,
+      full_fit = full_fit,
       cv_scores = cv_scores,
       cv_se = cv_se,
       lambda = lambda,

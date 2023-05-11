@@ -79,8 +79,7 @@ List rtestim_path(int algo,
 
   // Outer loop to compute solution path
   for (int i = 0; i < nsol; i++) {
-    if (verbose > 0)
-      Rcout << ".";
+    if (verbose > 0) Rcout << ".";
     Rcpp::checkUserInterrupt();
 
     if (korder == 0) {
@@ -102,8 +101,7 @@ List rtestim_path(int algo,
       }
       niter[i] = iters;
       maxiter -= iters + 1;
-      if (maxiter < 0)
-        nsols = i + 1;  // why not nsols -= 1;
+      if (maxiter < 0) nsols = i + 1;
     }
 
     // Store solution
@@ -117,14 +115,10 @@ List rtestim_path(int algo,
     nknots[i] = sum(abs(alp(_, i)) > tolerance);
 
     // Verbose handlers
-    if (verbose > 1)
-      Rcout << niter(i);
-    if (verbose > 2)
-      Rcout << "(" << lambda(i) << ")";
-    if (verbose > 0)
-      Rcout << std::endl;
-    if (maxiter < 0)
-      break;
+    if (verbose > 1) Rcout << niter(i);
+    if (verbose > 2) Rcout << "(" << lambda(i) << ")";
+    if (verbose > 0) Rcout << std::endl;
+    if (maxiter < 0) break;
   }
 
   // Return

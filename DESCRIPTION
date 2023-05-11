@@ -21,6 +21,7 @@ Imports:
     methods,
     Rcpp,
     rlang,
+    tibble,
     vctrs,
     zoo
 Suggests: 

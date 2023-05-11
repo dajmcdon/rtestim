@@ -75,11 +75,63 @@ confband.poisson_rt <- function(object, lambda, level = 0.95, ...) {
   cb <- outer(sqrt(covs), stats::qt(a, n - knots$dof))
   cb <- pmax(Rt + cb, 0)
   colnames(cb) <- fmt_perc(a)
-  vctrs::vec_cbind(Rt = Rt, cb)
+  tibble::new_tibble(
+    vctrs::vec_cbind(Rt = Rt, cb),
+    lambda = lambda,
+    CIs = level,
+    dof = knots$dof,
+    xval = object$x,
+    class = "rt_confidence_band"
+  )
 }
 
 fmt_perc <- function(probs, digits = 3) {
   paste0(
     format(100 * probs, trim = TRUE, scientific = FALSE, digits = digits),
     "%")
+}
+
+#' @exportS3Method print rt_confidence_band
+print.rt_confidence_band <- function(x, ...) {
+  cat("An `rt_confidence_band` object.\n")
+  cat(paste("* lambda =", round(attr(x, "lambda"), 3), "\n"))
+  cat(paste("* degrees of freedom =", attr(x, "dof"), "\n"))
+  cat("\n")
+  NextMethod()
+}
+
+#' @exportS3Method plot rt_confidence_band
+plot.rt_confidence_band <- function(x, color = "#3A448F", ...) {
+  x$x <- attr(x, "xval")
+  CIs <- names(x)[grep("[0-9]", names(x))]
+  plt <- ggplot2::ggplot(x, aes(x = x)) +
+    ggplot2::geom_line(aes(y = Rt), color = color) +
+    ggplot2::theme_bw()
+
+  plot_cis(plt, CIs, color)
+}
+
+plot_cis <- function(plot, CIs, fill = "#3A448F",
+                     alpha = 0.6, linewidth = 0.05) {
+  n <- length(CIs) / 2
+  alpha <- alpha / (n - 1)
+
+  for (i in 1:n) {
+    bottom <- CIs[i]
+    top <- rev(CIs)[i]
+    if (i == 1) {
+      plot <- plot +
+        ggplot2::geom_ribbon(
+          ggplot2::aes(ymin = .data[[bottom]], ymax = .data[[top]]),
+          alpha = 0.2, linewidth = linewidth, fill = fill
+        )
+    } else {
+      plot <- plot +
+        ggplot2::geom_ribbon(
+          ggplot2::aes(ymin = .data[[bottom]], ymax = .data[[top]]),
+          fill = fill,alpha = alpha
+        )
+    }
+  }
+  return(plot)
 }
