@@ -100,15 +100,32 @@ print.rt_confidence_band <- function(x, ...) {
   NextMethod()
 }
 
+#' Plot estimated confidence bands for an estimate of Rt
+#'
+#' Produces a figure showing a single estimated Rt value along with approximate
+#' confidence bands. The result is a [ggplot2::ggplot()]. Additional user
+#' modifications can be added as desired.
+#'
+#' @param x An object of class `rt_confidence_band` as produced by `confband()`.
+#' @param colour The colour of the desired plot
+#' @param ... Not used.
+#'
+#'
 #' @exportS3Method plot rt_confidence_band
-plot.rt_confidence_band <- function(x, color = "#3A448F", ...) {
+#' @examples
+#'
+#' y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
+#' out <- estimate_rt(y, nsol = 10)
+#' cb <- confband(out, out$lambda[2], level = c(0.95, 0.8, 0.5))
+#' plot(cb)
+plot.rt_confidence_band <- function(x, colour = "#3A448F", ...) {
   x$x <- attr(x, "xval")
   CIs <- names(x)[grep("[0-9]", names(x))]
   plt <- ggplot2::ggplot(x, aes(x = x)) +
-    ggplot2::geom_line(aes(y = Rt), color = color) +
+    ggplot2::geom_line(aes(y = Rt), colour = colour) +
     ggplot2::theme_bw()
 
-  plot_cis(plt, CIs, color)
+  plot_cis(plt, CIs, colour)
 }
 
 plot_cis <- function(plot, CIs, fill = "#3A448F",
@@ -133,5 +150,5 @@ plot_cis <- function(plot, CIs, fill = "#3A448F",
         )
     }
   }
-  return(plot)
+  plot
 }
