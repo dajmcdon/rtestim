@@ -101,7 +101,7 @@ double pois_obj(int ord,
                 NumericVector const& y,
                 NumericVector const& x,
                 NumericVector const& w,
-                NumericVector& theta,
+                NumericVector const& theta,
                 double lambda) {
   NumericVector Dtheta = doDv(theta, ord, x);
   NumericVector v = -y * theta + w * exp(theta);

@@ -22,7 +22,7 @@ double pois_obj(int ord,
                 Rcpp::NumericVector const& y,
                 Rcpp::NumericVector const& x,
                 Rcpp::NumericVector const& w,
-                Rcpp::NumericVector& theta,
+                Rcpp::NumericVector const& theta,
                 double lambda);
 
 Rcpp::NumericVector gaussianized_data(Rcpp::NumericVector const& y,

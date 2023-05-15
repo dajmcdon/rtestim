@@ -21,7 +21,7 @@ dptf_past <- function(y, lam, w) {
     .Call(`_rtestim_dptf_past`, y, lam, w)
 }
 
-rtestim_path <- function(algo, y, x, w, korder, lambda, lambdamax = -1, lambdamin = -1, nsol = 100L, rho = -1, maxiter = 1e5L, tolerance = 1e-3, lambda_min_ratio = 1e-4, ls_alpha = 0.5, ls_gamma = 0.9, maxiter_inner = 3L, maxiter_line = 5L, verbose = 0L) {
+rtestim_path <- function(algo, y, x, w, korder, lambda, lambdamax = -1, lambdamin = -1, nsol = 100L, rho = -1, maxiter = 1e5L, tolerance = 1e-3, lambda_min_ratio = 1e-4, ls_alpha = 0.5, ls_gamma = 0.9, maxiter_inner = 30L, maxiter_line = 10L, verbose = 0L) {
     .Call(`_rtestim_rtestim_path`, algo, y, x, w, korder, lambda, lambdamax, lambdamin, nsol, rho, maxiter, tolerance, lambda_min_ratio, ls_alpha, ls_gamma, maxiter_inner, maxiter_line, verbose)
 }
 

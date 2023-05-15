@@ -31,8 +31,8 @@ List rtestim_path(int algo,
                   double lambda_min_ratio = 1e-4,
                   double ls_alpha = 0.5,
                   double ls_gamma = 0.9,
-                  int maxiter_inner = 3,
-                  int maxiter_line = 5,
+                  int maxiter_inner = 30,
+                  int maxiter_line = 10,
                   int verbose = 0) {
   int n = y.size();
 
@@ -74,19 +74,19 @@ List rtestim_path(int algo,
   double mu = 2 * pow(4, korder);  // unevenly-spaced version?
   int iters = 0;
   int nsols = nsol;
+  double rho_fix = pow((x[n-1] - x[0]) / n, korder);
 
   // Outer loop to compute solution path
   for (int i = 0; i < nsol; i++) {
-    if (verbose > 0)
-      Rcout << ".";
+    if (verbose > 0) Rcout << ".";
     Rcpp::checkUserInterrupt();
 
     if (korder == 0) {
       beta = dptf_past(y, lambda[i], w);
       niter[i] = 0;
     } else {
-      _rho = (rho < 0) ? lambda[i] : rho;
-      _mu = mu * lambda[i];
+      _rho = (rho < 0) ? lambda[i] * rho_fix : rho;
+      _mu = mu * _rho;
       switch (algo) {
         case 1:
           linear_admm(maxiter, y, x, w, n, korder, beta, alpha, u, lambda[i],
@@ -100,8 +100,7 @@ List rtestim_path(int algo,
       }
       niter[i] = iters;
       maxiter -= iters + 1;
-      if (maxiter < 0)
-        nsols = i + 1;  // why not nsols -= 1;
+      if (maxiter < 0) nsols = i + 1;  // why not nsols -= 1;
     }
 
     // Store solution

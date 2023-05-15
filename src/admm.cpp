@@ -162,15 +162,13 @@ Rcpp::NumericVector admm_gauss(int M,
   VectorXd etheta = nvec_to_evec(theta);
   SparseMatrix<double> cDD = DD * n * rho;  // a copy that doesn't change
   // cDD.diagonal() += etheta.exp();
-  for (int i = 0; i < n; i++) {
-    cDD.diagonal()(i) += exp(etheta(i));
-  }
+  for (int i = 0; i < n; i++) cDD.diagonal()(i) += exp(etheta(i));
+
   qradmm.compute(cDD);
   NumericVector W = exp(theta);  // fix the weights
 
   for (int iter = 0; iter < M; iter++) {
-    if (iter % 50 == 0)
-      Rcpp::checkUserInterrupt();
+    if (iter % 50 == 0) Rcpp::checkUserInterrupt();
     // solve for primal variable - theta:
     tmp_n = doDtv(z - u, ord, x) * n * rho;
     tmp_n += W * y;
@@ -191,8 +189,7 @@ Rcpp::NumericVector admm_gauss(int M,
     tmp_n = doDtv(z - z_old, ord, x);
     s_norm = rho * sqrt(mean(pow(tmp_n, 2)));
     // stopping criteria check:
-    if (r_norm < tol && s_norm < tol)
-      break;
+    if (r_norm < tol && s_norm < tol) break;
 
     // auxiliary variables update:
     z_old = z;
@@ -220,7 +217,7 @@ void prox_newton(int& M,
                  int& iter) {
   double s;                       // step size
   NumericVector obj_list(M + 1);  // objective list for each iterate
-  double obj = 1e4;               // initialize it to be large
+  double obj;
   NumericVector theta_old(n);     // a buffer for line search
   double lam_z = lambda / rho;
   double r_norm = 0.0;
@@ -232,8 +229,7 @@ void prox_newton(int& M,
   int iter_best = 0;
 
   for (iter = 0; iter < M; iter++) {
-    if (iter % 50 == 0)
-      Rcpp::checkUserInterrupt();
+    if (iter % 50 == 0) Rcpp::checkUserInterrupt();
     theta_old = theta;
 
     // define new(Gaussianized) data for least squares problem
@@ -293,9 +289,13 @@ Rcpp::List prox_newton_testing(int M,
                                int iter) {
   prox_newton(M, Minner, n, ord, y, x, w, theta, z, u, lambda, rho, alpha,
               gamma, DD, tol, Mline, iter);
-  List out =
-      List::create(Named("y") = y, Named("n") = n, Named("lambda") = lambda,
-                   Named("theta") = exp(theta), Named("z") = z, Named("u") = u,
-                   Named("niter") = iter);
+  List out = List::create(
+    Named("y") = y,
+    Named("n") = n,
+    Named("lambda") = lambda,
+    Named("theta") = exp(theta),
+    Named("z") = z,
+    Named("u") = u,
+    Named("niter") = iter);
   return out;
 }

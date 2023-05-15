@@ -231,7 +231,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // pois_obj
-double pois_obj(int ord, NumericVector const& y, NumericVector const& x, NumericVector const& w, NumericVector& theta, double lambda);
+double pois_obj(int ord, NumericVector const& y, NumericVector const& x, NumericVector const& w, NumericVector const& theta, double lambda);
 RcppExport SEXP _rtestim_pois_obj(SEXP ordSEXP, SEXP ySEXP, SEXP xSEXP, SEXP wSEXP, SEXP thetaSEXP, SEXP lambdaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -240,7 +240,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector const& >::type y(ySEXP);
     Rcpp::traits::input_parameter< NumericVector const& >::type x(xSEXP);
     Rcpp::traits::input_parameter< NumericVector const& >::type w(wSEXP);
-    Rcpp::traits::input_parameter< NumericVector& >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< NumericVector const& >::type theta(thetaSEXP);
     Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
     rcpp_result_gen = Rcpp::wrap(pois_obj(ord, y, x, w, theta, lambda));
     return rcpp_result_gen;

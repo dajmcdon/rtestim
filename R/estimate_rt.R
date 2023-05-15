@@ -239,8 +239,8 @@ configure_rt_admm <- function(observed_counts,
                               alpha = 0.5,
                               gamma = 0.9,
                               tolerance = 1e-4,
-                              maxiter_inner = 5L,
-                              maxiter_line = 5L,
+                              maxiter_inner = 30L,
+                              maxiter_line = 10L,
                               verbose = 0) {
   n <- length(observed_counts)
   arg_is_scalar(degree, rho, rho_adjust, alpha, gamma, tolerance, verbose,
