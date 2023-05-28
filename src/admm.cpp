@@ -5,7 +5,6 @@
 #include "admm.h"
 #include "dptf.h"
 
-
 typedef Eigen::COLAMDOrdering<int> Ord;
 
 using Eigen::SparseMatrix;
@@ -85,7 +84,6 @@ void linear_admm(int& M,
     r_norm = sqrt(mean(pow(tmp_m - z, 2)));
     // dual residuals:
     s_norm = rho * sqrt(mean(pow(z_old - z, 2)));
-
     if ((r_norm < tol) && (s_norm < tol))
       break;
     // auxiliary variables update:
@@ -159,14 +157,13 @@ Rcpp::NumericVector admm_gauss(int M,
   NumericVector tmp_m(z.size());
   NumericVector Dth(z.size());
   VectorXd tmp_theta(n);
-  VectorXd etheta = nvec_to_evec(theta);
   SparseMatrix<double> cDD = DD * n * rho;  // a copy that doesn't change
-  // cDD.diagonal() += etheta.exp();
+  NumericVector W = exp(theta) * w;         // fix the weights
+  VectorXd eW = nvec_to_evec(W);
   for (int i = 0; i < n; i++) {
-    cDD.diagonal()(i) += exp(etheta(i));
+    cDD.diagonal()(i) += eW(i);
   }
   qradmm.compute(cDD);
-  NumericVector W = exp(theta);  // fix the weights
 
   for (int iter = 0; iter < M; iter++) {
     if (iter % 50 == 0)
