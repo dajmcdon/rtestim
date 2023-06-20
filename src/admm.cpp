@@ -136,22 +136,22 @@ Rcpp::List linear_admm_testing(int M,
  * @param tol tolerance of stopping criteria
  * @return updated primal variable
  */
-// [[Rcpp::export]]
-Rcpp::NumericVector admm_gauss(int M,
-                               int n,
-                               int ord,
-                               Rcpp::NumericVector const& y,
-                               Rcpp::NumericVector const& x,
-                               Rcpp::NumericVector const& w,
-                               Rcpp::NumericVector& theta,
-                               Rcpp::NumericVector& z,
-                               Rcpp::NumericVector& u,
-                               double rho,
-                               double lam_z,
-                               double r_norm,
-                               double s_norm,
-                               Eigen::SparseMatrix<double> const& DD,
-                               double tol) {
+void admm_gauss(int M,
+                int n,
+                int ord,
+                Rcpp::NumericVector const& y,
+                Rcpp::NumericVector const& x,
+                Rcpp::NumericVector const& w,
+                Rcpp::NumericVector& theta,
+                Rcpp::NumericVector& z,
+                Rcpp::NumericVector& u,
+                double rho,
+                double lam_z,
+                double r_norm,
+                double s_norm,
+                Eigen::SparseMatrix<double> const& DD,
+                double tol,
+                int& iter) {
   NumericVector z_old = clone(z);
   NumericVector tmp_n(n);
   NumericVector tmp_m(z.size());
@@ -165,8 +165,8 @@ Rcpp::NumericVector admm_gauss(int M,
   }
   qradmm.compute(cDD);
 
-  for (int iter = 0; iter < M; iter++) {
-    if (iter % 50 == 0)
+  for (iter = 0; iter < M; iter++) {
+    if (iter % 1000 == 0)
       Rcpp::checkUserInterrupt();
     // solve for primal variable - theta:
     tmp_n = doDtv(z - u, ord, x) * n * rho;
@@ -194,7 +194,7 @@ Rcpp::NumericVector admm_gauss(int M,
     // auxiliary variables update:
     z_old = z;
   }
-  return theta;
+  // return theta;
 }
 
 void prox_newton(int& M,
@@ -214,7 +214,7 @@ void prox_newton(int& M,
                  Eigen::SparseMatrix<double> const& DD,
                  double tol,
                  int Mline,
-                 int& iter) {
+                 int& iters) {
   double s;                       // step size
   NumericVector obj_list(M + 1);  // objective list for each iterate
   double obj = 1e4;               // initialize it to be large
@@ -222,13 +222,14 @@ void prox_newton(int& M,
   double lam_z = lambda / rho;
   double r_norm = 0.0;
   double s_norm = 0.0;
+  int inner_iter;
 
   // initialize objective
   obj = pois_obj(ord, y, x, w, theta, lambda);
   obj_list(0) = obj;
   int iter_best = 0;
 
-  for (iter = 0; iter < M; iter++) {
+  for (int iter = 0; iter < M; iter++) {
     if (iter % 50 == 0)
       Rcpp::checkUserInterrupt();
     theta_old = theta;
@@ -236,10 +237,10 @@ void prox_newton(int& M,
     // define new(Gaussianized) data for least squares problem
     NumericVector std_y = gaussianized_data(y, w, theta);
     // solve least squares problem (Gaussian TF)
-    theta = admm_gauss(Minner, n, ord, std_y, x, w, theta, z, u, rho, lam_z,
-                       r_norm, s_norm, DD, tol);
-
-    // line search for step size
+    admm_gauss(Minner, n, ord, std_y, x, w, theta, z, u, rho, lam_z, r_norm,
+               s_norm, DD, tol, inner_iter);
+    iters += inner_iter;
+    //  line search for step size
     s = line_search(s, lambda, alpha, gamma, y, x, w, n, ord, theta, theta_old,
                     Mline);
     if (s < 0)
@@ -260,6 +261,7 @@ void prox_newton(int& M,
       obj_list(iter_best) = obj;
       iter_best = iter + 1;
     }
+
     // adjust the iterate steps
     if (iter >= iter_best + 4 && iter_best != 0)
       break;

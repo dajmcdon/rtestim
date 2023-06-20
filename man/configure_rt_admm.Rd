@@ -16,8 +16,8 @@ configure_rt_admm(
   alpha = 0.5,
   gamma = 0.9,
   tolerance = 1e-04,
-  maxiter_inner = 5L,
-  maxiter_line = 5L,
+  maxiter_newton = 50L,
+  maxiter_line = 20L,
   verbose = 0
 )
 }
@@ -52,8 +52,8 @@ in `prox_newton` algorithm.}
 
 \item{tolerance}{Double. Tolerance of ADMM convergence.}
 
-\item{maxiter_inner}{Integer. Maximum number of iterations for the inner
-loop of proximal Newton method.}
+\item{maxiter_newton}{Integer. Maximum number of iterations for the outer
+Newton iteration.}
 
 \item{maxiter_line}{Integer. Maximum number of iterations for the linesearch
 algorithm in the proximal Newton method.}

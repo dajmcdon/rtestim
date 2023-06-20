@@ -70,8 +70,8 @@
 #' @export
 #'
 #' @examples
-#' y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
-#' out <- estimate_rt(y, nsol = 10)
+#' y <- c(1, rpois(100, dnorm(1:1000, 50, 15) * 500 + 1))
+#' out <- estimate_rt(y, nsol = 10, algo = "linear_admm")
 #' plot(out)
 #'
 #' out0 <- estimate_rt(y, degree = 0L, nsol = 10)
@@ -171,7 +171,7 @@ estimate_rt <- function(observed_counts,
     nsol = nsol,
     rho = init$rho,
     maxiter = maxiter,
-    maxiter_inner = init$maxiter_inner,
+    maxiter_newton = init$maxiter_newton,
     maxiter_line = init$maxiter_line,
     tolerance = init$tolerance,
     lambda_min_ratio = lambda_min_ratio,
@@ -219,10 +219,10 @@ estimate_rt <- function(observed_counts,
 #' @param gamma Double. A parameter adjusting step size in line search algorithm
 #'   in `prox_newton` algorithm.
 #' @param tolerance Double. Tolerance of ADMM convergence.
-#' @param maxiter_inner Integer. Maximum number of iterations for the inner
-#' loop of proximal Newton method.
+#' @param maxiter_newton Integer. Maximum number of iterations for the outer
+#'   Newton iteration.
 #' @param maxiter_line Integer. Maximum number of iterations for the linesearch
-#' algorithm in the proximal Newton method.
+#'   algorithm in the proximal Newton method.
 #' @param verbose Integer.
 #'
 #' @return a list of model parameters with class `rt_admm_configuration`
@@ -239,15 +239,15 @@ configure_rt_admm <- function(observed_counts,
                               alpha = 0.5,
                               gamma = 0.9,
                               tolerance = 1e-4,
-                              maxiter_inner = 5L,
-                              maxiter_line = 5L,
+                              maxiter_newton = 50L,
+                              maxiter_line = 20L,
                               verbose = 0) {
   n <- length(observed_counts)
   arg_is_scalar(degree, rho, rho_adjust, alpha, gamma, tolerance, verbose,
-                maxiter_inner, maxiter_line)
+                maxiter_newton, maxiter_line)
   arg_is_positive(alpha, gamma, tolerance)
   arg_is_numeric(rho, rho_adjust, tolerance)
-  arg_is_pos_int(maxiter_inner, maxiter_line)
+  arg_is_pos_int(maxiter_newton, maxiter_line)
   arg_is_nonneg_int(degree, verbose)
   if (alpha >= 1) cli::cli_abort("`alpha` must be in (0, 1).")
   if (gamma > 1) cli::cli_abort("`gamma` must be in (0, 1].")
@@ -285,7 +285,7 @@ configure_rt_admm <- function(observed_counts,
       tolerance = tolerance,
       alpha = alpha,
       gamma = gamma,
-      maxiter_inner = maxiter_inner,
+      maxiter_newton = maxiter_newton,
       maxiter_line = maxiter_line,
       verbose = verbose
     ),

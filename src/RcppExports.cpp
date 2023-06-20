@@ -35,31 +35,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// admm_gauss
-Rcpp::NumericVector admm_gauss(int M, int n, int ord, Rcpp::NumericVector const& y, Rcpp::NumericVector const& x, Rcpp::NumericVector const& w, Rcpp::NumericVector& theta, Rcpp::NumericVector& z, Rcpp::NumericVector& u, double rho, double lam_z, double r_norm, double s_norm, Eigen::SparseMatrix<double> const& DD, double tol);
-RcppExport SEXP _rtestim_admm_gauss(SEXP MSEXP, SEXP nSEXP, SEXP ordSEXP, SEXP ySEXP, SEXP xSEXP, SEXP wSEXP, SEXP thetaSEXP, SEXP zSEXP, SEXP uSEXP, SEXP rhoSEXP, SEXP lam_zSEXP, SEXP r_normSEXP, SEXP s_normSEXP, SEXP DDSEXP, SEXP tolSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type M(MSEXP);
-    Rcpp::traits::input_parameter< int >::type n(nSEXP);
-    Rcpp::traits::input_parameter< int >::type ord(ordSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector const& >::type y(ySEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector const& >::type x(xSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector const& >::type w(wSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector& >::type theta(thetaSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector& >::type z(zSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector& >::type u(uSEXP);
-    Rcpp::traits::input_parameter< double >::type rho(rhoSEXP);
-    Rcpp::traits::input_parameter< double >::type lam_z(lam_zSEXP);
-    Rcpp::traits::input_parameter< double >::type r_norm(r_normSEXP);
-    Rcpp::traits::input_parameter< double >::type s_norm(s_normSEXP);
-    Rcpp::traits::input_parameter< Eigen::SparseMatrix<double> const& >::type DD(DDSEXP);
-    Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
-    rcpp_result_gen = Rcpp::wrap(admm_gauss(M, n, ord, y, x, w, theta, z, u, rho, lam_z, r_norm, s_norm, DD, tol));
-    return rcpp_result_gen;
-END_RCPP
-}
 // prox_newton_testing
 Rcpp::List prox_newton_testing(int M, int Minner, int n, int ord, Rcpp::NumericVector const& y, Rcpp::NumericVector const& x, Rcpp::NumericVector const& w, Rcpp::NumericVector& theta, Rcpp::NumericVector& z, Rcpp::NumericVector& u, double lambda, double rho, double alpha, double gamma, Eigen::SparseMatrix<double> const& DD, double tol, int Mline, int iter);
 RcppExport SEXP _rtestim_prox_newton_testing(SEXP MSEXP, SEXP MinnerSEXP, SEXP nSEXP, SEXP ordSEXP, SEXP ySEXP, SEXP xSEXP, SEXP wSEXP, SEXP thetaSEXP, SEXP zSEXP, SEXP uSEXP, SEXP lambdaSEXP, SEXP rhoSEXP, SEXP alphaSEXP, SEXP gammaSEXP, SEXP DDSEXP, SEXP tolSEXP, SEXP MlineSEXP, SEXP iterSEXP) {
@@ -114,8 +89,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // rtestim_path
-List rtestim_path(int algo, NumericVector y, NumericVector x, NumericVector w, int korder, NumericVector lambda, double lambdamax, double lambdamin, int nsol, double rho, int maxiter, double tolerance, double lambda_min_ratio, double ls_alpha, double ls_gamma, int maxiter_inner, int maxiter_line, int verbose);
-RcppExport SEXP _rtestim_rtestim_path(SEXP algoSEXP, SEXP ySEXP, SEXP xSEXP, SEXP wSEXP, SEXP korderSEXP, SEXP lambdaSEXP, SEXP lambdamaxSEXP, SEXP lambdaminSEXP, SEXP nsolSEXP, SEXP rhoSEXP, SEXP maxiterSEXP, SEXP toleranceSEXP, SEXP lambda_min_ratioSEXP, SEXP ls_alphaSEXP, SEXP ls_gammaSEXP, SEXP maxiter_innerSEXP, SEXP maxiter_lineSEXP, SEXP verboseSEXP) {
+List rtestim_path(int algo, NumericVector y, NumericVector x, NumericVector w, int korder, NumericVector lambda, double lambdamax, double lambdamin, int nsol, double rho, int maxiter, double tolerance, double lambda_min_ratio, double ls_alpha, double ls_gamma, int maxiter_newton, int maxiter_line, int verbose);
+RcppExport SEXP _rtestim_rtestim_path(SEXP algoSEXP, SEXP ySEXP, SEXP xSEXP, SEXP wSEXP, SEXP korderSEXP, SEXP lambdaSEXP, SEXP lambdamaxSEXP, SEXP lambdaminSEXP, SEXP nsolSEXP, SEXP rhoSEXP, SEXP maxiterSEXP, SEXP toleranceSEXP, SEXP lambda_min_ratioSEXP, SEXP ls_alphaSEXP, SEXP ls_gammaSEXP, SEXP maxiter_newtonSEXP, SEXP maxiter_lineSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -134,10 +109,10 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type lambda_min_ratio(lambda_min_ratioSEXP);
     Rcpp::traits::input_parameter< double >::type ls_alpha(ls_alphaSEXP);
     Rcpp::traits::input_parameter< double >::type ls_gamma(ls_gammaSEXP);
-    Rcpp::traits::input_parameter< int >::type maxiter_inner(maxiter_innerSEXP);
+    Rcpp::traits::input_parameter< int >::type maxiter_newton(maxiter_newtonSEXP);
     Rcpp::traits::input_parameter< int >::type maxiter_line(maxiter_lineSEXP);
     Rcpp::traits::input_parameter< int >::type verbose(verboseSEXP);
-    rcpp_result_gen = Rcpp::wrap(rtestim_path(algo, y, x, w, korder, lambda, lambdamax, lambdamin, nsol, rho, maxiter, tolerance, lambda_min_ratio, ls_alpha, ls_gamma, maxiter_inner, maxiter_line, verbose));
+    rcpp_result_gen = Rcpp::wrap(rtestim_path(algo, y, x, w, korder, lambda, lambdamax, lambdamin, nsol, rho, maxiter, tolerance, lambda_min_ratio, ls_alpha, ls_gamma, maxiter_newton, maxiter_line, verbose));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -286,7 +261,6 @@ RcppExport SEXP run_testthat_tests(SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
     {"_rtestim_linear_admm_testing", (DL_FUNC) &_rtestim_linear_admm_testing, 14},
-    {"_rtestim_admm_gauss", (DL_FUNC) &_rtestim_admm_gauss, 15},
     {"_rtestim_prox_newton_testing", (DL_FUNC) &_rtestim_prox_newton_testing, 18},
     {"_rtestim_dptf", (DL_FUNC) &_rtestim_dptf, 2},
     {"_rtestim_dptf_past", (DL_FUNC) &_rtestim_dptf_past, 3},

@@ -5,10 +5,6 @@ linear_admm_testing <- function(M, y, x, w, n, ord, theta, z, u, lambda, rho, mu
     .Call(`_rtestim_linear_admm_testing`, M, y, x, w, n, ord, theta, z, u, lambda, rho, mu, tol, iter)
 }
 
-admm_gauss <- function(M, n, ord, y, x, w, theta, z, u, rho, lam_z, r_norm, s_norm, DD, tol) {
-    .Call(`_rtestim_admm_gauss`, M, n, ord, y, x, w, theta, z, u, rho, lam_z, r_norm, s_norm, DD, tol)
-}
-
 prox_newton_testing <- function(M, Minner, n, ord, y, x, w, theta, z, u, lambda, rho, alpha, gamma, DD, tol, Mline, iter) {
     .Call(`_rtestim_prox_newton_testing`, M, Minner, n, ord, y, x, w, theta, z, u, lambda, rho, alpha, gamma, DD, tol, Mline, iter)
 }
@@ -21,8 +17,8 @@ dptf_past <- function(y, lam, w) {
     .Call(`_rtestim_dptf_past`, y, lam, w)
 }
 
-rtestim_path <- function(algo, y, x, w, korder, lambda, lambdamax = -1, lambdamin = -1, nsol = 100L, rho = -1, maxiter = 1e5L, tolerance = 1e-3, lambda_min_ratio = 1e-4, ls_alpha = 0.5, ls_gamma = 0.9, maxiter_inner = 3L, maxiter_line = 5L, verbose = 0L) {
-    .Call(`_rtestim_rtestim_path`, algo, y, x, w, korder, lambda, lambdamax, lambdamin, nsol, rho, maxiter, tolerance, lambda_min_ratio, ls_alpha, ls_gamma, maxiter_inner, maxiter_line, verbose)
+rtestim_path <- function(algo, y, x, w, korder, lambda, lambdamax = -1, lambdamin = -1, nsol = 100L, rho = -1, maxiter = 1e5L, tolerance = 1e-3, lambda_min_ratio = 1e-4, ls_alpha = 0.5, ls_gamma = 0.9, maxiter_newton = 50L, maxiter_line = 5L, verbose = 0L) {
+    .Call(`_rtestim_rtestim_path`, algo, y, x, w, korder, lambda, lambdamax, lambdamin, nsol, rho, maxiter, tolerance, lambda_min_ratio, ls_alpha, ls_gamma, maxiter_newton, maxiter_line, verbose)
 }
 
 get_Dtil <- function(k, xd) {

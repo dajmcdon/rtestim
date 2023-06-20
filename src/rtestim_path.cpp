@@ -4,14 +4,12 @@
 #include "utils.h"
 #include "dptf.h"
 
-
 typedef Eigen::COLAMDOrdering<int> Ord;
 
 using Eigen::SparseMatrix;
 using Eigen::SparseQR;
 using Eigen::VectorXd;
 SparseQR<SparseMatrix<double>, Ord> qr;
-
 
 using namespace Rcpp;
 
@@ -31,7 +29,7 @@ List rtestim_path(int algo,
                   double lambda_min_ratio = 1e-4,
                   double ls_alpha = 0.5,
                   double ls_gamma = 0.9,
-                  int maxiter_inner = 3,
+                  int maxiter_newton = 50,
                   int maxiter_line = 5,
                   int verbose = 0) {
   int n = y.size();
@@ -56,7 +54,7 @@ List rtestim_path(int algo,
   // Generate lambda sequence if necessary
   if (abs(lambda[nsol - 1]) < tolerance / 100 && lambdamax <= 0) {
     VectorXd b(n - korder);
-    VectorXd wy = nvec_to_evec(w * y);
+    VectorXd wy = nvec_to_evec(w - y);
     b = qr.solve(wy);  // very approximate;
     NumericVector bp = evec_to_nvec(b);
     lambdamax = max(abs(bp)) / n;
@@ -93,7 +91,7 @@ List rtestim_path(int algo,
                       _rho, _mu, tolerance, iters);
           break;
         case 2:
-          prox_newton(maxiter, maxiter_inner, n, korder, y, x, w, beta, alpha,
+          prox_newton(maxiter_newton, maxiter, n, korder, y, x, w, beta, alpha,
                       u, lambda[i], _rho, ls_alpha, ls_gamma, DkDk, tolerance,
                       maxiter_line, iters);
           break;
