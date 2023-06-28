@@ -2,8 +2,8 @@
 #include <Eigen/Sparse>
 #include <boost/math/special_functions/lambert_w.hpp>
 #include "utils.h"
-#include "admm.h"
 #include "dptf.h"
+#include "admm.h"
 
 typedef Eigen::COLAMDOrdering<int> Ord;
 
@@ -99,21 +99,19 @@ Rcpp::List linear_admm_testing(int M,
                                NumericVector const& y,
                                NumericVector const& x,
                                NumericVector const& w,
-                               int n,
                                int ord,
-                               NumericVector theta,
-                               NumericVector z,
-                               NumericVector u,
                                double lambda,
-                               double rho,
-                               double mu,
-                               double tol,
-                               int iter) {
+                               double tol) {
+  int n = y.size();
+  NumericVector theta(n);
+  NumericVector z(n - ord);
+  NumericVector u(n - ord);
+  double rho = lambda;
+  double mu = 2 * pow(4, ord);
+  int iter = 0;
   linear_admm(M, y, x, w, n, ord, theta, z, u, lambda, rho, mu, tol, iter);
-  List out =
-      List::create(Named("y") = y, Named("n") = n, Named("lambda") = lambda,
-                   Named("theta") = exp(theta), Named("z") = z, Named("u") = u,
-                   Named("niter") = iter);
+  List out = List::create(Named("lambda") = lambda, Named("theta") = exp(theta),
+                          Named("niter") = iter);
   return out;
 }
 
@@ -130,11 +128,9 @@ Rcpp::List linear_admm_testing(int M,
  * @param u dual variable of length `n-ord`
  * @param rho Lagrangian parameter of ADMM
  * @param lam_z hyperparameter of the auxiliary step of ADMM
- * @param r_norm primal residual
- * @param s_norm dual residual
  * @param DD D^T * D
  * @param tol tolerance of stopping criteria
- * @return updated primal variable
+ * @param iter interation index
  */
 void admm_gauss(int M,
                 int n,
@@ -147,18 +143,18 @@ void admm_gauss(int M,
                 Rcpp::NumericVector& u,
                 double rho,
                 double lam_z,
-                double r_norm,
-                double s_norm,
                 Eigen::SparseMatrix<double> const& DD,
                 double tol,
                 int& iter) {
+  double r_norm = 0.0;
+  double s_norm = 0.0;
   NumericVector z_old = clone(z);
   NumericVector tmp_n(n);
   NumericVector tmp_m(z.size());
   NumericVector Dth(z.size());
   VectorXd tmp_theta(n);
   SparseMatrix<double> cDD = DD * n * rho;  // a copy that doesn't change
-  NumericVector W = exp(theta) * w;         // fix the weights
+  NumericVector W = exp(theta) * w;         // update the weights
   VectorXd eW = nvec_to_evec(W);
   for (int i = 0; i < n; i++) {
     cDD.diagonal()(i) += eW(i);
@@ -178,7 +174,6 @@ void admm_gauss(int M,
     Dth = doDv(theta, ord, x);
     tmp_m = Dth + u;
     z = dptf(tmp_m, lam_z);
-
     // update dual variable - u:
     u += Dth - z;
 
@@ -190,15 +185,14 @@ void admm_gauss(int M,
     // stopping criteria check:
     if (r_norm < tol && s_norm < tol)
       break;
-
     // auxiliary variables update:
     z_old = z;
   }
-  // return theta;
 }
 
-void prox_newton(int& M,
-                 int Minner,
+void prox_newton(int M,
+                 int& Minner,
+                 int Mline,
                  int n,
                  int ord,
                  Rcpp::NumericVector const& y,
@@ -213,15 +207,12 @@ void prox_newton(int& M,
                  double gamma,
                  Eigen::SparseMatrix<double> const& DD,
                  double tol,
-                 int Mline,
-                 int& iters) {
+                 int& total_iter) {
   double s;                       // step size
   NumericVector obj_list(M + 1);  // objective list for each iterate
   double obj = 1e4;               // initialize it to be large
   NumericVector theta_old(n);     // a buffer for line search
   double lam_z = lambda / rho;
-  double r_norm = 0.0;
-  double s_norm = 0.0;
   int inner_iter;
 
   // initialize objective
@@ -237,9 +228,9 @@ void prox_newton(int& M,
     // define new(Gaussianized) data for least squares problem
     NumericVector std_y = gaussianized_data(y, w, theta);
     // solve least squares problem (Gaussian TF)
-    admm_gauss(Minner, n, ord, std_y, x, w, theta, z, u, rho, lam_z, r_norm,
-               s_norm, DD, tol, inner_iter);
-    iters += inner_iter;
+    admm_gauss(Minner, n, ord, std_y, x, w, theta, z, u, rho, lam_z, DD, tol,
+               inner_iter);
+    total_iter += inner_iter;
     //  line search for step size
     s = line_search(s, lambda, alpha, gamma, y, x, w, n, ord, theta, theta_old,
                     Mline);
@@ -251,19 +242,18 @@ void prox_newton(int& M,
     // compute objective
     obj = pois_obj(ord, y, x, w, theta, lambda);
     obj_list(iter + 1) = obj;
+
     // check stopping criteria
     if (obj < obj_list(iter_best)) {
       if (obj_list(iter_best) - obj <= abs(obj_list(iter_best)) * tol) {
-        obj_list(iter_best) = obj;
         iter_best = iter + 1;
         break;
       }
-      obj_list(iter_best) = obj;
       iter_best = iter + 1;
     }
 
     // adjust the iterate steps
-    if (iter >= iter_best + 4 && iter_best != 0)
+    if (iter >= iter_best + 4)  // && iter_best != 0)
       break;
   }
 }
@@ -274,27 +264,29 @@ void prox_newton(int& M,
 // [[Rcpp::export]]
 Rcpp::List prox_newton_testing(int M,
                                int Minner,
-                               int n,
+                               int Mline,
                                int ord,
                                Rcpp::NumericVector const& y,
                                Rcpp::NumericVector const& x,
                                Rcpp::NumericVector const& w,
-                               Rcpp::NumericVector& theta,
-                               Rcpp::NumericVector& z,
-                               Rcpp::NumericVector& u,
                                double lambda,
-                               double rho,
-                               double alpha,
-                               double gamma,
-                               Eigen::SparseMatrix<double> const& DD,
-                               double tol,
-                               int Mline,
-                               int iter) {
-  prox_newton(M, Minner, n, ord, y, x, w, theta, z, u, lambda, rho, alpha,
-              gamma, DD, tol, Mline, iter);
-  List out =
-      List::create(Named("y") = y, Named("n") = n, Named("lambda") = lambda,
-                   Named("theta") = exp(theta), Named("z") = z, Named("u") = u,
-                   Named("niter") = iter);
+                               double ls_alpha,
+                               double ls_gamma,
+                               double tol) {
+  Eigen::SparseMatrix<double> Dk;
+  Eigen::SparseMatrix<double> DkDk;
+  Dk = get_Dtil(ord, x);
+  DkDk = Dk.transpose() * Dk;
+  int m = Dk.rows();
+  int n = y.size();
+  NumericVector beta(n);
+  NumericVector z(m);
+  NumericVector u(m);
+  double rho = lambda;
+  int iter = 0;
+  prox_newton(M, Minner, Mline, n, ord, y, x, w, beta, z, u, lambda, rho,
+              ls_alpha, ls_gamma, DkDk, tol, iter);
+  List out = List::create(Named("lambda") = lambda, Named("theta") = exp(beta),
+                          Named("niter") = iter);
   return out;
 }
