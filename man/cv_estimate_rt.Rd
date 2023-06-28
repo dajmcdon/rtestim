@@ -12,6 +12,7 @@ cv_estimate_rt(
   error_measure = c("mse", "mae", "deviance"),
   x = 1:n,
   lambda = NULL,
+  maxiter = 1000000L,
   ...
 )
 }
@@ -55,6 +56,9 @@ this behaviour. It is likely better to supply a
 decreasing sequence of `lambda` values than a single (small) value. If
 supplied, the user-defined `lambda` sequence is automatically sorted in
 decreasing order.}
+
+\item{maxiter}{Integer. Maximum number of iterations for the estimation
+algorithm.}
 
 \item{...}{additional parameters passed to `estimate_rt()` function}
 }
