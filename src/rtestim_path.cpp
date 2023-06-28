@@ -25,12 +25,12 @@ List rtestim_path(int algo,
                   int nsol = 100,
                   double rho = -1,
                   int maxiter = 1e5,
+                  int maxiter_newton = 50,
+                  int maxiter_line = 5,
                   double tolerance = 1e-3,
                   double lambda_min_ratio = 1e-4,
                   double ls_alpha = 0.5,
                   double ls_gamma = 0.9,
-                  int maxiter_newton = 50,
-                  int maxiter_line = 5,
                   int verbose = 0) {
   int n = y.size();
 
@@ -91,15 +91,15 @@ List rtestim_path(int algo,
                       _rho, _mu, tolerance, iters);
           break;
         case 2:
-          prox_newton(maxiter_newton, maxiter, n, korder, y, x, w, beta, alpha,
-                      u, lambda[i], _rho, ls_alpha, ls_gamma, DkDk, tolerance,
-                      maxiter_line, iters);
+          prox_newton(maxiter_newton, maxiter, maxiter_line, n, korder, y, x, w,
+                      beta, alpha, u, lambda[i], _rho, ls_alpha, ls_gamma, DkDk,
+                      tolerance, iters);
           break;
       }
       niter[i] = iters;
       maxiter -= iters + 1;
       if (maxiter < 0)
-        nsols = i + 1;  // why not nsols -= 1;
+        nsols = i + 1;
     }
 
     // Store solution
