@@ -14,7 +14,7 @@ estimate_rt(
   lambdamin = NULL,
   lambdamax = NULL,
   lambda_min_ratio = 1e-04,
-  algo = c("linear_admm", "prox_newton"),
+  algo = "prox_newton",
   maxiter = 10000,
   init = NULL
 )
@@ -64,8 +64,8 @@ A multiplicative factor for the minimal lambda in the
 A very small value will lead to the solution `Rt = log(observed_counts)`.
 This argument has no effect if there is a user-defined `lambda` sequence.}
 
-\item{algo}{the algorithm to be used in computation. `linear_admm`:
-linearized ADMM; `prox_newton`: proximal newton-based method.}
+\item{algo}{the algorithm to be used in computation. Currently, proximal
+newton-based method `prox_newton`.}
 
 \item{maxiter}{Integer. Maximum number of iterations for the estimation
 algorithm.}
@@ -102,7 +102,7 @@ difference matrix.
 }
 \examples{
 y <- c(1, rpois(100, dnorm(1:1000, 50, 15) * 500 + 1))
-out <- estimate_rt(y, nsol = 10, algo = "linear_admm")
+out <- estimate_rt(y, nsol = 10)
 plot(out)
 
 out0 <- estimate_rt(y, degree = 0L, nsol = 10)

@@ -52,8 +52,8 @@
 #'   `lambda` sequence, where `lambdamin = lambda_min_ratio * lambdamax`.
 #'   A very small value will lead to the solution `Rt = log(observed_counts)`.
 #'   This argument has no effect if there is a user-defined `lambda` sequence.
-#' @param algo the algorithm to be used in computation. `linear_admm`:
-#'   linearized ADMM; `prox_newton`: proximal newton-based method.
+#' @param algo the algorithm to be used in computation. Currently, proximal
+#' newton-based method `prox_newton`.
 #'
 #' @return An object with S3 class `poisson_rt`. Among the list components:
 #' * `observed_counts` the observed daily infection counts.
@@ -72,7 +72,7 @@
 #'
 #' @examples
 #' y <- c(1, rpois(100, dnorm(1:1000, 50, 15) * 500 + 1))
-#' out <- estimate_rt(y, nsol = 10, algo = "linear_admm")
+#' out <- estimate_rt(y, nsol = 10)
 #' plot(out)
 #'
 #' out0 <- estimate_rt(y, degree = 0L, nsol = 10)
@@ -86,7 +86,7 @@ estimate_rt <- function(observed_counts,
                         lambdamin = NULL,
                         lambdamax = NULL,
                         lambda_min_ratio = 1e-4,
-                        algo = c("linear_admm", "prox_newton"),
+                        algo = "prox_newton",
                         maxiter = 1e4,
                         init = NULL) {
   # check arguments are of proper types
@@ -149,7 +149,7 @@ estimate_rt <- function(observed_counts,
   lambda <- sort(lambda)
 
   # check algorithm
-  algo <- match(algo, c("linear_admm", "prox_newton"))
+  algo <- match(algo, "prox_newton")
   algo <- as.integer(algo)
 
   mod <- rtestim_path(

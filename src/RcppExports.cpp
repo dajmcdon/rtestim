@@ -11,23 +11,6 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// linear_admm_testing
-Rcpp::List linear_admm_testing(int M, NumericVector const& y, NumericVector const& x, NumericVector const& w, int ord, double lambda, double tol);
-RcppExport SEXP _rtestim_linear_admm_testing(SEXP MSEXP, SEXP ySEXP, SEXP xSEXP, SEXP wSEXP, SEXP ordSEXP, SEXP lambdaSEXP, SEXP tolSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type M(MSEXP);
-    Rcpp::traits::input_parameter< NumericVector const& >::type y(ySEXP);
-    Rcpp::traits::input_parameter< NumericVector const& >::type x(xSEXP);
-    Rcpp::traits::input_parameter< NumericVector const& >::type w(wSEXP);
-    Rcpp::traits::input_parameter< int >::type ord(ordSEXP);
-    Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
-    Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
-    rcpp_result_gen = Rcpp::wrap(linear_admm_testing(M, y, x, w, ord, lambda, tol));
-    return rcpp_result_gen;
-END_RCPP
-}
 // prox_newton_testing
 Rcpp::List prox_newton_testing(int M, int Minner, int Mline, int ord, Rcpp::NumericVector const& y, Rcpp::NumericVector const& x, Rcpp::NumericVector const& w, double lambda, double ls_alpha, double ls_gamma, double tol);
 RcppExport SEXP _rtestim_prox_newton_testing(SEXP MSEXP, SEXP MinnerSEXP, SEXP MlineSEXP, SEXP ordSEXP, SEXP ySEXP, SEXP xSEXP, SEXP wSEXP, SEXP lambdaSEXP, SEXP ls_alphaSEXP, SEXP ls_gammaSEXP, SEXP tolSEXP) {
@@ -167,19 +150,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// doDtDv
-NumericVector doDtDv(NumericVector v, int k, NumericVector xd);
-RcppExport SEXP _rtestim_doDtDv(SEXP vSEXP, SEXP kSEXP, SEXP xdSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type v(vSEXP);
-    Rcpp::traits::input_parameter< int >::type k(kSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type xd(xdSEXP);
-    rcpp_result_gen = Rcpp::wrap(doDtDv(v, k, xd));
-    return rcpp_result_gen;
-END_RCPP
-}
 // one_norm
 double one_norm(NumericVector const& z);
 RcppExport SEXP _rtestim_one_norm(SEXP zSEXP) {
@@ -243,10 +213,7 @@ BEGIN_RCPP
 END_RCPP
 }
 
-RcppExport SEXP run_testthat_tests(SEXP);
-
 static const R_CallMethodDef CallEntries[] = {
-    {"_rtestim_linear_admm_testing", (DL_FUNC) &_rtestim_linear_admm_testing, 7},
     {"_rtestim_prox_newton_testing", (DL_FUNC) &_rtestim_prox_newton_testing, 11},
     {"_rtestim_dptf", (DL_FUNC) &_rtestim_dptf, 2},
     {"_rtestim_dptf_past", (DL_FUNC) &_rtestim_dptf_past, 3},
@@ -256,12 +223,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rtestim_create_lambda_test", (DL_FUNC) &_rtestim_create_lambda_test, 5},
     {"_rtestim_doDv", (DL_FUNC) &_rtestim_doDv, 3},
     {"_rtestim_doDtv", (DL_FUNC) &_rtestim_doDtv, 3},
-    {"_rtestim_doDtDv", (DL_FUNC) &_rtestim_doDtDv, 3},
     {"_rtestim_one_norm", (DL_FUNC) &_rtestim_one_norm, 1},
     {"_rtestim_pois_obj", (DL_FUNC) &_rtestim_pois_obj, 6},
     {"_rtestim_gaussianized_data", (DL_FUNC) &_rtestim_gaussianized_data, 3},
     {"_rtestim_line_search", (DL_FUNC) &_rtestim_line_search, 12},
-    {"run_testthat_tests", (DL_FUNC) &run_testthat_tests, 1},
     {NULL, NULL, 0}
 };
 

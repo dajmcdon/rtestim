@@ -16,12 +16,6 @@ VectorXd nvec_to_evec(NumericVector nvec) {
   return evec;
 }
 
-Eigen::SparseMatrix<double> identity(int n) {
-  Eigen::SparseMatrix<double> Id(n, n);
-  Id.setIdentity();
-  return Id;
-}
-
 // [[Rcpp::export]]
 Eigen::SparseMatrix<double> get_Dtil(int k, NumericVector xd) {
   int n = xd.size();
@@ -82,12 +76,6 @@ NumericVector doDv(NumericVector v, int k, NumericVector xd) {
 // [[Rcpp::export]]
 NumericVector doDtv(NumericVector v, int k, NumericVector xd) {
   return dspline::rcpp_d_mat_mult(v, k, xd, false, true);
-}
-
-// [[Rcpp::export]]
-NumericVector doDtDv(NumericVector v, int k, NumericVector xd) {
-  NumericVector tmp = doDv(v, k, xd);
-  return doDtv(tmp, k, xd);
 }
 
 // [[Rcpp::export]]

@@ -15,107 +15,6 @@ SparseQR<SparseMatrix<double>, Ord> qradmm;
 using namespace Rcpp;
 
 /**
- * Solving Lambert_0 function for primal step of linearized ADMM
- * @param c primal variable to be computed
- * @param mu upper bound for the primal step
- * @param n signal length
- * @return updated primal variable
- */
-double update_pois(double c, double mu, int n) {
-  // solve x such that exp(x) * x = exp(c) / (mu * n) which is a Lambert_0
-  // function; then let theta = c - x
-  if (c < 500) {
-    double cz = exp(c) / (mu * n);
-    c -= boost::math::lambert_w0(cz);
-  } else {  // deal with potential overflow from big exp(c)
-    // See:
-    // https://en.wikipedia.org/wiki/Lambert_W_function#Asymptotic_expansions
-    // We use the first four terms.
-    double la, lb;
-    la = c - log(mu * n);
-    lb = log(la);
-    c -= la - lb + lb / la + (lb * (lb - 2)) / (2 * la * la);
-  }
-  return c;
-}
-
-void linear_admm(int& M,
-                 NumericVector const& y,
-                 NumericVector const& x,
-                 NumericVector const& w,
-                 int n,
-                 int ord,
-                 NumericVector& theta,
-                 NumericVector& z,
-                 NumericVector& u,
-                 double lambda,
-                 double rho,
-                 double mu,
-                 double tol,
-                 int& iter) {
-  double r_norm, s_norm;
-  NumericVector z_old = clone(z);
-  double lam_z = lambda / rho;
-  NumericVector tmp_n(n);
-  NumericVector tmp_m(z.size());
-
-  // start of iteration:
-  for (iter = 0; iter < M; iter++) {
-    if (iter % 100 == 0)
-      Rcpp::checkUserInterrupt();
-    // update primal variable:
-    tmp_n = doDtDv(theta, ord, x);
-    tmp_n = y / n - rho * tmp_n + rho * doDtv(z - u, ord, x) + mu * theta;
-    tmp_n = tmp_n / mu + log(w);
-    for (int it = 0; it < n; it++)
-      tmp_n(it) = update_pois(tmp_n(it), mu, n);
-    theta = tmp_n - log(w);
-
-    // update alternating variable:
-    tmp_m = doDv(theta, ord, x);
-    tmp_m += u;
-    z = dptf(tmp_m, lam_z);
-
-    // update dual variable:
-    tmp_m = doDv(theta, ord, x);
-    u += tmp_m - z;
-
-    // stopping criteria check:
-    r_norm = sqrt(mean(pow(tmp_m - z, 2)));
-    // dual residuals:
-    s_norm = rho * sqrt(mean(pow(z_old - z, 2)));
-    if ((r_norm < tol) && (s_norm < tol))
-      break;
-    // auxiliary variables update:
-    z_old = z;
-  }
-}
-
-/**
- * This is a wrapper around the void function to use in test_that()
- */
-// [[Rcpp::export]]
-Rcpp::List linear_admm_testing(int M,
-                               NumericVector const& y,
-                               NumericVector const& x,
-                               NumericVector const& w,
-                               int ord,
-                               double lambda,
-                               double tol) {
-  int n = y.size();
-  NumericVector theta(n);
-  NumericVector z(n - ord);
-  NumericVector u(n - ord);
-  double rho = lambda;
-  double mu = 2 * pow(4, ord);
-  int iter = 0;
-  linear_admm(M, y, x, w, n, ord, theta, z, u, lambda, rho, mu, tol, iter);
-  List out = List::create(Named("lambda") = lambda, Named("theta") = exp(theta),
-                          Named("niter") = iter);
-  return out;
-}
-
-/**
  * ADMM for Gaussian trend filtering
  * @param M maximum iteration of the algos
  * @param n signal length
@@ -185,6 +84,7 @@ void admm_gauss(int M,
     // stopping criteria check:
     if (r_norm < tol && s_norm < tol)
       break;
+
     // auxiliary variables update:
     z_old = z;
   }
@@ -219,6 +119,7 @@ void prox_newton(int M,
   obj = pois_obj(ord, y, x, w, theta, lambda);
   obj_list(0) = obj;
   int iter_best = 0;
+  NumericVector std_y(y);
 
   for (int iter = 0; iter < M; iter++) {
     if (iter % 50 == 0)
@@ -226,7 +127,7 @@ void prox_newton(int M,
     theta_old = theta;
 
     // define new(Gaussianized) data for least squares problem
-    NumericVector std_y = gaussianized_data(y, w, theta);
+    std_y = gaussianized_data(y, w, theta);
     // solve least squares problem (Gaussian TF)
     admm_gauss(Minner, n, ord, std_y, x, w, theta, z, u, rho, lam_z, DD, tol,
                inner_iter);
@@ -253,7 +154,7 @@ void prox_newton(int M,
     }
 
     // adjust the iterate steps
-    if (iter >= iter_best + 4)  // && iter_best != 0)
+    if (iter >= iter_best + 4)
       break;
   }
 }

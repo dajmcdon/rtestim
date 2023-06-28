@@ -16,8 +16,8 @@ using namespace Rcpp;
 // [[Rcpp::export]]
 List rtestim_path(int algo,
                   NumericVector y,
-                  NumericVector x,  // positions
-                  NumericVector w,  // weighted past cases
+                  NumericVector x,
+                  NumericVector w,
                   int korder,
                   NumericVector lambda,
                   double lambdamax = -1,
@@ -51,6 +51,7 @@ List rtestim_path(int algo,
     DkDk = Dk.transpose() * Dk;
     m = Dk.rows();
   }
+
   // Generate lambda sequence if necessary
   if (abs(lambda[nsol - 1]) < tolerance / 100 && lambdamax <= 0) {
     VectorXd b(n - korder);
@@ -63,13 +64,11 @@ List rtestim_path(int algo,
 
   // ADMM parameters
   double _rho;
-  double _mu;
 
   // ADMM variables
   NumericVector beta(n);
   NumericVector alpha(m);
   NumericVector u(m);
-  double mu = 2 * pow(4, korder);  // unevenly-spaced version?
   int iters = 0;
   int nsols = nsol;
 
@@ -84,13 +83,8 @@ List rtestim_path(int algo,
       niter[i] = 0;
     } else {
       _rho = (rho < 0) ? lambda[i] : rho;
-      _mu = mu * lambda[i];
       switch (algo) {
         case 1:
-          linear_admm(maxiter, y, x, w, n, korder, beta, alpha, u, lambda[i],
-                      _rho, _mu, tolerance, iters);
-          break;
-        case 2:
           prox_newton(maxiter_newton, maxiter, maxiter_line, n, korder, y, x, w,
                       beta, alpha, u, lambda[i], _rho, ls_alpha, ls_gamma, DkDk,
                       tolerance, iters);
