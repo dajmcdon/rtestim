@@ -126,12 +126,13 @@ estimate_rt <- function(observed_counts,
   if (!inherits(init, "rt_admm_configuration")) {
     cli::cli_abort("`init` must be created with `configure_rt_admm()`.")
   }
-  if (is.null(init$primal_var)) {
-    init <- configure_rt_admm(
-      observed_counts, init$degree, weighted_past_counts,
-      auxi_var = init$auxi_var, dual_var = init$dual_var
-    )
-  }
+  # Error: combine (rather than replace) it with the user's `init`!
+  #if (is.null(init$primal_var)) {
+  #  init <- configure_rt_admm(
+  #    observed_counts, init$degree, weighted_past_counts,
+  #    auxi_var = init$auxi_var, dual_var = init$dual_var
+  #  )
+  #}
 
   # check that degree is less than data length
   if (degree + 1 >= n) {
