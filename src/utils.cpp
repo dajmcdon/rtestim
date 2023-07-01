@@ -16,12 +16,6 @@ VectorXd nvec_to_evec(NumericVector nvec) {
   return evec;
 }
 
-Eigen::SparseMatrix<double> identity(int n) {
-  Eigen::SparseMatrix<double> Id(n, n);
-  Id.setIdentity();
-  return Id;
-}
-
 // [[Rcpp::export]]
 Eigen::SparseMatrix<double> get_Dtil(int k, NumericVector xd) {
   int n = xd.size();
@@ -64,7 +58,7 @@ void create_lambda(NumericVector& lambda,
   }
 }
 
-// [[Rcpp::export()]]
+// [[Rcpp::export]]
 NumericVector create_lambda_test(NumericVector lambda,
                                  double lambdamin,
                                  double lambdamax,
@@ -82,12 +76,6 @@ NumericVector doDv(NumericVector v, int k, NumericVector xd) {
 // [[Rcpp::export]]
 NumericVector doDtv(NumericVector v, int k, NumericVector xd) {
   return dspline::rcpp_d_mat_mult(v, k, xd, false, true);
-}
-
-// [[Rcpp::export]]
-NumericVector doDtDv(NumericVector v, int k, NumericVector xd) {
-  NumericVector tmp = doDv(v, k, xd);
-  return doDtv(tmp, k, xd);
 }
 
 // [[Rcpp::export]]
@@ -125,6 +113,12 @@ NumericVector gaussianized_data(NumericVector const& y,
   return out;
 }
 
+/**
+ * Backtracking line search for proximal Newton method
+ * @param s step size
+ * @param alpha
+ * @param gamma contraction factor
+ */
 // [[Rcpp::export]]
 double line_search(double s,
                    double lambda,
@@ -141,37 +135,30 @@ double line_search(double s,
   NumericVector dir = theta - theta_old;
   double bound;
   double gradient;
-  double grad_h = 0.0;
+  double bound_s = 0.0;
   NumericVector grad_g(n);
   NumericVector Dv(n);
 
   // initialize upper bound
   bound = mean(dir * (w * exp(theta) - y));
-
   NumericVector Dth = doDv(theta, ord, x);
   NumericVector Dth_old = doDv(theta_old, ord, x);
   double Dth_old_norm = one_norm(Dth_old);
   bound += lambda * (one_norm(Dth) - Dth_old_norm);
   NumericVector exp_theta_old = exp(theta_old);
 
-  s = 1;
+  s = 1;  // initial step length
   for (int i = 0; i < M; i++) {
-    // compute gradient/ grades
+    // compute gradient: f(theta_old + s * dir) - f(theta_old)
     grad_g = -s * dir * y + w * exp(theta_old + s * dir) - w * exp_theta_old;
-    if (i > 0)
-      Dv = Dth_old + s * (Dth - Dth_old);  // if s=1, Dv stays same
-    gradient = mean(grad_g) + lambda * (one_norm(Dth) - Dth_old_norm);
+    Dv = Dth_old + s * (Dth - Dth_old);  // if s=1, Dv stays same
+    gradient = mean(grad_g) + lambda * (one_norm(Dv) - Dth_old_norm);
 
-    // adjust upper bound
-    bound *= alpha * s;
+    // adjust upper bound: alpha * s * (f'(theta_old))^T * dir
+    bound_s = bound * alpha * s;
 
-    // compute upper bound
-    Dv = dir * (w * exp_theta_old - y);
-    bound = mean(Dv) * s;
-    bound += grad_h;
-
-    // check criteria
-    if (gradient <= bound)
+    // check the Armijo (sufficient decrease) condition
+    if (gradient <= bound_s)
       break;
     else
       s *= gamma;

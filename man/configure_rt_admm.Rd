@@ -8,16 +8,12 @@ configure_rt_admm(
   observed_counts,
   degree,
   weighted_past_counts = NULL,
-  primal_var = NULL,
-  auxi_var = NULL,
-  dual_var = NULL,
   rho = -1,
-  rho_adjust = -1,
   alpha = 0.5,
   gamma = 0.9,
   tolerance = 1e-04,
-  maxiter_inner = 5L,
-  maxiter_line = 5L,
+  maxiter_newton = 50L,
+  maxiter_line = 20L,
   verbose = 0
 )
 }
@@ -32,17 +28,8 @@ curve.}
 corresponding serial interval functions (or its Gamma approximation) as
 weights}
 
-\item{primal_var}{initial values of log(Rt)}
-
-\item{auxi_var}{auxiliary variable in the ADMM algorithm}
-
-\item{dual_var}{dual variable in the ADMM algorithm}
-
 \item{rho}{Double. An ADMM parameter; coefficient of augmented term in the
 Lagrangian function.}
-
-\item{rho_adjust}{Double. An ADMM parameter; adjusted coefficient of
-augmented term in the Lagrangian function.}
 
 \item{alpha}{Double. A parameter adjusting upper bound in line search algorithm
 in `prox_newton` algorithm.}
@@ -52,8 +39,8 @@ in `prox_newton` algorithm.}
 
 \item{tolerance}{Double. Tolerance of ADMM convergence.}
 
-\item{maxiter_inner}{Integer. Maximum number of iterations for the inner
-loop of proximal Newton method.}
+\item{maxiter_newton}{Integer. Maximum number of iterations for the outer
+Newton iteration.}
 
 \item{maxiter_line}{Integer. Maximum number of iterations for the linesearch
 algorithm in the proximal Newton method.}
@@ -64,6 +51,5 @@ algorithm in the proximal Newton method.}
 a list of model parameters with class `rt_admm_configuration`
 }
 \description{
-We should convert this into an S3 method so that we can pass in a
-vector of counts or an rt_admm_configuration object (and overwrite)
+Rt estimation algorithm configuration
 }
