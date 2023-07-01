@@ -14,7 +14,7 @@ estimate_rt(
   lambdamin = NULL,
   lambdamax = NULL,
   lambda_min_ratio = 1e-04,
-  algo = c("linear_admm", "prox_newton"),
+  algo = "prox_newton",
   maxiter = 10000,
   init = NULL
 )
@@ -42,7 +42,7 @@ determines the balance between data fidelity and
 smoothness of the estimated Rt; larger `lambda` results in a smoother
 estimate. The default, `NULL`
 results in an automatic computation based on `nlambda`, the largest value
-of `lambda` that would a maximally smooth estimate, and `lambda_min_ratio`.
+of `lambda` that would result in a maximally smooth estimate, and `lambda_min_ratio`.
 Supplying a value of `lambda` overrides
 this behaviour. It is likely better to supply a
 decreasing sequence of `lambda` values than a single (small) value. If
@@ -58,14 +58,14 @@ be greater than zero.}
 \item{lambdamax}{Optional value for the largest `lambda` to use.}
 
 \item{lambda_min_ratio}{If neither `lambda` nor `lambdamin` is specified, the
-program will generate a lambdamin by lambdamax * lambda_min_ratio
+program will generate a lambdamin by lambdamax * lambda_min_ratio.
 A multiplicative factor for the minimal lambda in the
 `lambda` sequence, where `lambdamin = lambda_min_ratio * lambdamax`.
 A very small value will lead to the solution `Rt = log(observed_counts)`.
-This argument has no effect if there is user-defined `lambda` sequence.}
+This argument has no effect if there is a user-defined `lambda` sequence.}
 
-\item{algo}{the algorithm to be used in computation. `linear_admm`:
-linearized ADMM; `prox_newton`: proximal newton-based method.}
+\item{algo}{the algorithm to be used in computation. Currently, proximal
+newton-based method `prox_newton`.}
 
 \item{maxiter}{Integer. Maximum number of iterations for the estimation
 algorithm.}
@@ -80,27 +80,28 @@ An object with S3 class `poisson_rt`. Among the list components:
 * `weighted_past_counts` the weighted sum of past infection counts.
 * `Rt` the estimated effective reproduction rate. This is a matrix with
     each column corresponding to one value of `lambda`.
-* `lambda` the value of `lambda` actually used in the algorithm.
+* `lambda` the values of `lambda` actually used in the algorithm.
 * `degree` degree of the estimated piecewise polynomial curve.
-* `niter` the required number of iterations for each value of `lambda`
+* `dof` degrees of freedom of the estimated trend filtering problem.
+* `niter` the required number of iterations for each value of `lambda`.
 * `convergence` if number of iterations for each value of `lambda` is less
     than the maximum number of iterations for the estimation algorithm.
 }
 \description{
 The Effective Reproduction Number \eqn{R_t} of an infectious
 disease can be estimated by solving the smoothness penalized Poisson
-regression of the form:
+regression (trend filtering) of the form:
 
-\eqn{R_t = argmin_{\theta} (\frac{1}{n} \sum_{i=1}^n e^{\theta_i} -
-  y_i\theta_i) + \lambda||D^{(k+1)}\theta||_1}
+\eqn{\hat{\theta} = argmin_{\theta} (\frac{1}{n} \sum_{i=1}^n w_i e^{\theta_i} -
+  y_i\theta_i) + \lambda||D^{(k+1)}\theta||_1, }
 
-where \eqn{y_i} is the observed case count at day \eqn{i},
-\eqn{\theta_i = \sum_{a=1}y_{a}w_{t-a}} is the weighted past counts
-at day \eqn{i}, \eqn{\lambda} is the smoothness penalty, and \eqn{D^{(k+1)}}
-is the \eqn{(k+1)}-th order difference matrix.
+where \eqn{R_t = e^{\theta}}, \eqn{y_i} is the observed case count at day
+\eqn{i}, \eqn{w_i} is the weighted past counts at day \eqn{i}, \eqn{\lambda}
+is the smoothness penalty, and \eqn{D^{(k+1)}} is the \eqn{(k+1)}-th order
+difference matrix.
 }
 \examples{
-y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
+y <- c(1, rpois(100, dnorm(1:1000, 50, 15) * 500 + 1))
 out <- estimate_rt(y, nsol = 10)
 plot(out)
 

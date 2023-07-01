@@ -34,6 +34,7 @@ cv_estimate_rt <- function(observed_counts,
                            error_measure = c("mse", "mae", "deviance"),
                            x = 1:n,
                            lambda = NULL,
+                           maxiter = 1e6L,
                            ...) {
 
   arg_is_pos_int(nfold)
@@ -74,26 +75,16 @@ cv_estimate_rt <- function(observed_counts,
     test_idx <- which(foldid == f)
 
     ## Run solver with the training set
-    #mod <- estimate_rt(
-    #  observed_counts = observed_counts[train_idx],
-    #  x = x[train_idx],
-    #  degree = degree,
-    #  lambda = lambda,
-    #  ...)
-    mod_list <- list()
-    mod_Rt <- matrix(nrow=length(train_idx), ncol=length(lambda))
-    for(i in 1:length(lambda)){
-      mod_list[[i]] <- estimate_rt(
-        observed_counts = observed_counts[train_idx],
-        x = x[train_idx],
-        degree = degree,
-        lambda = lambda[i],
-        ...)
-      mod_Rt[,i] <- mod_list[[i]]$Rt[,1]
-    }
+    mod <- estimate_rt(
+      observed_counts = observed_counts[train_idx],
+      x = x[train_idx],
+      degree = degree,
+      lambda = lambda,
+      maxiter = maxiter,
+      ...)
 
-    ### Predict training value ###
-    pred_rt <- pred_kth_rt(mod_Rt, #mod$Rt,
+    ### Predict training value
+    pred_rt <- pred_kth_rt(mod$Rt,
                            n = n,
                            train_idx = train_idx,
                            test_idx = test_idx,

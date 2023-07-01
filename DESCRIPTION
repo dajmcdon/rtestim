@@ -27,6 +27,7 @@ Suggests:
     knitr,
     rmarkdown,
     testthat (>= 3.0.0),
+    xml2
 LinkingTo: 
     BH,
     dspline,

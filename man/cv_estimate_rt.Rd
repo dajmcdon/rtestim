@@ -12,6 +12,7 @@ cv_estimate_rt(
   error_measure = c("mse", "mae", "deviance"),
   x = 1:n,
   lambda = NULL,
+  maxiter = 1000000L,
   ...
 )
 }
@@ -49,12 +50,15 @@ determines the balance between data fidelity and
 smoothness of the estimated Rt; larger `lambda` results in a smoother
 estimate. The default, `NULL`
 results in an automatic computation based on `nlambda`, the largest value
-of `lambda` that would a maximally smooth estimate, and `lambda_min_ratio`.
+of `lambda` that would result in a maximally smooth estimate, and `lambda_min_ratio`.
 Supplying a value of `lambda` overrides
 this behaviour. It is likely better to supply a
 decreasing sequence of `lambda` values than a single (small) value. If
 supplied, the user-defined `lambda` sequence is automatically sorted in
 decreasing order.}
+
+\item{maxiter}{Integer. Maximum number of iterations for the estimation
+algorithm.}
 
 \item{...}{additional parameters passed to `estimate_rt()` function}
 }

@@ -4,7 +4,6 @@
 #include "utils.h"
 #include "dptf.h"
 
-
 typedef Eigen::COLAMDOrdering<int> Ord;
 
 using Eigen::SparseMatrix;
@@ -12,14 +11,13 @@ using Eigen::SparseQR;
 using Eigen::VectorXd;
 SparseQR<SparseMatrix<double>, Ord> qr;
 
-
 using namespace Rcpp;
 
 // [[Rcpp::export]]
 List rtestim_path(int algo,
                   NumericVector y,
-                  NumericVector x,  // positions
-                  NumericVector w,  // weighted past cases
+                  NumericVector x,
+                  NumericVector w,
                   int korder,
                   NumericVector lambda,
                   double lambdamax = -1,
@@ -27,12 +25,12 @@ List rtestim_path(int algo,
                   int nsol = 100,
                   double rho = -1,
                   int maxiter = 1e5,
+                  int maxiter_newton = 50,
+                  int maxiter_line = 5,
                   double tolerance = 1e-3,
                   double lambda_min_ratio = 1e-4,
                   double ls_alpha = 0.5,
                   double ls_gamma = 0.9,
-                  int maxiter_inner = 3,
-                  int maxiter_line = 5,
                   int verbose = 0) {
   int n = y.size();
 
@@ -53,10 +51,11 @@ List rtestim_path(int algo,
     DkDk = Dk.transpose() * Dk;
     m = Dk.rows();
   }
+
   // Generate lambda sequence if necessary
   if (abs(lambda[nsol - 1]) < tolerance / 100 && lambdamax <= 0) {
     VectorXd b(n - korder);
-    VectorXd wy = nvec_to_evec(w * y);
+    VectorXd wy = nvec_to_evec(w - y);
     b = qr.solve(wy);  // very approximate;
     NumericVector bp = evec_to_nvec(b);
     lambdamax = max(abs(bp)) / n;
@@ -65,13 +64,11 @@ List rtestim_path(int algo,
 
   // ADMM parameters
   double _rho;
-  double _mu;
 
   // ADMM variables
   NumericVector beta(n);
   NumericVector alpha(m);
   NumericVector u(m);
-  double mu = 2 * pow(4, korder);  // unevenly-spaced version?
   int iters = 0;
   int nsols = nsol;
 
@@ -86,22 +83,17 @@ List rtestim_path(int algo,
       niter[i] = 0;
     } else {
       _rho = (rho < 0) ? lambda[i] : rho;
-      _mu = mu * lambda[i];
       switch (algo) {
         case 1:
-          linear_admm(maxiter, y, x, w, n, korder, beta, alpha, u, lambda[i],
-                      _rho, _mu, tolerance, iters);
-          break;
-        case 2:
-          prox_newton(maxiter, maxiter_inner, n, korder, y, x, w, beta, alpha,
-                      u, lambda[i], _rho, ls_alpha, ls_gamma, DkDk, tolerance,
-                      maxiter_line, iters);
+          prox_newton(maxiter_newton, maxiter, maxiter_line, n, korder, y, x, w,
+                      beta, alpha, u, lambda[i], _rho, ls_alpha, ls_gamma, DkDk,
+                      tolerance, iters);
           break;
       }
       niter[i] = iters;
       maxiter -= iters + 1;
       if (maxiter < 0)
-        nsols = i + 1;  // why not nsols -= 1;
+        nsols = i + 1;
     }
 
     // Store solution
