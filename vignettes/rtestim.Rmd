@@ -17,7 +17,6 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(rtestim)
-library(httr)
 ```
 
 \newcommand{\argmin}{\mathop{\mathrm{argmin}}}
@@ -32,16 +31,16 @@ each new infection today". Values larger than 1 indicate that an
 epidemic is growing while those less than 1 indicate decline.
 
 This vignette provides a few examples to demonstrate the usage of `{rtestim}` to 
-estimate the effective reproduction number, $R_t$.
-
-RtEstim find the sequence of $R_t$, $\Rtseq$ of an infectious disease by solving 
+estimate the effective reproduction number, $R_t$. `{rtestim}` 
+find the sequence of $R_t$, $\Rtseq$ of an infectious disease by solving 
 the following penalized Poisson regression
 \begin{equation} \label{eq:objective_fn}
     \hat{\theta} = \argmin_{\theta} \frac{1}{n} \sum_{t=1}^n \left(e^{\theta_{t}}x_t - y_t\theta_{t}\right) + \lambda \Vert D^{(k)} \theta \Vert_1
 \end{equation}
-where $y_t$ is the new case counts at day $t$, $\theta_{t} = \log(R_t)$ is the 
+where $y_t$ is the an epidemic signal, ideally, incident infections, but most
+frequently, incident cases, on day $t$, $\theta_{t} = \log(R_t)$ is the 
 natural logarithm of $R_t$ at time $t$, $D^{(k)}$ is the $k$-th order difference 
-operator, and $\lambda$ is the penalty which ensures smoothness of the $\Rtseq$
+operator, and $\lambda$ is the penalty which imposes smoothness of the $\Rtseq$
 
 In particular
 
@@ -49,15 +48,19 @@ In particular
 x_t = \sum_{a = 1}^m y_{t-a} w_a
 \end{equation}
 
-is the weighted past counts at $t$, calculated by convolving past $m$ days of
-new infection with the discretized serial interval distribution $w$ of length $m$.
+is the weighted sum of previous incidence at $t$, calculated by convolving the
+preceding $m$ days of new infections with the discretized serial interval distribution $w$ of length $m$. This delay distribution encapsulates the duration
+of time that a previous infection is likely to lead to future infection.
 
-To compute $\Rtseq$ with RtEstim, the minimal information needed is the new case
-counts at days up until $t$. The parameters of the discretized serial interval
-distribution are defaulted to the probability density function of a Gamma 
-distribution with values $2.5$ for both the scale and shape parameters, discretized
-at integers inputs, of size $t-1$. The order of the difference operator is defaulted 
-to $3$. The sequence of smoothness penalty $\lambda$, if no $\lambda$ is provided, 
+To compute $\Rtseq$ with `{rtestim}`, the minimal information needed is the 
+new case counts at days up until $t$ and a parametric form for the serial 
+interval distribution (a Gamma density). By default, 
+$2.5$ is used for both the scale and shape parameters, based on the literature
+on contract tracing, representing the typical delay between case onsets.
+This is discretized to be supported on the integers. 
+The order of the difference operator, the degree of smoothness, defaults
+to $3$. 
+The sequence of smoothness penalty $\lambda$, if no $\lambda$ is provided, 
 is calculated internally by the algorithm.
 
 # Example - synthetic dataset
@@ -68,6 +71,7 @@ We first demonstrate the usage of the package on a synthetic dataset, where the
 new daily case counts are generated as a sequence of integers that starts from 1. 
 
 ```{r}
+set.seed(12345)
 case_counts <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
 plot(case_counts, xlab = "Time", ylab = "Case Counts")
 ```
@@ -79,26 +83,26 @@ mod <- estimate_rt(observed_counts = case_counts, nsol = 20)
 plot(mod)
 ```
 
-RtEstim generates a sequence of $\Rtseq$s from a range of $\lambda$ values,
+`{rtestim}` estimates a spectrum of $\Rtseq$s for a range of $\lambda$ values,
 where each $\Rtseq$ corresponds to a specific $\lambda$ value. If no $\lambda$ 
 value is supplied by the user, RtEstim will automatically calculate a sequence 
-of $\lambda$ values. The additional parameter `nsol = 20` specify the number of 
+of $\lambda$ values. The additional parameter `nsol = 20` specifies the number of 
 $\lambda$s for which the $\Rtseq$ is calculated
 
 
 ## Cross Validation
 
-RtEstim is also equipped with a leave-every-k-th-out cross validation, which 
-selects an optimal $\lambda$ which minimizes the cross-validation error. Instead 
-of providing a sequence of $\lambda$'s, we rely on the algorithm again to provide
-it for us by specifying `nsol = 20` in the command below.
+`{rtestim}` also provides a cross validation procedure for selecting the amount of smoothness to be used in the final estimate (leave-every-k-th-out cross validation). Minimizing this metric, in principle, balances prediction error
+and smoothness (`lambda.min`) though if smoother estimates are desired, one
+can instead use `lambda.1se`, the largest value of $\lambda$ within one standard
+error of the minimum.
 
 ```{r}
 mod_cv <- cv_estimate_rt(observed_counts = case_counts, nsol = 20)
 ```
 
-The following command plots the cross validation errors of each $\lambda$ in an 
-ascending order
+The following command plots the cross validation errors for each $\lambda$ in
+ascending order.
 
 ```{r}
 plot(mod_cv)
@@ -115,18 +119,19 @@ gives minimum mean cross-validated error, called `lambda.min`, and the one on th
 right gives the most regularized model such that the cross-validated error is 
 within one standard error of the minimum, called `lambda.1se`.
 
-Users may wish to visualize the particular $\Rtseq$ which minimizes the cross-validation 
-errors with the following command
+Users may wish to visualize the particular $\Rtseq$ which minimizes the 
+cross-validation error while prioritizing smoothness.
 
 ```{r}
-plot(mod_cv, which_lambda = 'lambda.min')
+plot(mod_cv, which_lambda = 'lambda.1se')
 ```
 
 
 ## Uneven Reporting Frequency
 
 Ideally, case counts are observed at regular intervals, such as daily or 
-weekly. RtEstim also accommodates scenarios in which cases are reported 
+weekly, but this is not always the case. 
+`{rtestim}` also accommodates scenarios in which cases are reported 
 with uneven intervals. To demonstrate this, we generate a sequence of integers
 representing the days at which we observe the case counts
 
@@ -146,48 +151,28 @@ plot(mod)
 
 ## Changing degree of difference operator
 
-The degree of the difference operator $k$ is defaulted 3 for the algorithm, which
-corresponds to a piecewise exponential estimation of the $\Rtseq$. To estimate
+The degree of the difference operator $k$ defaults to 3 for the algorithm, which
+corresponds to a piecewise cubic estimate $\Rtseq$. To estimate
 $\Rtseq$ with piecewise constant curves for example, use the command
 
 ```{r}
-mod <- estimate_rt(observed_counts = case_counts, degree = 1,
-                   lambda = seq(10, 50, 5))
+mod <- estimate_rt(observed_counts = case_counts, degree = 1)
 plot(mod)
 ```
 
 
-## Choosing optimization algorithm
-
-The default algorithm to optimize the objective equation is the linearized 
-Alternating Direction Method of Multiplier (linearized ADMM). We could instead
-use the Iterative Re-weighted Least Square ADMM (IRLS ADMM) as
-
-```{r}
-# Takes too long, perhaps an issue?
-# mod <- estimate_rt(observed_counts = case_counts, algo = "irls_admm")
-# plot(mod)
-```
-
 
 # Example - Canadian Covid-19 cases
 
-We first retrieve the Covid-19 data from \textit{OpenCovid.ca}
+Finally, we use a long history of real case counts in Canada. The data is
+available from [opencovid.ca](https://opencovid.ca) and a version is included
+in the package.
 
-```{r}
-res <- httr::GET(url = "https://api.opencovid.ca/timeseries?",
-           query = list('fmt' = 'csv',
-                        'geo' = 'can',
-                        'stat' = 'cases'))
-covid_ca <- httr::content(res)
-covid_ca <- covid_ca[9:nrow(covid_ca),] # start from non-zero case counts
-```
 
 Then the model is fitted with
 ```{r}
-mod_cv <- cv_estimate_rt(observed_counts = covid_ca$value_daily, lambdamin = 10,
-                         nsol = 20)
-plot(mod_cv, 'lambda.min')
+can <- estimate_rt(observed_counts = cancovid$incident_cases, nsol = 20)
+plot(can)
 ```
 
 
