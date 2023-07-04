@@ -22,7 +22,7 @@ distribution with some shape and scale.}
 }
 \value{
 A vector of size n-1, containing the total infectiousness at each
-  observed time point
+observed time point
 }
 \description{
 The total infectiousness at each observed time point is calculated

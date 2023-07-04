@@ -9,3 +9,4 @@
 ^\.vscode$
 ^doc$
 ^Meta$
+^data-raw$

@@ -7,7 +7,7 @@
 \method{predict}{poisson_rt}(object, lambda = NULL, ...)
 }
 \arguments{
-\item{object}{An object of class `poisson_rt` produced with [estimate_rt()].}
+\item{object}{An object of class \code{poisson_rt} produced with \code{\link[=estimate_rt]{estimate_rt()}}.}
 
 \item{lambda}{Select which lambdas from the object to use. If not provided
 (the default), all are returned. Note that new lambdas not originally
@@ -20,7 +20,7 @@ calculated by linearly interpolating the estimated Rt's.}
 A vector or matrix of predicted case counts.
 }
 \description{
-Given an object of class `poisson_rt` produced with [estimate_rt()],
+Given an object of class \code{poisson_rt} produced with \code{\link[=estimate_rt]{estimate_rt()}},
 calculate predicted observed cases for the estimated Rt values.
 Note: This function is not intended for "new x" or to produce forecasts, but
 rather to examine how Rt relates to observables.

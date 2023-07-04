@@ -25,8 +25,14 @@ library(httr)
 
 # Overview
 
-This vignette provides a few examples to demonstrate the usage of RtEstim to 
-estimate the effective reproduction number $R_t$.
+This package uses l1-regularized nonparametric regression
+(trend filtering) to estimate the effective reproductive number,
+Rt. This value roughly says "how many new infections will result from
+each new infection today". Values larger than 1 indicate that an 
+epidemic is growing while those less than 1 indicate decline.
+
+This vignette provides a few examples to demonstrate the usage of `{rtestim}` to 
+estimate the effective reproduction number, $R_t$.
 
 RtEstim find the sequence of $R_t$, $\Rtseq$ of an infectious disease by solving 
 the following penalized Poisson regression

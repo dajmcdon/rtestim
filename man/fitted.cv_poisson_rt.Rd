@@ -7,20 +7,20 @@
 \method{fitted}{cv_poisson_rt}(object, which_lambda = c("lambda.min", "lambda.1se"), ...)
 }
 \arguments{
-\item{object}{result of cross validation of type `cv_poisson_rt`}
+\item{object}{result of cross validation of type \code{cv_poisson_rt}}
 
 \item{which_lambda}{select which Rt's to output. If not provided, all Rt's
 are returned. If provided a list of lambda,the corresponding Rt estimation
 will be returned.
 
-If provided a string, it must be either one of `lambda.min` or `lambda.1se`.
-
- * If provided `lambda.min`, return Rt which is generated from
- the lambda that minimizes the cross validation score.
-
- * If provided `lambda.1se`, return Rt which is generated from the lambda
- whose corresponding cross validation score is 1 standard error away of the
- minimal cross validation score.}
+If provided a string, it must be either one of \code{lambda.min} or \code{lambda.1se}.
+\itemize{
+\item If provided \code{lambda.min}, return Rt which is generated from
+the lambda that minimizes the cross validation score.
+\item If provided \code{lambda.1se}, return Rt which is generated from the lambda
+whose corresponding cross validation score is 1 standard error away of the
+minimal cross validation score.
+}}
 
 \item{...}{not used.}
 }

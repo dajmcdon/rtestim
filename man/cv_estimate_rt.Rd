@@ -20,7 +20,7 @@ cv_estimate_rt(
 \item{observed_counts}{vector of the observed daily infection counts}
 
 \item{degree}{Integer. Degree of the piecewise polynomial curve to be
-estimated. For example, `degree = 0` corresponds to a piecewise constant
+estimated. For example, \code{degree = 0} corresponds to a piecewise constant
 curve.}
 
 \item{dist_gamma}{Vector of length 2. These are the shape and scale for the
@@ -34,12 +34,12 @@ distribution with some shape and scale.}
 cross validation. For leave-kth-out cross validation, every kth
 observed_counts and their corresponding position (evenly or unevenly
 spaced) are placed into the same fold. The first and last observed_counts are
-not assigned to any folds. Smallest allowable value is `nfold = 2`.}
+not assigned to any folds. Smallest allowable value is \code{nfold = 2}.}
 
 \item{error_measure}{Metric used to calculate cross validation scores.
-Must be choose from `mse`, `mae`, and `deviance`.
-`mse` calculates the mean square error; `mae` calculates the mean absolute error;
-`deviance` calculates the deviance}
+Must be choose from \code{mse}, \code{mae}, and \code{deviance}.
+\code{mse} calculates the mean square error; \code{mae} calculates the mean absolute error;
+\code{deviance} calculates the deviance}
 
 \item{x}{a vector of positions at which the counts have been observed. In an
 ideal case, we would observe data at regular intervals (e.g. daily or
@@ -47,31 +47,33 @@ weekly) but this may not always be the case.}
 
 \item{lambda}{Vector. A user supplied sequence of tuning parameters which
 determines the balance between data fidelity and
-smoothness of the estimated Rt; larger `lambda` results in a smoother
-estimate. The default, `NULL`
-results in an automatic computation based on `nlambda`, the largest value
-of `lambda` that would result in a maximally smooth estimate, and `lambda_min_ratio`.
-Supplying a value of `lambda` overrides
+smoothness of the estimated Rt; larger \code{lambda} results in a smoother
+estimate. The default, \code{NULL}
+results in an automatic computation based on \code{nlambda}, the largest value
+of \code{lambda} that would result in a maximally smooth estimate, and \code{lambda_min_ratio}.
+Supplying a value of \code{lambda} overrides
 this behaviour. It is likely better to supply a
-decreasing sequence of `lambda` values than a single (small) value. If
-supplied, the user-defined `lambda` sequence is automatically sorted in
+decreasing sequence of \code{lambda} values than a single (small) value. If
+supplied, the user-defined \code{lambda} sequence is automatically sorted in
 decreasing order.}
 
 \item{maxiter}{Integer. Maximum number of iterations for the estimation
 algorithm.}
 
-\item{...}{additional parameters passed to `estimate_rt()` function}
+\item{...}{additional parameters passed to \code{estimate_rt()} function}
 }
 \value{
-An object with S3 class `"cv_result"`. Among the list components:
-* `full_fit` An object with S3 class `"poisson_rt"`, fitted with all
-`observed_counts` and `lambda`
-* `cv_scores` leave-kth-out cross validation scores
-* `cv_se` leave-kth-out cross validation standard error
-* `lambda.min` lambda which achieved the optimal cross validation score
-* `lambda.1se` lambda that gives the optimal cross validation score
+An object with S3 class \code{"cv_result"}. Among the list components:
+\itemize{
+\item \code{full_fit} An object with S3 class \code{"poisson_rt"}, fitted with all
+\code{observed_counts} and \code{lambda}
+\item \code{cv_scores} leave-kth-out cross validation scores
+\item \code{cv_se} leave-kth-out cross validation standard error
+\item \code{lambda.min} lambda which achieved the optimal cross validation score
+\item \code{lambda.1se} lambda that gives the optimal cross validation score
 within one standard error.
-* `lambda` the value of `lambda` used in the algorithm.
+\item \code{lambda} the value of \code{lambda} used in the algorithm.
+}
 }
 \description{
 Leave-kth-out cross validation for choosing a optimal parameter lambda
