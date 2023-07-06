@@ -434,9 +434,9 @@ void tf_dp_past(int n, double* y, double* past, double lam, double* beta) {
     a[r] = ahi;
     b[r] = bhi + lamv[k + 1];
     afirst = 1;
-    bfirst = -y[k + 1] - lamv[k + 1];
+    bfirst = -yw[k + 1] - lamv[k + 1];
     alast = -1;
-    blast = y[k + 1] - lamv[k + 1];
+    blast = yw[k + 1] - lamv[k + 1];
   }
 
   /* Compute the last coefficient: this is where
