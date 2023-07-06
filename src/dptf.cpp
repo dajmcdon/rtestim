@@ -37,6 +37,7 @@ Rcpp::NumericVector dptf_past(Rcpp::NumericVector y,
                               Rcpp::NumericVector w) {
   int n = y.size();
   Rcpp::NumericVector beta(n);
+  lam = n * lam;
   tf_dp_past(n, y.begin(), w.begin(), lam, beta.begin());
   return beta;
 }
