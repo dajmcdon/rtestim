@@ -8,11 +8,12 @@
 [![R-CMD-check](https://github.com/dajmcdon/rtestim/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/dajmcdon/rtestim/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-This package uses l1-regularized nonparametric regression (trend
-filtering) to estimate the effective reproductive number, Rt. This value
-roughly says “how many new infections will result from each new
-infection today”. Values larger than 1 indicate that an epidemic is
-growing while those less than 1 indicate decline.
+This package uses Poisson likelihood with trend filtering penalty (a
+type of regularized nonparametric regression) to estimate the effective
+reproductive number, Rt. This value roughly says “how many new
+infections will result from each new infection today”. Values larger
+than 1 indicate that an epidemic is growing while those less than 1
+indicate decline.
 
 ## Installation
 
@@ -20,15 +21,15 @@ You can install the development version of rtestim from
 [GitHub](https://github.com/) with:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("dajmcdon/rtestim")
+# install.packages("remotes")
+remotes::install_github("dajmcdon/rtestim")
 ```
 
 ## Quick example
 
-Here we create so data that “looks” like a typical wave in an epidemic.
-Because the model uses regularized regression, we estimate the model at
-a range of tuning parameters simultaneously.
+Here we create some data that “looks” like a typical wave in an
+epidemic. Because the model uses regularized regression, we estimate the
+model at a range of tuning parameters simultaneously.
 
 ``` r
 set.seed(12345)
@@ -45,7 +46,7 @@ ggplot(dat, aes(Time, incident_cases)) +
 
 <img src="man/figures/README-plot-data-1.png" width="100%" />
 
-We fit the model and visualize the resulting estimated sequence of
+We fit the model and visualize the resulting estimated sequences of
 $R_t$:
 
 ``` r
@@ -55,7 +56,7 @@ plot(mod)
 
 <img src="man/figures/README-full-fit-1.png" width="100%" />
 
-The additional parameter `nsol = 20` specify the number of $\lambda$s
+The additional parameter `nsol = 20` specifies the number of $\lambda$s
 for which $R_t$ is estimated.
 
 A built in function for cross-validation can be used to select the
