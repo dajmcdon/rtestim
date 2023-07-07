@@ -12,5 +12,5 @@ test_that("Report error if observed_counts has non-neg values 0", {
 test_that("estimate_rt works with uneven spacing", {
   y <- c(1:10)
   x <- c(1,2,4,6,7,9,10,15,18,20)
-  expect_no_error(estimate_rt(observed_counts = y, x = x, degree = 2, lambda = 1))
+  expect_silent(estimate_rt(observed_counts = y, x = x, degree = 2, lambda = 1))
 })
