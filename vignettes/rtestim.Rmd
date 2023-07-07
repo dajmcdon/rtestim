@@ -1,5 +1,5 @@
 ---
-title: "Rtestim Package Vignette"
+title: "rtestim Package Vignette"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Rtestim Package Vignette}
@@ -24,9 +24,10 @@ library(rtestim)
 
 # Overview
 
-This package uses l1-regularized nonparametric regression
-(trend filtering) to estimate the effective reproductive number,
-Rt. This value roughly says "how many new infections will result from
+This package uses Poisson likelihood with 
+trend filtering penalty (a type of regularized nonparametric regression)
+to estimate the effective reproductive number, $R_t$. 
+This value roughly says "how many new infections will result from
 each new infection today". Values larger than 1 indicate that an 
 epidemic is growing while those less than 1 indicate decline.
 
@@ -35,19 +36,20 @@ estimate the effective reproduction number, $R_t$. `{rtestim}`
 find the sequence of $R_t$, $\Rtseq$ of an infectious disease by solving 
 the following penalized Poisson regression
 \begin{equation} \label{eq:objective_fn}
-    \hat{\theta} = \argmin_{\theta} \frac{1}{n} \sum_{t=1}^n \left(e^{\theta_{t}}x_t - y_t\theta_{t}\right) + \lambda \Vert D^{(k)} \theta \Vert_1
+    \hat{\theta} = \argmin_{\theta} \frac{1}{n} \sum_{t=1}^n \left(e^{\theta_{t}}x_t - y_t\theta_{t}\right) + \lambda \Vert D^{(k+1)} \theta \Vert_1
 \end{equation}
 where $y_t$ is the an epidemic signal, ideally, incident infections, but most
 frequently, incident cases, on day $t$, $\theta_{t} = \log(R_t)$ is the 
-natural logarithm of $R_t$ at time $t$, $D^{(k)}$ is the $k$-th order difference 
-operator, and $\lambda$ is the penalty which imposes smoothness of the $\Rtseq$
+natural logarithm of $R_t$ at time $t$, $D^{(k)}$ is the $k$-th order 
+divided difference operator ($k \geq 0$).
+The penalty $\Vert D^{(k+1)} \theta \Vert_1$ imposes smoothness on the solution
+and $\lambda$ controls the level of this smoothness, with larger $\lambda$
+resulting in smoother estimates.
 
 In particular
-
 \begin{equation}
 x_t = \sum_{a = 1}^m y_{t-a} w_a
 \end{equation}
-
 is the weighted sum of previous incidence at $t$, calculated by convolving the
 preceding $m$ days of new infections with the discretized serial interval distribution $w$ of length $m$. This delay distribution encapsulates the duration
 of time that a previous infection is likely to lead to future infection.
@@ -67,16 +69,18 @@ is calculated internally by the algorithm.
 
 ## Quick start
 
-We first demonstrate the usage of the package on a synthetic dataset, where the
-new daily case counts are generated as a sequence of integers that starts from 1. 
+We first demonstrate the usage of the package on synthetic data, where the
+new daily case counts are generated from a Poisson distribution with mean
+parameter that roughly follows a wave. Note that the first observation must 
+be strictly larger than 0.
 
 ```{r}
-set.seed(12345)
+set.seed(1234)
 case_counts <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
 plot(case_counts, xlab = "Time", ylab = "Case Counts")
 ```
 
-We fit the model and visualize the resulting $\Rtseq$ with the following functions
+Next, we fit the model and visualize the resulting $\Rtseq$:
 
 ```{r}
 mod <- estimate_rt(observed_counts = case_counts, nsol = 20)
@@ -85,7 +89,7 @@ plot(mod)
 
 `{rtestim}` estimates a spectrum of $\Rtseq$s for a range of $\lambda$ values,
 where each $\Rtseq$ corresponds to a specific $\lambda$ value. If no $\lambda$ 
-value is supplied by the user, RtEstim will automatically calculate a sequence 
+value is supplied by the user, `{rtestim}` will automatically calculate a sequence 
 of $\lambda$ values. The additional parameter `nsol = 20` specifies the number of 
 $\lambda$s for which the $\Rtseq$ is calculated
 
@@ -98,7 +102,7 @@ can instead use `lambda.1se`, the largest value of $\lambda$ within one standard
 error of the minimum.
 
 ```{r}
-mod_cv <- cv_estimate_rt(observed_counts = case_counts, nsol = 20)
+mod_cv <- cv_estimate_rt(observed_counts = case_counts)
 ```
 
 The following command plots the cross validation errors for each $\lambda$ in
@@ -133,7 +137,7 @@ Ideally, case counts are observed at regular intervals, such as daily or
 weekly, but this is not always the case. 
 `{rtestim}` also accommodates scenarios in which cases are reported 
 with uneven intervals. To demonstrate this, we generate a sequence of integers
-representing the days at which we observe the case counts
+representing the days at which we observe the case counts.
 
 ```{r}
 observation_incr <- rpois(101, lambda = 1)
@@ -141,7 +145,7 @@ observation_incr[observation_incr == 0] = 1
 observation_time <- cumsum(observation_incr)
 ```
 
-We can then fit the model by passing the observation time point as `x`
+We can then fit the model by passing the observation time point as `x`.
 
 ```{r}
 mod <- estimate_rt(observed_counts = case_counts, x = observation_time)
@@ -151,12 +155,13 @@ plot(mod)
 
 ## Changing degree of difference operator
 
-The degree of the difference operator $k$ defaults to 3 for the algorithm, which
-corresponds to a piecewise cubic estimate $\Rtseq$. To estimate
-$\Rtseq$ with piecewise constant curves for example, use the command
+The degree of the estimated penalized Poisson regression function
+$k$ defaults to 3 for the algorithm, which
+corresponds to a piece-wise cubic estimate $\Rtseq$. To estimate
+$\Rtseq$ with piece-wise constant curves for example, use the command
 
 ```{r}
-mod <- estimate_rt(observed_counts = case_counts, degree = 1)
+mod <- estimate_rt(observed_counts = case_counts, degree = 0)
 plot(mod)
 ```
 
@@ -165,14 +170,18 @@ plot(mod)
 # Example - Canadian Covid-19 cases
 
 Finally, we use a long history of real case counts in Canada. The data is
-available from [opencovid.ca](https://opencovid.ca) and a version is included
-in the package.
-
-
-Then the model is fitted with
-```{r}
-can <- estimate_rt(observed_counts = cancovid$incident_cases, nsol = 20)
-plot(can)
+available from [opencovid.ca](https://opencovid.ca) and the version downloaded
+on 4 July 2023 is included in the package. We use this data to estimate $R_t$.
+```{r, warning=FALSE}
+library(ggplot2)
+can <- estimate_rt(cancovid$incident_cases, nsol = 20, maxiter = 1e6)
+labs <- seq(as.Date("2021-01-01"), as.Date("2023-01-01"), by = "12 months")
+breaks <- which(cancovid$date %in% labs)
+plot(can) + 
+  geom_hline(yintercept = 1) +
+  scale_y_continuous(limits = c(0.5, 2)) +
+  scale_x_continuous(breaks = breaks, labels = strftime(labs, "%Y"), 
+                     name = "Year")
 ```
 
 

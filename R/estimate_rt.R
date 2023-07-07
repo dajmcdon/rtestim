@@ -84,7 +84,7 @@ estimate_rt <- function(observed_counts,
                         lambdamin = NULL,
                         lambdamax = NULL,
                         lambda_min_ratio = 1e-4,
-                        maxiter = 1e4,
+                        maxiter = 1e5,
                         init = NULL) {
   # check arguments are of proper types
   arg_is_nonneg_int(degree)
@@ -142,7 +142,7 @@ estimate_rt <- function(observed_counts,
     lambda <- double(nsol)
   }
   if (length(lambda) != nsol) nsol <- length(lambda)
-  lambda <- sort(lambda)
+  lambda <- sort(lambda, decreasing = TRUE)
 
   mod <- rtestim_path(
     observed_counts,

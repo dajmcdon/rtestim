@@ -14,7 +14,7 @@ estimate_rt(
   lambdamin = NULL,
   lambdamax = NULL,
   lambda_min_ratio = 1e-04,
-  maxiter = 10000,
+  maxiter = 1e+05,
   init = NULL
 )
 }
@@ -103,6 +103,6 @@ y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
 out <- estimate_rt(y, nsol = 10)
 plot(out)
 
-out0 <- estimate_rt(y, degree = 1L, nsol = 10)
+out0 <- estimate_rt(y, degree = 0L, nsol = 10)
 plot(out0)
 }
