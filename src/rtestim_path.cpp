@@ -79,7 +79,7 @@ List rtestim_path(int algo,
     Rcpp::checkUserInterrupt();
 
     if (korder == 0) {
-      beta = dptf_past(y, lambda[i], w);
+      beta = weight_dptf(y, lambda[i], w);
       niter[i] = 0;
     } else {
       _rho = (rho < 0) ? lambda[i] : rho;

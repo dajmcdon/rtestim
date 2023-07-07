@@ -9,8 +9,8 @@ dptf <- function(y, lam) {
     .Call(`_rtestim_dptf`, y, lam)
 }
 
-dptf_past <- function(y, lam, w) {
-    .Call(`_rtestim_dptf_past`, y, lam, w)
+weight_dptf <- function(y, lam, w) {
+    .Call(`_rtestim_weight_dptf`, y, lam, w)
 }
 
 rtestim_path <- function(algo, y, x, w, korder, lambda, lambdamax = -1, lambdamin = -1, nsol = 100L, rho = -1, maxiter = 1e5L, maxiter_newton = 50L, maxiter_line = 5L, tolerance = 1e-3, lambda_min_ratio = 1e-4, ls_alpha = 0.5, ls_gamma = 0.9, verbose = 0L) {

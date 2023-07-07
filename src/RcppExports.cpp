@@ -44,16 +44,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// dptf_past
-Rcpp::NumericVector dptf_past(Rcpp::NumericVector y, double lam, Rcpp::NumericVector w);
-RcppExport SEXP _rtestim_dptf_past(SEXP ySEXP, SEXP lamSEXP, SEXP wSEXP) {
+// weight_dptf
+Rcpp::NumericVector weight_dptf(Rcpp::NumericVector y, double lam, Rcpp::NumericVector w);
+RcppExport SEXP _rtestim_weight_dptf(SEXP ySEXP, SEXP lamSEXP, SEXP wSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type y(ySEXP);
     Rcpp::traits::input_parameter< double >::type lam(lamSEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type w(wSEXP);
-    rcpp_result_gen = Rcpp::wrap(dptf_past(y, lam, w));
+    rcpp_result_gen = Rcpp::wrap(weight_dptf(y, lam, w));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -216,7 +216,7 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_rtestim_prox_newton_testing", (DL_FUNC) &_rtestim_prox_newton_testing, 11},
     {"_rtestim_dptf", (DL_FUNC) &_rtestim_dptf, 2},
-    {"_rtestim_dptf_past", (DL_FUNC) &_rtestim_dptf_past, 3},
+    {"_rtestim_weight_dptf", (DL_FUNC) &_rtestim_weight_dptf, 3},
     {"_rtestim_rtestim_path", (DL_FUNC) &_rtestim_rtestim_path, 18},
     {"_rtestim_get_Dtil", (DL_FUNC) &_rtestim_get_Dtil, 2},
     {"_rtestim_get_D", (DL_FUNC) &_rtestim_get_D, 2},
