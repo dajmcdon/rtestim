@@ -18,13 +18,13 @@ using namespace Rcpp;
  * ADMM for Gaussian trend filtering
  * @param M maximum iteration of the algos
  * @param n signal length
- * @param ord degree of Poisson trend filtering
+ * @param korder degree of Poisson trend filtering
  * @param y observed signals
  * @param x signal locations
  * @param w signal weights
  * @param theta primal variable of length `n`
- * @param z auxiliary variable of length `n-ord`
- * @param u dual variable of length `n-ord`
+ * @param z auxiliary variable of length `n-korder`
+ * @param u dual variable of length `n-korder`
  * @param rho Lagrangian parameter of ADMM
  * @param lam_z hyperparameter of the auxiliary step of ADMM
  * @param DD D^T * D
@@ -33,7 +33,7 @@ using namespace Rcpp;
  */
 void admm_gauss(int M,
                 int n,
-                int ord,
+                int korder,
                 Rcpp::NumericVector const& y,
                 Rcpp::NumericVector const& x,
                 Rcpp::NumericVector const& w,
@@ -64,13 +64,13 @@ void admm_gauss(int M,
     if (iter % 1000 == 0)
       Rcpp::checkUserInterrupt();
     // solve for primal variable - theta:
-    tmp_n = doDtv(z - u, ord, x) * n * rho;
+    tmp_n = doDtv(z - u, korder, x) * n * rho;
     tmp_n += W * y;
     tmp_theta = nvec_to_evec(tmp_n);
     tmp_theta = qradmm.solve(tmp_theta);
     theta = evec_to_nvec(tmp_theta);
     // solve for alternating variable - z:
-    Dth = doDv(theta, ord, x);
+    Dth = doDv(theta, korder, x);
     tmp_m = Dth + u;
     z = dptf(tmp_m, lam_z);
     // update dual variable - u:
@@ -79,7 +79,7 @@ void admm_gauss(int M,
     // primal residuals:
     r_norm = sqrt(mean(pow(Dth - z, 2)));
     // dual residuals:
-    tmp_n = doDtv(z - z_old, ord, x);
+    tmp_n = doDtv(z - z_old, korder, x);
     s_norm = rho * sqrt(mean(pow(tmp_n, 2)));
     // stopping criteria check:
     if (r_norm < tol && s_norm < tol)
@@ -94,7 +94,7 @@ void prox_newton(int M,
                  int& Minner,
                  int Mline,
                  int n,
-                 int ord,
+                 int korder,
                  Rcpp::NumericVector const& y,
                  Rcpp::NumericVector const& x,
                  Rcpp::NumericVector const& w,
@@ -116,7 +116,7 @@ void prox_newton(int M,
   int inner_iter;
 
   // initialize objective
-  obj = pois_obj(ord, y, x, w, theta, lambda);
+  obj = pois_obj(korder, y, x, w, theta, lambda);
   obj_list(0) = obj;
   int iter_best = 0;
   NumericVector std_y(y);
@@ -129,11 +129,11 @@ void prox_newton(int M,
     // define new(Gaussianized) data for least squares problem
     std_y = gaussianized_data(y, w, theta);
     // solve least squares problem (Gaussian TF)
-    admm_gauss(Minner, n, ord, std_y, x, w, theta, z, u, rho, lam_z, DD, tol,
+    admm_gauss(Minner, n, korder, std_y, x, w, theta, z, u, rho, lam_z, DD, tol,
                inner_iter);
     total_iter += inner_iter;
     //  line search for step size
-    s = line_search(s, lambda, alpha, gamma, y, x, w, n, ord, theta, theta_old,
+    s = line_search(s, lambda, alpha, gamma, y, x, w, n, korder, theta, theta_old,
                     Mline);
     if (s < 0)
       break;
@@ -141,7 +141,7 @@ void prox_newton(int M,
     theta = theta * s + (1 - s) * theta_old;
 
     // compute objective
-    obj = pois_obj(ord, y, x, w, theta, lambda);
+    obj = pois_obj(korder, y, x, w, theta, lambda);
     obj_list(iter + 1) = obj;
 
     // check stopping criteria
@@ -166,7 +166,7 @@ void prox_newton(int M,
 Rcpp::List prox_newton_testing(int M,
                                int Minner,
                                int Mline,
-                               int ord,
+                               int korder,
                                Rcpp::NumericVector const& y,
                                Rcpp::NumericVector const& x,
                                Rcpp::NumericVector const& w,
@@ -176,7 +176,7 @@ Rcpp::List prox_newton_testing(int M,
                                double tol) {
   Eigen::SparseMatrix<double> Dk;
   Eigen::SparseMatrix<double> DkDk;
-  Dk = get_Dtil(ord, x);
+  Dk = get_Dtil(korder, x);
   DkDk = Dk.transpose() * Dk;
   int m = Dk.rows();
   int n = y.size();
@@ -185,7 +185,7 @@ Rcpp::List prox_newton_testing(int M,
   NumericVector u(m);
   double rho = lambda;
   int iter = 0;
-  prox_newton(M, Minner, Mline, n, ord, y, x, w, beta, z, u, lambda, rho,
+  prox_newton(M, Minner, Mline, n, korder, y, x, w, beta, z, u, lambda, rho,
               ls_alpha, ls_gamma, DkDk, tol, iter);
   List out = List::create(Named("lambda") = lambda, Named("theta") = exp(beta),
                           Named("niter") = iter);

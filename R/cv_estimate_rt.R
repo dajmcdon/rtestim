@@ -25,10 +25,10 @@
 #'
 #' @examples
 #' y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
-#' cv <- cv_estimate_rt(y, degree = 3, nfold = 3, nsol = 30)
+#' cv <- cv_estimate_rt(y, korder = 3, nfold = 3, nsol = 30)
 #' cv
 cv_estimate_rt <- function(observed_counts,
-                           degree = 3L,
+                           korder = 3L,
                            dist_gamma = c(2.5, 2.5),
                            nfold = 3,
                            error_measure = c("mse", "mae", "deviance"),
@@ -45,7 +45,7 @@ cv_estimate_rt <- function(observed_counts,
   ## Run program one time to create lambda
   full_data_fit <- estimate_rt(
     observed_counts = observed_counts,
-    degree = degree,
+    korder = korder,
     x = x,
     lambda = lambda,
     ...)
@@ -78,7 +78,7 @@ cv_estimate_rt <- function(observed_counts,
     mod <- estimate_rt(
       observed_counts = observed_counts[train_idx],
       x = x[train_idx],
-      degree = degree,
+      korder = korder,
       lambda = lambda,
       maxiter = maxiter,
       ...)

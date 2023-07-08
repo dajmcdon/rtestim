@@ -18,7 +18,7 @@ summary.poisson_rt <- function(object, ...) {
   lambda <- object$lambda
   rownames(tab) <- names(xlam)
   out <- structure(
-    list(call = object$call, table = tab, degree = object$degree, nlam = ns),
+    list(call = object$call, table = tab, korder = object$korder, nlam = ns),
     class = "summary.poisson_rt")
   out
 }
@@ -30,7 +30,7 @@ print.summary.poisson_rt <- function(x,
                                      ...) {
   rlang::check_dots_empty()
   cat("\nCall: ", deparse(x$call), fill = TRUE)
-  cat("\nDegree of the estimated piecewise polynomial curve:", x$degree, "\n")
+  cat("\nDegree of the estimated piecewise polynomial curve:", x$korder, "\n")
   cat("\nSummary of the", x$nlam, "estimated models:\n")
   print(x$tab, digits = digits)
   cat("\n")

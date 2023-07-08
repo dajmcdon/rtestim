@@ -79,7 +79,7 @@ List rtestim_path(int algo,
     Rcpp::checkUserInterrupt();
 
     if (korder == 0) {
-      beta = dptf_past(y, lambda[i], w);
+      beta = weight_dptf(y, lambda[i], w);
       niter[i] = 0;
     } else {
       _rho = (rho < 0) ? lambda[i] : rho;
@@ -119,7 +119,7 @@ List rtestim_path(int algo,
   // Return
   List out = List::create(Named("Rt") = theta(_, Range(0, nsols - 1)),
                           Named("lambda") = lambda[Range(0, nsols - 1)],
-                          Named("degree") = korder,
+                          Named("korder") = korder,
                           Named("dof") = dof[Range(0, nsols - 1)],
                           Named("niter") = niter[Range(0, nsols - 1)]);
   return out;
