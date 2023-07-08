@@ -32,11 +32,12 @@ Rcpp::NumericVector dptf(Rcpp::NumericVector y, double lam) {
  * @return filtered mean (exponential of natural parameter) trend
  */
 // [[Rcpp::export]]
-Rcpp::NumericVector dptf_past(Rcpp::NumericVector y,
-                              double lam,
-                              Rcpp::NumericVector w) {
+Rcpp::NumericVector weight_dptf(Rcpp::NumericVector y,
+                                double lam,
+                                Rcpp::NumericVector w) {
   int n = y.size();
   Rcpp::NumericVector beta(n);
+  lam = n * lam;
   tf_dp_past(n, y.begin(), w.begin(), lam, beta.begin());
   return beta;
 }

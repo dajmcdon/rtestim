@@ -12,15 +12,15 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // prox_newton_testing
-Rcpp::List prox_newton_testing(int M, int Minner, int Mline, int ord, Rcpp::NumericVector const& y, Rcpp::NumericVector const& x, Rcpp::NumericVector const& w, double lambda, double ls_alpha, double ls_gamma, double tol);
-RcppExport SEXP _rtestim_prox_newton_testing(SEXP MSEXP, SEXP MinnerSEXP, SEXP MlineSEXP, SEXP ordSEXP, SEXP ySEXP, SEXP xSEXP, SEXP wSEXP, SEXP lambdaSEXP, SEXP ls_alphaSEXP, SEXP ls_gammaSEXP, SEXP tolSEXP) {
+Rcpp::List prox_newton_testing(int M, int Minner, int Mline, int korder, Rcpp::NumericVector const& y, Rcpp::NumericVector const& x, Rcpp::NumericVector const& w, double lambda, double ls_alpha, double ls_gamma, double tol);
+RcppExport SEXP _rtestim_prox_newton_testing(SEXP MSEXP, SEXP MinnerSEXP, SEXP MlineSEXP, SEXP korderSEXP, SEXP ySEXP, SEXP xSEXP, SEXP wSEXP, SEXP lambdaSEXP, SEXP ls_alphaSEXP, SEXP ls_gammaSEXP, SEXP tolSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< int >::type M(MSEXP);
     Rcpp::traits::input_parameter< int >::type Minner(MinnerSEXP);
     Rcpp::traits::input_parameter< int >::type Mline(MlineSEXP);
-    Rcpp::traits::input_parameter< int >::type ord(ordSEXP);
+    Rcpp::traits::input_parameter< int >::type korder(korderSEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericVector const& >::type y(ySEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericVector const& >::type x(xSEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericVector const& >::type w(wSEXP);
@@ -28,7 +28,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type ls_alpha(ls_alphaSEXP);
     Rcpp::traits::input_parameter< double >::type ls_gamma(ls_gammaSEXP);
     Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
-    rcpp_result_gen = Rcpp::wrap(prox_newton_testing(M, Minner, Mline, ord, y, x, w, lambda, ls_alpha, ls_gamma, tol));
+    rcpp_result_gen = Rcpp::wrap(prox_newton_testing(M, Minner, Mline, korder, y, x, w, lambda, ls_alpha, ls_gamma, tol));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -44,16 +44,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// dptf_past
-Rcpp::NumericVector dptf_past(Rcpp::NumericVector y, double lam, Rcpp::NumericVector w);
-RcppExport SEXP _rtestim_dptf_past(SEXP ySEXP, SEXP lamSEXP, SEXP wSEXP) {
+// weight_dptf
+Rcpp::NumericVector weight_dptf(Rcpp::NumericVector y, double lam, Rcpp::NumericVector w);
+RcppExport SEXP _rtestim_weight_dptf(SEXP ySEXP, SEXP lamSEXP, SEXP wSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type y(ySEXP);
     Rcpp::traits::input_parameter< double >::type lam(lamSEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type w(wSEXP);
-    rcpp_result_gen = Rcpp::wrap(dptf_past(y, lam, w));
+    rcpp_result_gen = Rcpp::wrap(weight_dptf(y, lam, w));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -216,7 +216,7 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_rtestim_prox_newton_testing", (DL_FUNC) &_rtestim_prox_newton_testing, 11},
     {"_rtestim_dptf", (DL_FUNC) &_rtestim_dptf, 2},
-    {"_rtestim_dptf_past", (DL_FUNC) &_rtestim_dptf_past, 3},
+    {"_rtestim_weight_dptf", (DL_FUNC) &_rtestim_weight_dptf, 3},
     {"_rtestim_rtestim_path", (DL_FUNC) &_rtestim_rtestim_path, 18},
     {"_rtestim_get_Dtil", (DL_FUNC) &_rtestim_get_Dtil, 2},
     {"_rtestim_get_D", (DL_FUNC) &_rtestim_get_D, 2},
