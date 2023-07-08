@@ -6,7 +6,7 @@
 \usage{
 configure_rt_admm(
   observed_counts,
-  degree,
+  korder,
   weighted_past_counts = NULL,
   rho = -1,
   alpha = 0.5,
@@ -20,8 +20,8 @@ configure_rt_admm(
 \arguments{
 \item{observed_counts}{vector of the observed daily infection counts}
 
-\item{degree}{Integer. Degree of the piecewise polynomial curve to be
-estimated. For example, `degree = 0` corresponds to a piecewise constant
+\item{korder}{Integer. Degree of the piecewise polynomial curve to be
+estimated. For example, `korder = 0` corresponds to a piecewise constant
 curve.}
 
 \item{weighted_past_counts}{the weighted sum of past infections counts with

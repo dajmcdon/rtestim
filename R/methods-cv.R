@@ -21,7 +21,7 @@ summary.cv_poisson_rt <- function(object, ...) {
   }
 
   out <- structure(
-    list(call = object$call, table = tab, degree = object$full_fit$degree),
+    list(call = object$call, table = tab, korder = object$full_fit$korder),
     class = "summary.cv_poisson_rt")
   out
 }
@@ -47,7 +47,7 @@ print.summary.cv_poisson_rt <- function(
   if (x$table$index[2] == x$table$index[4]) lambda_warning = "largest"
 
   cat("\nCall:", deparse(x$call), fill = TRUE)
-  cat("\nDegree of the estimated piecewise polynomial curve:", x$degree, "\n")
+  cat("\nDegree of the estimated piecewise polynomial curve:", x$korder, "\n")
   if (!is.null(lambda_warning)) {
     cat("Warning: the CV minimum occurred at the", lambda_warning,
         "lambda in the path.\n\n")
@@ -86,7 +86,7 @@ print.summary.cv_poisson_rt <- function(
 #'
 #' @examples
 #' y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
-#' cv <- cv_estimate_rt(y, degree = 1, nfold = 3, nsol = 30)
+#' cv <- cv_estimate_rt(y, korder = 1, nfold = 3, nsol = 30)
 #' plot(cv)
 #' plot(cv, which_lambda = cv$lambda[1])
 #' plot(cv, which_lambda = "lambda.min")
@@ -156,7 +156,7 @@ plot.cv_poisson_rt <- function(
 #'
 #' @examples
 #' y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
-#' cv <- cv_estimate_rt(y, degree = 3, nfold = 3, nsol = 30)
+#' cv <- cv_estimate_rt(y, korder = 3, nfold = 3, nsol = 30)
 #' f <- fitted(cv)
 #' f <- fitted(cv, which_lambda = cv$lambda[1])
 #' f <- fitted(cv, which_lambda = "lambda.1se")
@@ -204,7 +204,7 @@ coef.cv_poisson_rt <- fitted.cv_poisson_rt
 #' @export
 #' @examples
 #' y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
-#' cv <- cv_estimate_rt(y, degree = 3, nfold = 3, nsol = 30)
+#' cv <- cv_estimate_rt(y, korder = 3, nfold = 3, nsol = 30)
 #' p <- predict(cv)
 #' p <- predict(cv, which_lambda = cv$lambda[1])
 #' p <- predict(cv, which_lambda = "lambda.1se")
