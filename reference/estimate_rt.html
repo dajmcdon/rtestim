@@ -34,7 +34,10 @@ difference matrix."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/aj
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto"><li class="active nav-item">
+      <ul class="navbar-nav me-auto"><li class="nav-item">
+  <a class="nav-link" href="../articles/rtestim.html">Get started</a>
+</li>
+<li class="active nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
@@ -76,8 +79,7 @@ difference matrix.</p>
 <span>  lambdamin <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  lambdamax <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  lambda_min_ratio <span class="op">=</span> <span class="fl">1e-04</span>,</span>
-<span>  algo <span class="op">=</span> <span class="st">"prox_newton"</span>,</span>
-<span>  maxiter <span class="op">=</span> <span class="fl">10000</span>,</span>
+<span>  maxiter <span class="op">=</span> <span class="fl">1e+05</span>,</span>
 <span>  init <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -90,7 +92,7 @@ difference matrix.</p>
 
 <dt>korder</dt>
 <dd><p>Integer. Degree of the piecewise polynomial curve to be
-estimated. For example, `korder = 0` corresponds to a piecewise constant
+estimated. For example, <code>korder = 0</code> corresponds to a piecewise constant
 curve.</p></dd>
 
 
@@ -112,43 +114,38 @@ weekly) but this may not always be the case.</p></dd>
 <dt>lambda</dt>
 <dd><p>Vector. A user supplied sequence of tuning parameters which
 determines the balance between data fidelity and
-smoothness of the estimated Rt; larger `lambda` results in a smoother
-estimate. The default, `NULL`
-results in an automatic computation based on `nlambda`, the largest value
-of `lambda` that would result in a maximally smooth estimate, and `lambda_min_ratio`.
-Supplying a value of `lambda` overrides
+smoothness of the estimated Rt; larger <code>lambda</code> results in a smoother
+estimate. The default, <code>NULL</code>
+results in an automatic computation based on <code>nlambda</code>, the largest value
+of <code>lambda</code> that would result in a maximally smooth estimate, and <code>lambda_min_ratio</code>.
+Supplying a value of <code>lambda</code> overrides
 this behaviour. It is likely better to supply a
-decreasing sequence of `lambda` values than a single (small) value. If
-supplied, the user-defined `lambda` sequence is automatically sorted in
+decreasing sequence of <code>lambda</code> values than a single (small) value. If
+supplied, the user-defined <code>lambda</code> sequence is automatically sorted in
 decreasing order.</p></dd>
 
 
 <dt>nsol</dt>
-<dd><p>Integer. The number of tuning parameters `lambda` at which to
+<dd><p>Integer. The number of tuning parameters <code>lambda</code> at which to
 compute Rt.</p></dd>
 
 
 <dt>lambdamin</dt>
-<dd><p>Optional value for the smallest `lambda` to use. This should
+<dd><p>Optional value for the smallest <code>lambda</code> to use. This should
 be greater than zero.</p></dd>
 
 
 <dt>lambdamax</dt>
-<dd><p>Optional value for the largest `lambda` to use.</p></dd>
+<dd><p>Optional value for the largest <code>lambda</code> to use.</p></dd>
 
 
 <dt>lambda_min_ratio</dt>
-<dd><p>If neither `lambda` nor `lambdamin` is specified, the
+<dd><p>If neither <code>lambda</code> nor <code>lambdamin</code> is specified, the
 program will generate a lambdamin by lambdamax * lambda_min_ratio.
 A multiplicative factor for the minimal lambda in the
-`lambda` sequence, where `lambdamin = lambda_min_ratio * lambdamax`.
-A very small value will lead to the solution `Rt = log(observed_counts)`.
-This argument has no effect if there is a user-defined `lambda` sequence.</p></dd>
-
-
-<dt>algo</dt>
-<dd><p>the algorithm to be used in computation. Currently, proximal
-newton-based method `prox_newton`.</p></dd>
+<code>lambda</code> sequence, where <code>lambdamin = lambda_min_ratio * lambdamax</code>.
+A very small value will lead to the solution <code>Rt = log(observed_counts)</code>.
+This argument has no effect if there is a user-defined <code>lambda</code> sequence.</p></dd>
 
 
 <dt>maxiter</dt>
@@ -158,30 +155,29 @@ algorithm.</p></dd>
 
 <dt>init</dt>
 <dd><p>a list of internal configuration parameters of class
-`rt_admm_configuration`.</p></dd>
+<code>rt_admm_configuration</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>An object with S3 class `poisson_rt`. Among the list components:
-* `observed_counts` the observed daily infection counts.
-* `x` a vector of positions at which the counts have been observed.
-* `weighted_past_counts` the weighted sum of past infection counts.
-* `Rt` the estimated effective reproduction rate. This is a matrix with
-    each column corresponding to one value of `lambda`.
-* `lambda` the values of `lambda` actually used in the algorithm.
-* `korder` degree of the estimated piecewise polynomial curve.
-* `dof` degrees of freedom of the estimated trend filtering problem.
-* `niter` the required number of iterations for each value of `lambda`.
-* `convergence` if number of iterations for each value of `lambda` is less
-    than the maximum number of iterations for the estimation algorithm.</p>
-    </div>
+<p>An object with S3 class <code>poisson_rt</code>. Among the list components:</p><ul><li><p><code>observed_counts</code> the observed daily infection counts.</p></li>
+<li><p><code>x</code> a vector of positions at which the counts have been observed.</p></li>
+<li><p><code>weighted_past_counts</code> the weighted sum of past infection counts.</p></li>
+<li><p><code>Rt</code> the estimated effective reproduction rate. This is a matrix with
+each column corresponding to one value of <code>lambda</code>.</p></li>
+<li><p><code>lambda</code> the values of <code>lambda</code> actually used in the algorithm.</p></li>
+<li><p><code>korder</code> degree of the estimated piecewise polynomial curve.</p></li>
+<li><p><code>dof</code> degrees of freedom of the estimated trend filtering problem.</p></li>
+<li><p><code>niter</code> the required number of iterations for each value of <code>lambda</code>.</p></li>
+<li><p><code>convergence</code> if number of iterations for each value of <code>lambda</code> is less
+than the maximum number of iterations for the estimation algorithm.</p></li>
+</ul></div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">rpois</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">dnorm</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">1000</span>, <span class="fl">50</span>, <span class="fl">15</span><span class="op">)</span> <span class="op">*</span> <span class="fl">500</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">rpois</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">dnorm</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">100</span>, <span class="fl">50</span>, <span class="fl">15</span><span class="op">)</span> <span class="op">*</span> <span class="fl">500</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu">estimate_rt</span><span class="op">(</span><span class="va">y</span>, nsol <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">out</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="estimate_rt-1.png" alt="" width="700" height="433"></span>

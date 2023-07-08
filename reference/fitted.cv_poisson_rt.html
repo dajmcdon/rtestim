@@ -18,7 +18,10 @@
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto"><li class="active nav-item">
+      <ul class="navbar-nav me-auto"><li class="nav-item">
+  <a class="nav-link" href="../articles/rtestim.html">Get started</a>
+</li>
+<li class="active nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
@@ -49,19 +52,19 @@
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>object</dt>
-<dd><p>result of cross validation of type `cv_poisson_rt`</p></dd>
+<dd><p>result of cross validation of type <code>cv_poisson_rt</code></p></dd>
 
 
 <dt>which_lambda</dt>
 <dd><p>select which Rt's to output. If not provided, all Rt's
 are returned. If provided a list of lambda,the corresponding Rt estimation
 will be returned.</p>
-<p>If provided a string, it must be either one of `lambda.min` or `lambda.1se`.</p>
-<p>* If provided `lambda.min`, return Rt which is generated from
- the lambda that minimizes the cross validation score.</p>
-<p>* If provided `lambda.1se`, return Rt which is generated from the lambda
- whose corresponding cross validation score is 1 standard error away of the
- minimal cross validation score.</p></dd>
+<p>If provided a string, it must be either one of <code>lambda.min</code> or <code>lambda.1se</code>.</p><ul><li><p>If provided <code>lambda.min</code>, return Rt which is generated from
+the lambda that minimizes the cross validation score.</p></li>
+<li><p>If provided <code>lambda.1se</code>, return Rt which is generated from the lambda
+whose corresponding cross validation score is 1 standard error away of the
+minimal cross validation score.</p></li>
+</ul></dd>
 
 
 <dt>...</dt>

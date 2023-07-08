@@ -10,10 +10,19 @@
     <loc>https://dajmcdon.github.io/rtestim/LICENSE.html</loc>
   </url>
   <url>
+    <loc>https://dajmcdon.github.io/rtestim/articles/index.html</loc>
+  </url>
+  <url>
+    <loc>https://dajmcdon.github.io/rtestim/articles/rtestim.html</loc>
+  </url>
+  <url>
     <loc>https://dajmcdon.github.io/rtestim/authors.html</loc>
   </url>
   <url>
     <loc>https://dajmcdon.github.io/rtestim/index.html</loc>
+  </url>
+  <url>
+    <loc>https://dajmcdon.github.io/rtestim/reference/cancovid.html</loc>
   </url>
   <url>
     <loc>https://dajmcdon.github.io/rtestim/reference/configure_rt_admm.html</loc>

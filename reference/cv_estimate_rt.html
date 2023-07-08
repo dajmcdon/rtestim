@@ -18,7 +18,10 @@
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto"><li class="active nav-item">
+      <ul class="navbar-nav me-auto"><li class="nav-item">
+  <a class="nav-link" href="../articles/rtestim.html">Get started</a>
+</li>
+<li class="active nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
@@ -63,7 +66,7 @@
 
 <dt>korder</dt>
 <dd><p>Integer. Degree of the piecewise polynomial curve to be
-estimated. For example, `korder = 0` corresponds to a piecewise constant
+estimated. For example, <code>korder = 0</code> corresponds to a piecewise constant
 curve.</p></dd>
 
 
@@ -81,14 +84,14 @@ distribution with some shape and scale.</p></dd>
 cross validation. For leave-kth-out cross validation, every kth
 observed_counts and their corresponding position (evenly or unevenly
 spaced) are placed into the same fold. The first and last observed_counts are
-not assigned to any folds. Smallest allowable value is `nfold = 2`.</p></dd>
+not assigned to any folds. Smallest allowable value is <code>nfold = 2</code>.</p></dd>
 
 
 <dt>error_measure</dt>
 <dd><p>Metric used to calculate cross validation scores.
-Must be choose from `mse`, `mae`, and `deviance`.
-`mse` calculates the mean square error; `mae` calculates the mean absolute error;
-`deviance` calculates the deviance</p></dd>
+Must be choose from <code>mse</code>, <code>mae</code>, and <code>deviance</code>.
+<code>mse</code> calculates the mean square error; <code>mae</code> calculates the mean absolute error;
+<code>deviance</code> calculates the deviance</p></dd>
 
 
 <dt>x</dt>
@@ -100,14 +103,14 @@ weekly) but this may not always be the case.</p></dd>
 <dt>lambda</dt>
 <dd><p>Vector. A user supplied sequence of tuning parameters which
 determines the balance between data fidelity and
-smoothness of the estimated Rt; larger `lambda` results in a smoother
-estimate. The default, `NULL`
-results in an automatic computation based on `nlambda`, the largest value
-of `lambda` that would result in a maximally smooth estimate, and `lambda_min_ratio`.
-Supplying a value of `lambda` overrides
+smoothness of the estimated Rt; larger <code>lambda</code> results in a smoother
+estimate. The default, <code>NULL</code>
+results in an automatic computation based on <code>nlambda</code>, the largest value
+of <code>lambda</code> that would result in a maximally smooth estimate, and <code>lambda_min_ratio</code>.
+Supplying a value of <code>lambda</code> overrides
 this behaviour. It is likely better to supply a
-decreasing sequence of `lambda` values than a single (small) value. If
-supplied, the user-defined `lambda` sequence is automatically sorted in
+decreasing sequence of <code>lambda</code> values than a single (small) value. If
+supplied, the user-defined <code>lambda</code> sequence is automatically sorted in
 decreasing order.</p></dd>
 
 
@@ -117,23 +120,22 @@ algorithm.</p></dd>
 
 
 <dt>...</dt>
-<dd><p>additional parameters passed to `estimate_rt()` function</p></dd>
+<dd><p>additional parameters passed to <code><a href="estimate_rt.html">estimate_rt()</a></code> function</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>An object with S3 class `"cv_result"`. Among the list components:
-* `full_fit` An object with S3 class `"poisson_rt"`, fitted with all
-`observed_counts` and `lambda`
-* `cv_scores` leave-kth-out cross validation scores
-* `cv_se` leave-kth-out cross validation standard error
-* `lambda.min` lambda which achieved the optimal cross validation score
-* `lambda.1se` lambda that gives the optimal cross validation score
-within one standard error.
-* `lambda` the value of `lambda` used in the algorithm.</p>
-    </div>
+<p>An object with S3 class <code>"cv_result"</code>. Among the list components:</p><ul><li><p><code>full_fit</code> An object with S3 class <code>"poisson_rt"</code>, fitted with all
+<code>observed_counts</code> and <code>lambda</code></p></li>
+<li><p><code>cv_scores</code> leave-kth-out cross validation scores</p></li>
+<li><p><code>cv_se</code> leave-kth-out cross validation standard error</p></li>
+<li><p><code>lambda.min</code> lambda which achieved the optimal cross validation score</p></li>
+<li><p><code>lambda.1se</code> lambda that gives the optimal cross validation score
+within one standard error.</p></li>
+<li><p><code>lambda</code> the value of <code>lambda</code> used in the algorithm.</p></li>
+</ul></div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
@@ -144,15 +146,13 @@ within one standard error.
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call: cv_estimate_rt(observed_counts = y, korder = 3, nfold = 3, nsol = 30)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Degree of the estimated piecewise polynomial curve: 3 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Warning: the CV minimum occurred at the largest lambda in the path.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Summary of cross validation across lambda:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               lambda index cv_scores cv_se dof</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Min Lambda   0.01853     1     8.599 1.991  24</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CV Minimizer 0.60978    12     7.054 1.204   5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1se Lambda   0.60978    12     7.054 1.204   5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Max Lambda   0.60978    12     7.054 1.204   5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                 lambda index cv_scores  cv_se dof</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Min Lambda   319.09102     1     6.526 0.9692   0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> CV Minimizer 169.06453     3     5.700 1.4187   0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1se Lambda   319.09102     1     6.526 0.9692   0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Max Lambda     0.03191    30     7.258 0.9072  23</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 </code></pre></div>
     </div>

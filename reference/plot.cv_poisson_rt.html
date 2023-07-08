@@ -18,7 +18,10 @@
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto"><li class="active nav-item">
+      <ul class="navbar-nav me-auto"><li class="nav-item">
+  <a class="nav-link" href="../articles/rtestim.html">Get started</a>
+</li>
+<li class="active nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
@@ -49,7 +52,7 @@
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>x</dt>
-<dd><p>result of cv_estimate_rt of class `cv_poisson_rt`</p></dd>
+<dd><p>result of cv_estimate_rt of class <code>cv_poisson_rt</code></p></dd>
 
 
 <dt>which_lambda</dt>
@@ -57,14 +60,14 @@
 <p>If not provided, the cross validation score will be plotted. If provided a
 list of lambda, the corresponding Rt estimation will be plotted.</p>
 <p>If provided a string, it
-must be either one of `lambda.min`, `lambda.1se`, or `cv_scores`.</p>
-<p>* If provided `lambda.min`, plot Rt which is generated from the lambda that
- minimizes the cross validation score.</p>
-<p>* If provided `lambda.1se`, plot Rt which is generated from the lambda whose
- corresponding cross validation score is 1 standard error away of the
- minimal cross validation score.</p>
-<p>* If provided `cv_scores`, plot the cross validation score.</p>
-<p>* If NULL, all estimated Rt values are plotted.</p></dd>
+must be either one of <code>lambda.min</code>, <code>lambda.1se</code>, or <code>cv_scores</code>.</p><ul><li><p>If provided <code>lambda.min</code>, plot Rt which is generated from the lambda that
+minimizes the cross validation score.</p></li>
+<li><p>If provided <code>lambda.1se</code>, plot Rt which is generated from the lambda whose
+corresponding cross validation score is 1 standard error away of the
+minimal cross validation score.</p></li>
+<li><p>If provided <code>cv_scores</code>, plot the cross validation score.</p></li>
+<li><p>If NULL, all estimated Rt values are plotted.</p></li>
+</ul></dd>
 
 
 <dt>...</dt>
