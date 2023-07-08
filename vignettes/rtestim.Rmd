@@ -11,12 +11,19 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.width = 5
+  fig.width = 6,
+  fig.align = "center",
+  fig.height = 4,
+  fig.width = 6,
+  out.width = "100%",
+  dev = "svg"
 )
 ```
 
 ```{r setup}
 library(rtestim)
+library(ggplot2)
+theme_set(theme_bw())
 ```
 
 \newcommand{\argmin}{\mathop{\mathrm{argmin}}}
@@ -77,14 +84,16 @@ be strictly larger than 0.
 ```{r}
 set.seed(1234)
 case_counts <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
-plot(case_counts, xlab = "Time", ylab = "Case Counts")
+ggplot(data.frame(x = 1:101, case_counts), aes(x, case_counts)) +
+  geom_point(colour = "cornflowerblue") +
+  labs(x = "Time", y = "Case Counts")
 ```
 
 Next, we fit the model and visualize the resulting $\Rtseq$:
 
 ```{r}
 mod <- estimate_rt(observed_counts = case_counts, nsol = 20)
-plot(mod)
+plot(mod) + geom_hline(yintercept = 1)
 ```
 
 `{rtestim}` estimates a spectrum of $\Rtseq$s for a range of $\lambda$ values,
@@ -173,7 +182,6 @@ Finally, we use a long history of real case counts in Canada. The data is
 available from [opencovid.ca](https://opencovid.ca) and the version downloaded
 on 4 July 2023 is included in the package. We use this data to estimate $R_t$.
 ```{r, warning=FALSE}
-library(ggplot2)
 can <- estimate_rt(cancovid$incident_cases, nsol = 20, maxiter = 1e6)
 labs <- seq(as.Date("2021-01-01"), as.Date("2023-01-01"), by = "12 months")
 breaks <- which(cancovid$date %in% labs)

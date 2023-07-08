@@ -9,9 +9,11 @@ knitr::opts_chunk$set(
   collapse = FALSE,
   comment = "#>",
   fig.path = "man/figures/README-",
+  fig.align = "center",
   fig.height = 4,
   fig.width = 6,
-  out.width = "100%"
+  out.width = "100%",
+  dev = "svg"
 )
 ```
 
