@@ -2,25 +2,12 @@
 title: "rtestim Package Vignette"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Rtestim Package Vignette}
+  %\VignetteIndexEntry{rtestim Package Vignette}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.width = 6,
-  fig.align = "center",
-  fig.height = 4,
-  fig.width = 6,
-  out.width = "100%",
-  dev = "svg"
-)
-```
-
-```{r setup}
+```{r setup, collapse=TRUE}
 library(rtestim)
 library(ggplot2)
 theme_set(theme_bw())
@@ -28,6 +15,18 @@ theme_set(theme_bw())
 
 \newcommand{\argmin}{\mathop{\mathrm{argmin}}}
 \newcommand{\Rtseq}{\mathop{\{R_t\}_{t=1}^n}}
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  dpi = 300, 
+  collapse = FALSE, 
+  comment = "#>",
+  fig.asp = 0.618,
+  fig.width = 6,
+  out.width = "80%"
+)
+```
+
 
 # Overview
 
@@ -81,7 +80,7 @@ new daily case counts are generated from a Poisson distribution with mean
 parameter that roughly follows a wave. Note that the first observation must 
 be strictly larger than 0.
 
-```{r}
+```{r, fig.align='center'}
 set.seed(1234)
 case_counts <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
 ggplot(data.frame(x = 1:101, case_counts), aes(x, case_counts)) +
@@ -91,7 +90,7 @@ ggplot(data.frame(x = 1:101, case_counts), aes(x, case_counts)) +
 
 Next, we fit the model and visualize the resulting $\Rtseq$:
 
-```{r}
+```{r, fig.align='center'}
 mod <- estimate_rt(observed_counts = case_counts, nsol = 20)
 plot(mod) + geom_hline(yintercept = 1)
 ```
@@ -117,7 +116,7 @@ mod_cv <- cv_estimate_rt(observed_counts = case_counts)
 The following command plots the cross validation errors for each $\lambda$ in
 ascending order.
 
-```{r}
+```{r, fig.align='center'}
 plot(mod_cv)
 ```
 
@@ -135,7 +134,7 @@ within one standard error of the minimum, called `lambda.1se`.
 Users may wish to visualize the particular $\Rtseq$ which minimizes the 
 cross-validation error while prioritizing smoothness.
 
-```{r}
+```{r, fig.align='center'}
 plot(mod_cv, which_lambda = 'lambda.1se')
 ```
 
@@ -156,7 +155,7 @@ observation_time <- cumsum(observation_incr)
 
 We can then fit the model by passing the observation time point as `x`.
 
-```{r}
+```{r, fig.align='center'}
 mod <- estimate_rt(observed_counts = case_counts, x = observation_time)
 plot(mod)
 ```
@@ -169,8 +168,8 @@ $k$ defaults to 3 for the algorithm, which
 corresponds to a piece-wise cubic estimate $\Rtseq$. To estimate
 $\Rtseq$ with piece-wise constant curves for example, use the command
 
-```{r}
-mod <- estimate_rt(observed_counts = case_counts, korder = 0)
+```{r, fig.align='center'}
+mod <- estimate_rt(observed_counts = case_counts, korder = 0, nsol = 20)
 plot(mod)
 ```
 
@@ -181,7 +180,7 @@ plot(mod)
 Finally, we use a long history of real case counts in Canada. The data is
 available from [opencovid.ca](https://opencovid.ca) and the version downloaded
 on 4 July 2023 is included in the package. We use this data to estimate $R_t$.
-```{r, warning=FALSE}
+```{r, warning=FALSE, fig.align='center'}
 can <- estimate_rt(cancovid$incident_cases, nsol = 20, maxiter = 1e6)
 labs <- seq(as.Date("2021-01-01"), as.Date("2023-01-01"), by = "12 months")
 breaks <- which(cancovid$date %in% labs)

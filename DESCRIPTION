@@ -16,6 +16,7 @@ Description: This package uses Poisson likelihood with trend filtering
 License: MIT + file LICENSE
 URL: https://github.com/dajmcdon/rtestim,
     https://dajmcdon.github.io/rtestim/
+BugReports: https://github.com/dajmcdon/rtestim/issues
 Depends: 
     dspline,
     Matrix,

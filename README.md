@@ -44,7 +44,7 @@ ggplot(dat, aes(Time, incident_cases)) +
   theme_bw()
 ```
 
-<img src="man/figures/README-plot-data-1.svg" width="100%" style="display: block; margin: auto;" />
+<img src="man/figures/README-plot-data-1.png" width="80%" style="display: block; margin: auto;" />
 
 We fit the model and visualize the resulting estimated sequences of
 $R_t$:
@@ -54,7 +54,7 @@ mod <- estimate_rt(observed_counts = dat$incident_cases, nsol = 20)
 plot(mod)
 ```
 
-<img src="man/figures/README-full-fit-1.svg" width="100%" style="display: block; margin: auto;" />
+<img src="man/figures/README-full-fit-1.png" width="80%" style="display: block; margin: auto;" />
 
 The additional parameter `nsol = 20` specifies the number of $\lambda$s
 for which $R_t$ is estimated.
@@ -67,4 +67,4 @@ mod_cv <- cv_estimate_rt(dat$incident_cases, nsol = 20)
 plot(mod_cv, which_lambda = 'lambda.1se')
 ```
 
-<img src="man/figures/README-cv-estimate-1.svg" width="100%" style="display: block; margin: auto;" />
+<img src="man/figures/README-cv-estimate-1.png" width="80%" style="display: block; margin: auto;" />

@@ -10,10 +10,10 @@ knitr::opts_chunk$set(
   comment = "#>",
   fig.path = "man/figures/README-",
   fig.align = "center",
-  fig.height = 4,
+  fig.height = 3,
   fig.width = 6,
-  out.width = "100%",
-  dev = "svg"
+  dpi = 300,
+  out.width = "80%"
 )
 ```
 
@@ -45,7 +45,7 @@ Here we create some data that "looks" like a typical wave in an epidemic.
 Because the model uses regularized regression, we estimate the model
 at a range of tuning parameters simultaneously. 
 
-```{r plot-data, message=FALSE}
+```{r plot-data, message=FALSE, fig.align='center'}
 set.seed(12345)
 library(rtestim)
 library(ggplot2)
@@ -60,7 +60,7 @@ ggplot(dat, aes(Time, incident_cases)) +
 
 We fit the model and visualize the resulting estimated sequences of $R_t$:
 
-```{r full-fit}
+```{r full-fit, fig.align='center'}
 mod <- estimate_rt(observed_counts = dat$incident_cases, nsol = 20)
 plot(mod)
 ```
@@ -71,7 +71,7 @@ $\lambda$s for which $R_t$ is estimated.
 A built in function for cross-validation can be used to select the
 tuning parameter.
 
-```{r cv-estimate}
+```{r cv-estimate, fig.align='center'}
 mod_cv <- cv_estimate_rt(dat$incident_cases, nsol = 20)
 plot(mod_cv, which_lambda = 'lambda.1se')
 ```
