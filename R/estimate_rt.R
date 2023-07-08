@@ -14,8 +14,8 @@
 #' difference matrix.
 #'
 #' @param observed_counts vector of the observed daily infection counts
-#' @param degree Integer. Degree of the piecewise polynomial curve to be
-#'   estimated. For example, `degree = 0` corresponds to a piecewise constant
+#' @param korder Integer. Degree of the piecewise polynomial curve to be
+#'   estimated. For example, `korder = 0` corresponds to a piecewise constant
 #'   curve.
 #' @param lambda Vector. A user supplied sequence of tuning parameters which
 #'   determines the balance between data fidelity and
@@ -60,7 +60,7 @@
 #' * `Rt` the estimated effective reproduction rate. This is a matrix with
 #'     each column corresponding to one value of `lambda`.
 #' * `lambda` the values of `lambda` actually used in the algorithm.
-#' * `degree` degree of the estimated piecewise polynomial curve.
+#' * `korder` degree of the estimated piecewise polynomial curve.
 #' * `dof` degrees of freedom of the estimated trend filtering problem.
 #' * `niter` the required number of iterations for each value of `lambda`.
 #' * `convergence` if number of iterations for each value of `lambda` is less
@@ -73,10 +73,10 @@
 #' out <- estimate_rt(y, nsol = 10)
 #' plot(out)
 #'
-#' out0 <- estimate_rt(y, degree = 0L, nsol = 10)
+#' out0 <- estimate_rt(y, korder = 0L, nsol = 10)
 #' plot(out0)
 estimate_rt <- function(observed_counts,
-                        degree = 3L,
+                        korder = 3L,
                         dist_gamma = c(2.5, 2.5),
                         x = 1:n,
                         lambda = NULL,
@@ -87,9 +87,9 @@ estimate_rt <- function(observed_counts,
                         maxiter = 1e5,
                         init = NULL) {
   # check arguments are of proper types
-  arg_is_nonneg_int(degree)
+  arg_is_nonneg_int(korder)
   arg_is_pos_int(nsol, maxiter)
-  arg_is_scalar(degree, nsol, lambda_min_ratio)
+  arg_is_scalar(korder, nsol, lambda_min_ratio)
   arg_is_scalar(lambdamin, lambdamax, allow_null = TRUE)
   arg_is_positive(lambdamin, lambdamax, allow_null = TRUE)
   arg_is_positive(lambda_min_ratio, dist_gamma)
@@ -116,15 +116,15 @@ estimate_rt <- function(observed_counts,
 
   # initialize parameters and variables
   if (is.null(init)) {
-    init <- configure_rt_admm(observed_counts, degree, weighted_past_counts)
+    init <- configure_rt_admm(observed_counts, korder, weighted_past_counts)
   }
   if (!inherits(init, "rt_admm_configuration")) {
     cli::cli_abort("`init` must be created with `configure_rt_admm()`.")
   }
 
-  # check that degree is less than data length
-  if (degree + 1 >= n) {
-    cli::cli_abort("`degree + 1` must be less than observed data length.")
+  # check that korder is less than data length
+  if (korder + 1 >= n) {
+    cli::cli_abort("`korder + 1` must be less than observed data length.")
   }
 
   # checks on lambda, lambdamin, lambdamax
@@ -148,7 +148,7 @@ estimate_rt <- function(observed_counts,
     observed_counts,
     x,
     weighted_past_counts,
-    init$degree,
+    init$korder,
     lambda = lambda,
     lambdamax = lambdamax,
     lambdamin = lambdamin,
@@ -171,7 +171,7 @@ estimate_rt <- function(observed_counts,
       weighted_past_counts = weighted_past_counts,
       Rt = mod$Rt,
       lambda = drop(mod$lambda),
-      degree = mod$degree,
+      korder = mod$korder,
       dof = drop(mod$dof),
       niter = drop(mod$niter),
       convergence = (mod$niter < maxiter),
@@ -205,7 +205,7 @@ estimate_rt <- function(observed_counts,
 #'
 #' @export
 configure_rt_admm <- function(observed_counts,
-                              degree,
+                              korder,
                               weighted_past_counts = NULL,
                               rho = -1,
                               alpha = 0.5,
@@ -215,21 +215,21 @@ configure_rt_admm <- function(observed_counts,
                               maxiter_line = 20L,
                               verbose = 0) {
   n <- length(observed_counts)
-  arg_is_scalar(degree, rho, alpha, gamma, tolerance, verbose,
+  arg_is_scalar(korder, rho, alpha, gamma, tolerance, verbose,
                 maxiter_newton, maxiter_line)
   arg_is_positive(alpha, gamma, tolerance)
   arg_is_numeric(rho, tolerance)
   arg_is_pos_int(maxiter_newton, maxiter_line)
-  arg_is_nonneg_int(degree, verbose)
+  arg_is_nonneg_int(korder, verbose)
   if (alpha >= 1) cli::cli_abort("`alpha` must be in (0, 1).")
   if (gamma > 1) cli::cli_abort("`gamma` must be in (0, 1].")
-  if (degree + 1 >= n) {
-    cli::cli_abort("`degree + 1` must be less than observed data length.")
+  if (korder + 1 >= n) {
+    cli::cli_abort("`korder + 1` must be less than observed data length.")
   }
 
   structure(
     list(
-      degree = degree,
+      korder = korder,
       rho = rho,
       tolerance = tolerance,
       alpha = alpha,

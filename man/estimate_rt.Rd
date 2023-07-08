@@ -6,7 +6,7 @@
 \usage{
 estimate_rt(
   observed_counts,
-  degree = 3L,
+  korder = 3L,
   dist_gamma = c(2.5, 2.5),
   x = 1:n,
   lambda = NULL,
@@ -21,8 +21,8 @@ estimate_rt(
 \arguments{
 \item{observed_counts}{vector of the observed daily infection counts}
 
-\item{degree}{Integer. Degree of the piecewise polynomial curve to be
-estimated. For example, \code{degree = 0} corresponds to a piecewise constant
+\item{korder}{Integer. Degree of the piecewise polynomial curve to be
+estimated. For example, \code{korder = 0} corresponds to a piecewise constant
 curve.}
 
 \item{dist_gamma}{Vector of length 2. These are the shape and scale for the
@@ -78,7 +78,7 @@ An object with S3 class \code{poisson_rt}. Among the list components:
 \item \code{Rt} the estimated effective reproduction rate. This is a matrix with
 each column corresponding to one value of \code{lambda}.
 \item \code{lambda} the values of \code{lambda} actually used in the algorithm.
-\item \code{degree} degree of the estimated piecewise polynomial curve.
+\item \code{korder} degree of the estimated piecewise polynomial curve.
 \item \code{dof} degrees of freedom of the estimated trend filtering problem.
 \item \code{niter} the required number of iterations for each value of \code{lambda}.
 \item \code{convergence} if number of iterations for each value of \code{lambda} is less
@@ -103,6 +103,6 @@ y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
 out <- estimate_rt(y, nsol = 10)
 plot(out)
 
-out0 <- estimate_rt(y, degree = 0L, nsol = 10)
+out0 <- estimate_rt(y, korder = 0L, nsol = 10)
 plot(out0)
 }
