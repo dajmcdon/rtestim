@@ -161,7 +161,7 @@ corresponds to a piece-wise cubic estimate $\Rtseq$. To estimate
 $\Rtseq$ with piece-wise constant curves for example, use the command
 
 ```{r}
-mod <- estimate_rt(observed_counts = case_counts, degree = 0)
+mod <- estimate_rt(observed_counts = case_counts, korder = 0)
 plot(mod)
 ```
 
