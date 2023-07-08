@@ -43,17 +43,15 @@ void create_lambda(NumericVector& lambda,
     double lmpad = 1e-20;
     double ns = static_cast<double>(nsol);
     double p;
-    if (lambdamin < lmpad) {
-      p = pow(lambdamax / lmpad, 1 / (ns - 2));
-      lambda(1) = lmpad;
-      for (int i = 2; i < nsol; i++)
-        lambda[i] = lambda[i - 1] * p;
-      lambda(0) = lambdamin;
+    if (lambdamin > lmpad) {
+      p = pow(lambdamin / lambdamax, 1 / (ns - 1));
+      lambda(0) = lambdamax;
+      for (int i = 1; i < nsol; i++) lambda[i] = lambda[i - 1] * p;
     } else {
-      p = pow(lambdamax / lambdamin, 1 / (ns - 1));
-      lambda(0) = lambdamin;
-      for (int i = 1; i < nsol; i++)
-        lambda[i] += lambda[i - 1] * p;
+      p = pow(lmpad / lambdamax, 1 / (ns - 2));
+      lambda(0) = lambdamax;
+      for (int i = 1; i < nsol - 1; i++) lambda[i] = lambda[i - 1] * p;
+      lambda(nsol - 1) = lambdamin;
     }
   }
 }

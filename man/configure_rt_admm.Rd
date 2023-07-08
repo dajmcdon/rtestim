@@ -21,7 +21,7 @@ configure_rt_admm(
 \item{observed_counts}{vector of the observed daily infection counts}
 
 \item{korder}{Integer. Degree of the piecewise polynomial curve to be
-estimated. For example, `korder = 0` corresponds to a piecewise constant
+estimated. For example, \code{korder = 0} corresponds to a piecewise constant
 curve.}
 
 \item{weighted_past_counts}{the weighted sum of past infections counts with
@@ -32,10 +32,10 @@ weights}
 Lagrangian function.}
 
 \item{alpha}{Double. A parameter adjusting upper bound in line search algorithm
-in `prox_newton` algorithm.}
+in \code{prox_newton} algorithm.}
 
 \item{gamma}{Double. A parameter adjusting step size in line search algorithm
-in `prox_newton` algorithm.}
+in \code{prox_newton} algorithm.}
 
 \item{tolerance}{Double. Tolerance of ADMM convergence.}
 
@@ -48,7 +48,7 @@ algorithm in the proximal Newton method.}
 \item{verbose}{Integer.}
 }
 \value{
-a list of model parameters with class `rt_admm_configuration`
+a list of model parameters with class \code{rt_admm_configuration}
 }
 \description{
 Rt estimation algorithm configuration

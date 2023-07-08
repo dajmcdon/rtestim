@@ -2,7 +2,7 @@
 % Please edit documentation in R/cv_estimate_rt.R
 \name{fold_calculator}
 \alias{fold_calculator}
-\title{Helper function. Calculate the fold index for each `observed_counts`}
+\title{Helper function. Calculate the fold index for each \code{observed_counts}}
 \usage{
 fold_calculator(n, nfold)
 }
@@ -13,11 +13,11 @@ fold_calculator(n, nfold)
 cross validation. For leave-kth-out cross validation, every kth
 observed_counts and their corresponding position (evenly or unevenly
 spaced) are placed into the same fold. The first and last observed_counts are
-not assigned to any folds. Smallest allowable value is `nfold = 2`.}
+not assigned to any folds. Smallest allowable value is \code{nfold = 2}.}
 }
 \value{
 a vector of fold index at which the counts are distributed into folds
 }
 \description{
-Helper function. Calculate the fold index for each `observed_counts`
+Helper function. Calculate the fold index for each \code{observed_counts}
 }

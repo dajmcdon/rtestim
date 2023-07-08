@@ -4,10 +4,10 @@ test_that("fitted method for poisson_rt works", {
   out <- estimate_rt(y, nsol = 10)
   expect_identical(out$Rt, fitted(out))
   expect_identical(out$Rt[,1], fitted(out, out$lambda[1]))
-  expect_warning(ff <- fitted(out, out$lambda[1] - .001))
+  expect_warning(ff <- fitted(out, out$lambda[1] + .001))
   expect_identical(out$Rt[,1], ff)
 
-  fff <- suppressWarnings(fitted(out, c(out$lambda[1] - .001, out$lambda[1])))
+  fff <- suppressWarnings(fitted(out, c(out$lambda[1] + .001, out$lambda[1])))
   expect_identical(out$Rt[,c(1,1)], fff)
 
   l <- mean(out$lambda[1:2])

@@ -2,12 +2,12 @@
 % Please edit documentation in R/methods.R
 \name{plot.poisson_rt}
 \alias{plot.poisson_rt}
-\title{Plot estimated Rt values from a `poisson_rt` object}
+\title{Plot estimated Rt values from a \code{poisson_rt} object}
 \usage{
 \method{plot}{poisson_rt}(x, lambda = NULL, ...)
 }
 \arguments{
-\item{x}{output of the function [estimate_rt()] of class `poisson_rt`}
+\item{x}{output of the function \code{\link[=estimate_rt]{estimate_rt()}} of class \code{poisson_rt}}
 
 \item{lambda}{select which Rt's to plot. If not provided,
 all Rt's are plotted.}
@@ -16,7 +16,7 @@ all Rt's are plotted.}
 }
 \description{
 Produces a figure showing some or all estimated Rt values for different
-values of the penalty. The result is a [ggplot2::ggplot()]. Additional user
+values of the penalty. The result is a \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}. Additional user
 modifications can be added as desired.
 }
 \examples{

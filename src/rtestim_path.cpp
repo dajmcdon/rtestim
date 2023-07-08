@@ -14,8 +14,7 @@ SparseQR<SparseMatrix<double>, Ord> qr;
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-List rtestim_path(int algo,
-                  NumericVector y,
+List rtestim_path(NumericVector y,
                   NumericVector x,
                   NumericVector w,
                   int korder,
@@ -83,13 +82,9 @@ List rtestim_path(int algo,
       niter[i] = 0;
     } else {
       _rho = (rho < 0) ? lambda[i] : rho;
-      switch (algo) {
-        case 1:
-          prox_newton(maxiter_newton, maxiter, maxiter_line, n, korder, y, x, w,
-                      beta, alpha, u, lambda[i], _rho, ls_alpha, ls_gamma, DkDk,
-                      tolerance, iters);
-          break;
-      }
+      prox_newton(maxiter_newton, maxiter, maxiter_line, n, korder, y, x, w,
+                  beta, alpha, u, lambda[i], _rho, ls_alpha, ls_gamma, DkDk,
+                  tolerance, iters);
       niter[i] = iters;
       maxiter -= iters + 1;
       if (maxiter < 0)

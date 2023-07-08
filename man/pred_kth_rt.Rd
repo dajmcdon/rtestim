@@ -12,16 +12,16 @@ for all values of lambdas}
 
 \item{n}{Integer. Number of total observations}
 
-\item{train_idx}{vector of Integers. Index of `observed_counts` and `x` to be
+\item{train_idx}{vector of Integers. Index of \code{observed_counts} and \code{x} to be
 assigned to the training set}
 
-\item{test_idx}{vector of Integers. Index of `observed_counts` and `x` to be
+\item{test_idx}{vector of Integers. Index of \code{observed_counts} and \code{x} to be
 assigned to the testing set}
 
-\item{train_x}{vector of Integers. Location of the `observed_counts` in the
+\item{train_x}{vector of Integers. Location of the \code{observed_counts} in the
 training set}
 
-\item{test_x}{vector of Integers. Location of the `observed_counts` in the
+\item{test_x}{vector of Integers. Location of the \code{observed_counts} in the
 testing set}
 }
 \value{

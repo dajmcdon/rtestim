@@ -52,8 +52,6 @@
 #'   `lambda` sequence, where `lambdamin = lambda_min_ratio * lambdamax`.
 #'   A very small value will lead to the solution `Rt = log(observed_counts)`.
 #'   This argument has no effect if there is a user-defined `lambda` sequence.
-#' @param algo the algorithm to be used in computation. Currently, proximal
-#' newton-based method `prox_newton`.
 #'
 #' @return An object with S3 class `poisson_rt`. Among the list components:
 #' * `observed_counts` the observed daily infection counts.
@@ -71,7 +69,7 @@
 #' @export
 #'
 #' @examples
-#' y <- c(1, rpois(100, dnorm(1:1000, 50, 15) * 500 + 1))
+#' y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
 #' out <- estimate_rt(y, nsol = 10)
 #' plot(out)
 #'
@@ -86,8 +84,7 @@ estimate_rt <- function(observed_counts,
                         lambdamin = NULL,
                         lambdamax = NULL,
                         lambda_min_ratio = 1e-4,
-                        algo = "prox_newton",
-                        maxiter = 1e4,
+                        maxiter = 1e5,
                         init = NULL) {
   # check arguments are of proper types
   arg_is_nonneg_int(korder)
@@ -97,7 +94,6 @@ estimate_rt <- function(observed_counts,
   arg_is_positive(lambdamin, lambdamax, allow_null = TRUE)
   arg_is_positive(lambda_min_ratio, dist_gamma)
   arg_is_length(2, dist_gamma)
-  algo <- match.arg(algo)
   n <- length(observed_counts)
 
   # check that x is a sorted, double vector of length n
@@ -146,14 +142,9 @@ estimate_rt <- function(observed_counts,
     lambda <- double(nsol)
   }
   if (length(lambda) != nsol) nsol <- length(lambda)
-  lambda <- sort(lambda)
-
-  # check algorithm
-  algo <- match(algo, "prox_newton")
-  algo <- as.integer(algo)
+  lambda <- sort(lambda, decreasing = TRUE)
 
   mod <- rtestim_path(
-    algo,
     observed_counts,
     x,
     weighted_past_counts,

@@ -98,7 +98,7 @@ fitted.poisson_rt <- function(object, lambda = NULL, ...) {
 
   if (is.null(lambda)) return(object$Rt)
 
-  lam_list <- interpolate_lambda(object$lambda, lambda)
+  lam_list <- interpolate_from_ref_sequence(object$lambda, lambda)
   k <- length(lambda)
   log_r <- log(object$Rt)
   ret <- log_r[ ,lam_list$left, drop = FALSE] %*% diag(lam_list$frac, k, k) +

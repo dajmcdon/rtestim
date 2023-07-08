@@ -14,8 +14,7 @@ estimate_rt(
   lambdamin = NULL,
   lambdamax = NULL,
   lambda_min_ratio = 1e-04,
-  algo = "prox_newton",
-  maxiter = 10000,
+  maxiter = 1e+05,
   init = NULL
 )
 }
@@ -23,7 +22,7 @@ estimate_rt(
 \item{observed_counts}{vector of the observed daily infection counts}
 
 \item{korder}{Integer. Degree of the piecewise polynomial curve to be
-estimated. For example, `korder = 0` corresponds to a piecewise constant
+estimated. For example, \code{korder = 0} corresponds to a piecewise constant
 curve.}
 
 \item{dist_gamma}{Vector of length 2. These are the shape and scale for the
@@ -39,53 +38,52 @@ weekly) but this may not always be the case.}
 
 \item{lambda}{Vector. A user supplied sequence of tuning parameters which
 determines the balance between data fidelity and
-smoothness of the estimated Rt; larger `lambda` results in a smoother
-estimate. The default, `NULL`
-results in an automatic computation based on `nlambda`, the largest value
-of `lambda` that would result in a maximally smooth estimate, and `lambda_min_ratio`.
-Supplying a value of `lambda` overrides
+smoothness of the estimated Rt; larger \code{lambda} results in a smoother
+estimate. The default, \code{NULL}
+results in an automatic computation based on \code{nlambda}, the largest value
+of \code{lambda} that would result in a maximally smooth estimate, and \code{lambda_min_ratio}.
+Supplying a value of \code{lambda} overrides
 this behaviour. It is likely better to supply a
-decreasing sequence of `lambda` values than a single (small) value. If
-supplied, the user-defined `lambda` sequence is automatically sorted in
+decreasing sequence of \code{lambda} values than a single (small) value. If
+supplied, the user-defined \code{lambda} sequence is automatically sorted in
 decreasing order.}
 
-\item{nsol}{Integer. The number of tuning parameters `lambda` at which to
+\item{nsol}{Integer. The number of tuning parameters \code{lambda} at which to
 compute Rt.}
 
-\item{lambdamin}{Optional value for the smallest `lambda` to use. This should
+\item{lambdamin}{Optional value for the smallest \code{lambda} to use. This should
 be greater than zero.}
 
-\item{lambdamax}{Optional value for the largest `lambda` to use.}
+\item{lambdamax}{Optional value for the largest \code{lambda} to use.}
 
-\item{lambda_min_ratio}{If neither `lambda` nor `lambdamin` is specified, the
+\item{lambda_min_ratio}{If neither \code{lambda} nor \code{lambdamin} is specified, the
 program will generate a lambdamin by lambdamax * lambda_min_ratio.
 A multiplicative factor for the minimal lambda in the
-`lambda` sequence, where `lambdamin = lambda_min_ratio * lambdamax`.
-A very small value will lead to the solution `Rt = log(observed_counts)`.
-This argument has no effect if there is a user-defined `lambda` sequence.}
-
-\item{algo}{the algorithm to be used in computation. Currently, proximal
-newton-based method `prox_newton`.}
+\code{lambda} sequence, where \code{lambdamin = lambda_min_ratio * lambdamax}.
+A very small value will lead to the solution \code{Rt = log(observed_counts)}.
+This argument has no effect if there is a user-defined \code{lambda} sequence.}
 
 \item{maxiter}{Integer. Maximum number of iterations for the estimation
 algorithm.}
 
 \item{init}{a list of internal configuration parameters of class
-`rt_admm_configuration`.}
+\code{rt_admm_configuration}.}
 }
 \value{
-An object with S3 class `poisson_rt`. Among the list components:
-* `observed_counts` the observed daily infection counts.
-* `x` a vector of positions at which the counts have been observed.
-* `weighted_past_counts` the weighted sum of past infection counts.
-* `Rt` the estimated effective reproduction rate. This is a matrix with
-    each column corresponding to one value of `lambda`.
-* `lambda` the values of `lambda` actually used in the algorithm.
-* `korder` degree of the estimated piecewise polynomial curve.
-* `dof` degrees of freedom of the estimated trend filtering problem.
-* `niter` the required number of iterations for each value of `lambda`.
-* `convergence` if number of iterations for each value of `lambda` is less
-    than the maximum number of iterations for the estimation algorithm.
+An object with S3 class \code{poisson_rt}. Among the list components:
+\itemize{
+\item \code{observed_counts} the observed daily infection counts.
+\item \code{x} a vector of positions at which the counts have been observed.
+\item \code{weighted_past_counts} the weighted sum of past infection counts.
+\item \code{Rt} the estimated effective reproduction rate. This is a matrix with
+each column corresponding to one value of \code{lambda}.
+\item \code{lambda} the values of \code{lambda} actually used in the algorithm.
+\item \code{korder} degree of the estimated piecewise polynomial curve.
+\item \code{dof} degrees of freedom of the estimated trend filtering problem.
+\item \code{niter} the required number of iterations for each value of \code{lambda}.
+\item \code{convergence} if number of iterations for each value of \code{lambda} is less
+than the maximum number of iterations for the estimation algorithm.
+}
 }
 \description{
 The Effective Reproduction Number \eqn{R_t} of an infectious
@@ -101,7 +99,7 @@ is the smoothness penalty, and \eqn{D^{(k+1)}} is the \eqn{(k+1)}-th order
 difference matrix.
 }
 \examples{
-y <- c(1, rpois(100, dnorm(1:1000, 50, 15) * 500 + 1))
+y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
 out <- estimate_rt(y, nsol = 10)
 plot(out)
 

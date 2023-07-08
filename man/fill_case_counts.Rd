@@ -14,14 +14,14 @@ weekly) but this may not always be the case.}
 \item{observed_counts}{vector of the observed daily infection counts}
 }
 \value{
-interpolated `observed_counts`
+interpolated \code{observed_counts}
 }
 \description{
-Given observation time points `x` and observed case counts `observed_counts`,
-this function finds the minimal difference `m` from consecutive `x` and
-construct a full and even `x` with difference `m`. This function then find
+Given observation time points \code{x} and observed case counts \code{observed_counts},
+this function finds the minimal difference \code{m} from consecutive \code{x} and
+construct a full and even \code{x} with difference \code{m}. This function then find
 the missing index and interpolate the observed case counts using
-`na.fill` method with argument `fill = "extend"`
+\code{na.fill} method with argument \code{fill = "extend"}
 }
 \examples{
 x1 <- c(1,3,4,5,7,9)
