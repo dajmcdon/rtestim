@@ -33,7 +33,7 @@ epidemic is growing while those less than 1 indicate decline.
 
 This vignette provides a few examples to demonstrate the usage of `{rtestim}` to 
 estimate the effective reproduction number, $R_t$. `{rtestim}` 
-find the sequence of $R_t$, $\Rtseq$ of an infectious disease by solving 
+finds a sequence of $R_t$, $\Rtseq$ of an infectious disease by solving 
 the following penalized Poisson regression
 \begin{equation} \label{eq:objective_fn}
     \hat{\theta} = \argmin_{\theta} \frac{1}{n} \sum_{t=1}^n \left(e^{\theta_{t}}x_t - y_t\theta_{t}\right) + \lambda \Vert D^{(k+1)} \theta \Vert_1
