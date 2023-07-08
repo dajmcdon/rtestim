@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rtestim</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -27,7 +27,13 @@
       </ul><form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
 
-      <ul class="navbar-nav"></ul></div>
+      <ul class="navbar-nav"><li class="nav-item">
+  <a class="external-link nav-link" href="https://github.com/dajmcdon/rtestim/" aria-label="github">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul></div>
 
     
   </div>
@@ -35,7 +41,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Leave-kth-out cross validation for choosing a optimal parameter lambda</h1>
-      
+      <small class="dont-index">Source: <a href="https://github.com/dajmcdon/rtestim/blob/HEAD/R/cv_estimate_rt.R" class="external-link"><code>R/cv_estimate_rt.R</code></a></small>
       <div class="d-none name"><code>cv_estimate_rt.Rd</code></div>
     </div>
 
@@ -148,11 +154,11 @@ within one standard error.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Degree of the estimated piecewise polynomial curve: 3 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Summary of cross validation across lambda:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                lambda index cv_scores  cv_se dof</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Min Lambda   406.0115     1     7.147 0.8888   0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CV Minimizer   0.3750    23     5.374 0.6765   8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1se Lambda   295.5339     2     5.704 0.7289   0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Max Lambda     0.0406    30     5.740 0.6776  18</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                 lambda index cv_scores cv_se dof</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Min Lambda   331.92091     1     9.551 1.982   0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> CV Minimizer 175.86222     3     8.565 2.083   0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1se Lambda   331.92091     1     9.551 1.982   0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Max Lambda     0.03319    30    11.873 3.387  17</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 </code></pre></div>
     </div>

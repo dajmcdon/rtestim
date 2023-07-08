@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rtestim</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -46,7 +46,14 @@
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
 </form>
 
-      <ul class="navbar-nav"></ul>
+      <ul class="navbar-nav">
+<li class="nav-item">
+  <a class="external-link nav-link" href="https://github.com/dajmcdon/rtestim/" aria-label="github">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
 </div>
 
     
@@ -61,14 +68,14 @@
       <img src="" class="logo" alt=""><h1>rtestim Package Vignette</h1>
             
       
-      
+      <small class="dont-index">Source: <a href="https://github.com/dajmcdon/rtestim/blob/HEAD/vignettes/rtestim.Rmd" class="external-link"><code>vignettes/rtestim.Rmd</code></a></small>
       <div class="d-none name"><code>rtestim.Rmd</code></div>
     </div>
 
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dajmcdon.github.io/rtestim/">rtestim</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/dajmcdon/rtestim" class="external-link">rtestim</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: dspline</span></span>
 <span><span class="co">#&gt; Loading required package: Matrix</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
@@ -83,8 +90,8 @@ value roughly says “how many new infections will result from each new
 infection today”. Values larger than 1 indicate that an epidemic is
 growing while those less than 1 indicate decline.</p>
 <p>This vignette provides a few examples to demonstrate the usage of
-<a href="https://dajmcdon.github.io/rtestim/">rtestim</a> to estimate the effective reproduction number,
-<span class="math inline">\(R_t\)</span>. <a href="https://dajmcdon.github.io/rtestim/">rtestim</a> finds a
+<a href="https://github.com/dajmcdon/rtestim" class="external-link">rtestim</a> to estimate the effective reproduction number,
+<span class="math inline">\(R_t\)</span>. <a href="https://github.com/dajmcdon/rtestim" class="external-link">rtestim</a> finds a
 sequence of <span class="math inline">\(R_t\)</span>, <span class="math inline">\(\mathop{\{R_t\}_{t=1}^n}\)</span> of an infectious
 disease by solving the following penalized Poisson regression <span class="math display">\[\begin{equation} \label{eq:objective_fn}
     \hat{\theta} = \mathop{\mathrm{argmin}}_{\theta} \frac{1}{n}
@@ -107,7 +114,7 @@ with the discretized serial interval distribution <span class="math inline">\(w\
 the duration of time that a previous infection is likely to lead to
 future infection.</p>
 <p>To compute <span class="math inline">\(\mathop{\{R_t\}_{t=1}^n}\)</span> with
-<a href="https://dajmcdon.github.io/rtestim/">rtestim</a>, the minimal information needed is the new case
+<a href="https://github.com/dajmcdon/rtestim" class="external-link">rtestim</a>, the minimal information needed is the new case
 counts at days up until <span class="math inline">\(t\)</span> and a
 parametric form for the serial interval distribution (a Gamma density).
 By default, <span class="math inline">\(2.5\)</span> is used for both
@@ -140,17 +147,17 @@ the first observation must be strictly larger than 0.</p>
 <code class="sourceCode R"><span><span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/estimate_rt.html">estimate_rt</a></span><span class="op">(</span>observed_counts <span class="op">=</span> <span class="va">case_counts</span>, nsol <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mod</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
 <p><img src="rtestim_files/figure-html/unnamed-chunk-3-1.png" width="100%" style="display: block; margin: auto;"></p>
-<p><a href="https://dajmcdon.github.io/rtestim/">rtestim</a> estimates a spectrum of <span class="math inline">\(\mathop{\{R_t\}_{t=1}^n}\)</span>s for a range of
+<p><a href="https://github.com/dajmcdon/rtestim" class="external-link">rtestim</a> estimates a spectrum of <span class="math inline">\(\mathop{\{R_t\}_{t=1}^n}\)</span>s for a range of
 <span class="math inline">\(\lambda\)</span> values, where each <span class="math inline">\(\mathop{\{R_t\}_{t=1}^n}\)</span> corresponds to a
 specific <span class="math inline">\(\lambda\)</span> value. If no <span class="math inline">\(\lambda\)</span> value is supplied by the user,
-<a href="https://dajmcdon.github.io/rtestim/">rtestim</a> will automatically calculate a sequence of <span class="math inline">\(\lambda\)</span> values. The additional parameter
+<a href="https://github.com/dajmcdon/rtestim" class="external-link">rtestim</a> will automatically calculate a sequence of <span class="math inline">\(\lambda\)</span> values. The additional parameter
 <code>nsol = 20</code> specifies the number of <span class="math inline">\(\lambda\)</span>s for which the <span class="math inline">\(\mathop{\{R_t\}_{t=1}^n}\)</span> is
 calculated</p>
 </div>
 <div class="section level3">
 <h3 id="cross-validation">Cross Validation<a class="anchor" aria-label="anchor" href="#cross-validation"></a>
 </h3>
-<p><a href="https://dajmcdon.github.io/rtestim/">rtestim</a> also provides a cross validation procedure for
+<p><a href="https://github.com/dajmcdon/rtestim" class="external-link">rtestim</a> also provides a cross validation procedure for
 selecting the amount of smoothness to be used in the final estimate
 (leave-every-k-th-out cross validation). Minimizing this metric, in
 principle, balances prediction error and smoothness
@@ -186,7 +193,7 @@ the cross-validation error while prioritizing smoothness.</p>
 <h3 id="uneven-reporting-frequency">Uneven Reporting Frequency<a class="anchor" aria-label="anchor" href="#uneven-reporting-frequency"></a>
 </h3>
 <p>Ideally, case counts are observed at regular intervals, such as daily
-or weekly, but this is not always the case. <a href="https://dajmcdon.github.io/rtestim/">rtestim</a> also
+or weekly, but this is not always the case. <a href="https://github.com/dajmcdon/rtestim" class="external-link">rtestim</a> also
 accommodates scenarios in which cases are reported with uneven
 intervals. To demonstrate this, we generate a sequence of integers
 representing the days at which we observe the case counts.</p>
