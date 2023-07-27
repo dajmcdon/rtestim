@@ -39,6 +39,7 @@ cv_estimate_rt <- function(observed_counts,
 
   arg_is_pos_int(nfold)
   n <- length(observed_counts)
+  arg_is_length(n, x)
 
   if (nfold == 1) cli::cli_abort("nfold must be greater than 1")
 
@@ -48,31 +49,29 @@ cv_estimate_rt <- function(observed_counts,
     korder = korder,
     x = x,
     lambda = lambda,
+    maxiter = maxiter,
     ...)
 
-  ## Use values from the full data fit
   if (is.null(lambda)) lambda <- full_data_fit$lambda
-  weighted_past_counts <- full_data_fit$weighted_past_counts
-  x <- full_data_fit$x
 
-  # Cross validation
   foldid = fold_calculator(n, nfold)
   cvall <- matrix(0, nfold, length(lambda))
-
   error_measure <- match.arg(error_measure)
-  err_fun <- switch(error_measure,
-                    mse = function(y, m) (y - m)^2,
-                    mae = function(y, m) abs(y - m),
-                    deviance = function(y, m) {
-                      devr <- y * log(m) - m
-                      devy <- y * log(y) - y
-                      devy[y == 0] <- 0
-                      2 * (devr - devy) })
+  err_fun <- switch(
+    error_measure,
+    mse = function(y, m) (y - m)^2,
+    mae = function(y, m) abs(y - m),
+    deviance = function(y, m) {
+      devr <- y * log(m) - m
+      devy <- y * log(y) - y
+      devy[y == 0] <- 0
+      2 * (devr - devy) }
+  )
 
   for (f in 1:nfold) {
     ### train test splits
-    train_idx <- which(foldid != f)
-    test_idx <- which(foldid == f)
+    train_idx <- foldid != f
+    test_idx <- foldid == f
 
     ## Run solver with the training set
     mod <- estimate_rt(
@@ -83,13 +82,10 @@ cv_estimate_rt <- function(observed_counts,
       maxiter = maxiter,
       ...)
 
-    ### Predict training value
-    pred_rt <- pred_kth_rt(mod$Rt,
-                           n = n,
-                           train_idx = train_idx,
-                           test_idx = test_idx,
-                           train_x = x[train_idx],
-                           test_x = x[test_idx])
+    pred_rt <- stats::approx(
+      x[train_idx], observed_counts[train_idx], x[test_idx])$y
+    wpc <- delay_calculator(y[train_idx], x[train_idx])
+
 
     pred_observed_counts <- pred_rt * weighted_past_counts[test_idx]
     score <- colMeans(err_fun(observed_counts[test_idx], pred_observed_counts))

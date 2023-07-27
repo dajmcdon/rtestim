@@ -9,51 +9,55 @@
 #'
 #' @inheritParams estimate_rt
 #'
-#' @return A vector of size n-1, containing the total infectiousness at each
+#' @return A vector containing the total infectiousness at each
 #'   observed time point
 #' @export
 #'
 #' @examples
 #' delay_calculator(c(3,2,5,3,1), dist_gamma = c(2.5, 2.5))
-delay_calculator <- function(observed_counts, x = NULL,
-                             dist_gamma = c(2.5, 2.5)) {
+delay_calculator <- function(
+    observed_counts,
+    x = NULL,
+    dist_gamma = c(2.5, 2.5),
+    delay_distn = NULL) {
+
   arg_is_length(2, dist_gamma)
   arg_is_positive(dist_gamma)
+  arg_is_positive(delay_distn, allow_null = TRUE)
   n <- length(observed_counts)
   arg_is_length(n, x, allow_null = TRUE)
-  if (!is.null(x)) {
+  if (is.null(x)) x <- 1:n
+  else {
     if (any(is.na(x)))
       cli::cli_abort("x may not contain missing values.")
     if (is.unsorted(x, strictly = TRUE))
       cli::cli_abort("x must be sorted and contain no duplicates.")
-  } else {
-    x <- 1:n
   }
 
+  if (!is.null(delay_distn)) delay_distn <- delay_distn / sum(delay_distn)
   regular <- vctrs::vec_unique_count(diff(x)) == 1L
+  if (regular) xout <- x
+  else xout <- seq(from = min(x), to = max(x), by = min(diff(x)))
 
-
-  if (!regular) {
-    helper_result <- fill_case_counts(x, observed_counts)
-    full_counts <- helper_result$full_counts
-    missing_idx <- helper_result$missing_idx
-
-    full_n <- length(full_counts)
-    x <- 1:full_n
-    w <- discretize_gamma(x, dist_gamma[1], dist_gamma[2])
-    cw <- cumsum(w)
-    convolved_seq <- stats::convolve(full_counts, rev(w), type = "open")[1:full_n] / cw
-    convolved_seq <- convolved_seq[!missing_idx]
-
+  if (is.null(delay_distn)) {
+    delay_distn <- discretize_gamma(xout, dist_gamma[1], dist_gamma[2])
   } else {
-    n <- length(observed_counts)
-    x <- 1:n
-    w <- discretize_gamma(x, dist_gamma[1], dist_gamma[2])
-    cw <- cumsum(w)
-    convolved_seq <- stats::convolve(observed_counts, rev(w), type = "open")[1:n] / cw
-
+    if (length(delay_distn) > length(xout)) {
+      cli::cli_abort(
+        "User specified `w` must have no more than {length(xout)} elements."
+      )
+    }
+    # pad the tail with zero if too short
+    delay_distn <- c(delay_distn, rep(0, length(xout) - length(delay_distn)))
   }
-  return(c(convolved_seq[1], convolved_seq[1:(n - 1)]))
+
+  y <- approx(x, observed_counts, xout = xout)$y
+  cw <- cumsum(delay_distn)
+
+  convolved_seq <- stats::convolve(
+    y, rev(delay_distn), type = "open")[seq_along(xout)] / cw
+  if (!regular) convolved_seq <- convolved_seq[xout %in% x]
+  return(c(0, convolved_seq[1:(n - 1)]))
 }
 
 

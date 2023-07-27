@@ -43,6 +43,9 @@
 #'   weekly) but this may not always be the case.
 #' @param nsol Integer. The number of tuning parameters `lambda` at which to
 #'   compute Rt.
+#' @param delay_distn in the case of a non-gamma delay distribution,
+#'   a vector of delay probabilities may be passed here. These will be coerced
+#'   to sum to 1, and padded with 0 in the right tail if necessary.
 #' @param lambdamin Optional value for the smallest `lambda` to use. This should
 #'   be greater than zero.
 #' @param lambdamax Optional value for the largest `lambda` to use.
@@ -81,6 +84,7 @@ estimate_rt <- function(observed_counts,
                         x = 1:n,
                         lambda = NULL,
                         nsol = 100L,
+                        delay_distn = NULL,
                         lambdamin = NULL,
                         lambdamax = NULL,
                         lambda_min_ratio = 1e-4,
@@ -91,10 +95,12 @@ estimate_rt <- function(observed_counts,
   arg_is_pos_int(nsol, maxiter)
   arg_is_scalar(korder, nsol, lambda_min_ratio)
   arg_is_scalar(lambdamin, lambdamax, allow_null = TRUE)
-  arg_is_positive(lambdamin, lambdamax, allow_null = TRUE)
+  arg_is_positive(lambdamin, lambdamax, delay_distn, allow_null = TRUE)
   arg_is_positive(lambda_min_ratio, dist_gamma)
   arg_is_length(2, dist_gamma)
   n <- length(observed_counts)
+
+  if (!is.null(delay_distn)) delay_distn <- delay_distn / sum(delay_distn)
 
   # check that x is a sorted, double vector of length n
   arg_is_numeric(x)
@@ -112,7 +118,9 @@ estimate_rt <- function(observed_counts,
   if (observed_counts[1] == 0 || is.na(observed_counts[1])) {
     cli::cli_abort("`observed_counts` must start with positive count")
   }
-  weighted_past_counts <- delay_calculator(observed_counts, x, dist_gamma)
+  weighted_past_counts <- delay_calculator(
+    observed_counts, x, dist_gamma, delay_distn
+  )
 
   # initialize parameters and variables
   if (is.null(init)) {
