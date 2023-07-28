@@ -35,7 +35,7 @@ distribution with some shape and scale.}
 
 \item{x}{a vector of positions at which the counts have been observed. In an
 ideal case, we would observe data at regular intervals (e.g. daily or
-weekly) but this may not always be the case.}
+weekly) but this may not always be the case. May be numeric or Date.}
 
 \item{lambda}{Vector. A user supplied sequence of tuning parameters which
 determines the balance between data fidelity and

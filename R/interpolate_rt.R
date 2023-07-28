@@ -9,6 +9,8 @@
 #' @return A vector or matrix of interpolated Rt estimates.
 #' @export
 interpolate_rt <- function(object, xout, ...) {
+  if (inherits(xout, "Date")) xout <- as.numeric(xout)
+  arg_is_numeric(xout)
   UseMethod("interpolate_rt")
 }
 

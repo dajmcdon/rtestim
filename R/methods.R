@@ -146,14 +146,8 @@ predict.poisson_rt <- function(object, lambda = NULL, ...) {
 interpolate_rt.poisson_rt <- function(object, xout, lambda = NULL, ...) {
   rlang::check_dots_empty()
   xin <- object$x
+  if (inherits(xin, "Date")) xin <- as.numeric(xin)
   arg_is_positive(lambda, allow_null = TRUE)
-  if (class(xout) != class(xin)) {
-    cli_abort(
-      c("`xout` must have the same class as was used in `estimate_rt()`.",
-        i = "`xout` has class {.cls {class(xout)}} rather than {.cls {class(xin)}}."
-      )
-    )
-  }
   if (is.unsorted(xout)) xout <- sort(xout)
 
   logr <- log(fitted(object, lambda = lambda))

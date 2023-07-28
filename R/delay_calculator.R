@@ -39,6 +39,8 @@ delay_calculator <- function(
       cli_abort("x must be sorted and contain no duplicates.")
   }
 
+  if (inherits(x, "Date")) x <- as.numeric(x)
+  arg_is_numeric(x)
   if (!is.null(delay_distn)) delay_distn <- delay_distn / sum(delay_distn)
   regular <- vctrs::vec_unique_count(diff(x)) == 1L
   if (regular) xout <- x

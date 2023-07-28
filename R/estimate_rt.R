@@ -40,7 +40,7 @@
 #'   distribution with some shape and scale.
 #' @param x a vector of positions at which the counts have been observed. In an
 #'   ideal case, we would observe data at regular intervals (e.g. daily or
-#'   weekly) but this may not always be the case.
+#'   weekly) but this may not always be the case. May be numeric or Date.
 #' @param nsol Integer. The number of tuning parameters `lambda` at which to
 #'   compute Rt.
 #' @param delay_distn in the case of a non-gamma delay distribution,
@@ -73,7 +73,7 @@
 #'
 #' @examples
 #' y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
-#' out <- estimate_rt(y, nsol = 10)
+#' out <- estimate_rt(y)
 #' plot(out)
 #'
 #' out0 <- estimate_rt(y, korder = 0L, nsol = 10)
@@ -107,6 +107,8 @@ estimate_rt <- function(
   if (!is.null(delay_distn)) delay_distn <- delay_distn / sum(delay_distn)
 
   # check that x is a sorted, double vector of length n
+  xin <- x
+  if (inherits(xin, "Date")) x <- as.numeric(x)
   arg_is_numeric(x)
   arg_is_length(n, x)
   if (is.unsorted(x)) {
@@ -122,7 +124,7 @@ estimate_rt <- function(
     cli_abort("`observed_counts` must start with positive count")
 
   weighted_past_counts <- delay_calculator(
-    observed_counts, x, dist_gamma, delay_distn
+    observed_counts, x - min(x) + 1, dist_gamma, delay_distn
   )
 
   if (!inherits(init, "rt_admm_configuration")) {
@@ -168,7 +170,7 @@ estimate_rt <- function(
   structure(
     list(
       observed_counts = observed_counts,
-      x = x,
+      x = xin,
       weighted_past_counts = weighted_past_counts,
       Rt = mod$Rt,
       lambda = drop(mod$lambda),
