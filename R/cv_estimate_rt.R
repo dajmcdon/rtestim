@@ -43,7 +43,7 @@ cv_estimate_rt <- function(
   n <- length(observed_counts)
   arg_is_length(n, x)
 
-  if (nfold == 1) cli::cli_abort("nfold must be greater than 1")
+  if (nfold == 1) cli_abort("nfold must be greater than 1")
 
   ## Run program one time to create lambda
   full_data_fit <- estimate_rt(

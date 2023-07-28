@@ -102,7 +102,7 @@ estimate_rt <- function(
   n <- length(observed_counts)
 
   if (korder + 1 >= n)
-    cli::cli_abort("`korder + 1` must be less than observed data length.")
+    cli_abort("`korder + 1` must be less than observed data length.")
 
   if (!is.null(delay_distn)) delay_distn <- delay_distn / sum(delay_distn)
 
@@ -116,18 +116,17 @@ estimate_rt <- function(
   }
 
   # create weighted past cases
-  if (any(observed_counts < 0)) {
-    cli::cli_abort("`observed_counts` must be non-negative")
-  }
-  if (observed_counts[1] == 0 || is.na(observed_counts[1])) {
-    cli::cli_abort("`observed_counts` must start with positive count")
-  }
+  if (any(observed_counts < 0))
+    cli_abort("`observed_counts` must be non-negative")
+  if (observed_counts[1] == 0 || is.na(observed_counts[1]))
+    cli_abort("`observed_counts` must start with positive count")
+
   weighted_past_counts <- delay_calculator(
     observed_counts, x, dist_gamma, delay_distn
   )
 
   if (!inherits(init, "rt_admm_configuration")) {
-    cli::cli_abort("`init` must be created with `configure_rt_admm()`.")
+    cli_abort("`init` must be created with `configure_rt_admm()`.")
   }
 
 
@@ -137,12 +136,10 @@ estimate_rt <- function(
   if (is.null(lambdamax)) lambdamax <- -1.0
   if (length(lambda) == 0) {
     msg <- "If lambda is not specified,"
-    if (lambda_min_ratio >= 1) {
-      cli::cli_abort("{msg} lambda_min_ratio must be in (0,1).")
-    }
-    if (lambdamin > 0 && lambdamax > 0 && lambdamin >= lambdamax) {
-      cli::cli_abort("{msg} lambdamin must be < lambdamax.")
-    }
+    if (lambda_min_ratio >= 1)
+      cli_abort("{msg} lambda_min_ratio must be in (0,1).")
+    if (lambdamin > 0 && lambdamax > 0 && lambdamin >= lambdamax)
+      cli_abort("{msg} lambdamin must be < lambdamax.")
     lambda <- double(nsol)
   }
   if (length(lambda) != nsol) nsol <- length(lambda)
@@ -213,22 +210,21 @@ configure_rt_admm <- function(
     maxiter_line = 20L,
     verbose = 0) {
 
-  arg_is_scalar(rho, alpha, gamma, tolerance, verbose,
-                maxiter_newton, maxiter_line)
+  arg_is_scalar(rho, alpha, gamma, tolerance, verbose)
+  arg_is_scalar(maxiter_newton, maxiter_line)
   arg_is_positive(alpha, gamma, tolerance)
   arg_is_numeric(rho, tolerance)
   arg_is_pos_int(maxiter_newton, maxiter_line)
-  arg_is_nonneg_int(korder, verbose)
-  if (alpha >= 1) cli::cli_abort("`alpha` must be in (0, 1).")
-  if (gamma > 1) cli::cli_abort("`gamma` must be in (0, 1].")
+  arg_is_nonneg_int(verbose)
+  if (alpha >= 1) cli_abort("`alpha` must be in (0, 1).")
+  if (gamma > 1) cli_abort("`gamma` must be in (0, 1].")
 
   structure(
     list(
-      korder = korder,
       rho = rho,
-      tolerance = tolerance,
       alpha = alpha,
       gamma = gamma,
+      tolerance = tolerance,
       maxiter_newton = maxiter_newton,
       maxiter_line = maxiter_line,
       verbose = verbose

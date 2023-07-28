@@ -14,7 +14,7 @@ interpolate_rt <- function(object, xout, ...) {
 
 #' @export
 interpolate_rt.default <- function(object, xout, ...) {
-  cli::cli_abort(
+  cli_abort(
     "No interpolation methods exist for objects of class {.cls {class(object)}}."
   )
 }
