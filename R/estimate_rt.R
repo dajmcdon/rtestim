@@ -78,19 +78,20 @@
 #'
 #' out0 <- estimate_rt(y, korder = 0L, nsol = 10)
 #' plot(out0)
-estimate_rt <- function(observed_counts,
-                        korder = 3L,
-                        dist_gamma = c(2.5, 2.5),
-                        x = 1:n,
-                        lambda = NULL,
-                        nsol = 100L,
-                        delay_distn = NULL,
-                        lambdamin = NULL,
-                        lambdamax = NULL,
-                        lambda_min_ratio = 1e-4,
-                        maxiter = 1e5,
-                        init = NULL) {
-  # check arguments are of proper types
+estimate_rt <- function(
+    observed_counts,
+    korder = 3L,
+    dist_gamma = c(2.5, 2.5),
+    x = 1:n,
+    lambda = NULL,
+    nsol = 100L,
+    delay_distn = NULL,
+    lambdamin = NULL,
+    lambdamax = NULL,
+    lambda_min_ratio = 1e-4,
+    maxiter = 1e5,
+    init = configure_rt_admm()) {
+
   arg_is_nonneg_int(korder)
   arg_is_pos_int(nsol, maxiter)
   arg_is_scalar(korder, nsol, lambda_min_ratio)
@@ -99,6 +100,9 @@ estimate_rt <- function(observed_counts,
   arg_is_positive(lambda_min_ratio, dist_gamma)
   arg_is_length(2, dist_gamma)
   n <- length(observed_counts)
+
+  if (korder + 1 >= n)
+    cli::cli_abort("`korder + 1` must be less than observed data length.")
 
   if (!is.null(delay_distn)) delay_distn <- delay_distn / sum(delay_distn)
 
@@ -122,18 +126,10 @@ estimate_rt <- function(observed_counts,
     observed_counts, x, dist_gamma, delay_distn
   )
 
-  # initialize parameters and variables
-  if (is.null(init)) {
-    init <- configure_rt_admm(observed_counts, korder, weighted_past_counts)
-  }
   if (!inherits(init, "rt_admm_configuration")) {
     cli::cli_abort("`init` must be created with `configure_rt_admm()`.")
   }
 
-  # check that korder is less than data length
-  if (korder + 1 >= n) {
-    cli::cli_abort("`korder + 1` must be less than observed data length.")
-  }
 
   # checks on lambda, lambdamin, lambdamax
   if (is.null(lambda)) lambda <- double(nsol) # prep for create_lambda
@@ -156,7 +152,7 @@ estimate_rt <- function(observed_counts,
     observed_counts,
     x,
     weighted_past_counts,
-    init$korder,
+    korder,
     lambda = lambda,
     lambdamax = lambdamax,
     lambdamin = lambdamin,
@@ -192,10 +188,6 @@ estimate_rt <- function(observed_counts,
 
 #' Rt estimation algorithm configuration
 #'
-#' @inheritParams estimate_rt
-#' @param weighted_past_counts the weighted sum of past infections counts with
-#'   corresponding serial interval functions (or its Gamma approximation) as
-#'   weights
 #' @param rho Double. An ADMM parameter; coefficient of augmented term in the
 #' Lagrangian function.
 #' @param alpha Double. A parameter adjusting upper bound in line search algorithm
@@ -212,18 +204,16 @@ estimate_rt <- function(observed_counts,
 #' @return a list of model parameters with class `rt_admm_configuration`
 #'
 #' @export
-configure_rt_admm <- function(observed_counts,
-                              korder,
-                              weighted_past_counts = NULL,
-                              rho = -1,
-                              alpha = 0.5,
-                              gamma = 0.9,
-                              tolerance = 1e-4,
-                              maxiter_newton = 50L,
-                              maxiter_line = 20L,
-                              verbose = 0) {
-  n <- length(observed_counts)
-  arg_is_scalar(korder, rho, alpha, gamma, tolerance, verbose,
+configure_rt_admm <- function(
+    rho = -1,
+    alpha = 0.5,
+    gamma = 0.9,
+    tolerance = 1e-4,
+    maxiter_newton = 50L,
+    maxiter_line = 20L,
+    verbose = 0) {
+
+  arg_is_scalar(rho, alpha, gamma, tolerance, verbose,
                 maxiter_newton, maxiter_line)
   arg_is_positive(alpha, gamma, tolerance)
   arg_is_numeric(rho, tolerance)
@@ -231,9 +221,6 @@ configure_rt_admm <- function(observed_counts,
   arg_is_nonneg_int(korder, verbose)
   if (alpha >= 1) cli::cli_abort("`alpha` must be in (0, 1).")
   if (gamma > 1) cli::cli_abort("`gamma` must be in (0, 1].")
-  if (korder + 1 >= n) {
-    cli::cli_abort("`korder + 1` must be less than observed data length.")
-  }
 
   structure(
     list(

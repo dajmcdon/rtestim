@@ -16,7 +16,7 @@ estimate_rt(
   lambdamax = NULL,
   lambda_min_ratio = 1e-04,
   maxiter = 1e+05,
-  init = NULL
+  init = configure_rt_admm()
 )
 }
 \arguments{

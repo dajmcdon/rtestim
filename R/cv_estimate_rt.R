@@ -31,7 +31,7 @@ cv_estimate_rt <- function(
     observed_counts,
     korder = 3L,
     dist_gamma = c(2.5, 2.5),
-    nfold = 3,
+    nfold = 3L,
     error_measure = c("mse", "mae", "deviance"),
     x = 1:n,
     lambda = NULL,
@@ -86,7 +86,7 @@ cv_estimate_rt <- function(
     interp_rt <- interpolate_rt(mod, x[test_idx])
 
     wpc <- delay_calculator(
-      observed_counts = y[train_idx],
+      observed_counts = observed_counts[train_idx],
       x = x[train_idx],
       dist_gamma = dist_gamma,
       delay_distn = delay_distn,

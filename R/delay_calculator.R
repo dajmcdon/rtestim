@@ -60,11 +60,12 @@ delay_calculator <- function(
   y <- approx(x, observed_counts, xout = xout)$y
   cw <- cumsum(delay_distn)
 
-  convolved_seq <- stats::convolve(
-    y, rev(delay_distn), type = "open")[seq_along(xout)] / cw
+  convolved_seq <- stats::convolve(y, rev(delay_distn), type = "open")
+  convolved_seq <- convolved_seq[seq_along(xout)] / cw
+  convolved_seq <- c(convolved_seq[1], convolved_seq[-length(convolved_seq)])
   if (!regular && output_partial_seq)
     convolved_seq <- convolved_seq[xout %in% x]
-  return(c(0, convolved_seq[1:(n - 1)]))
+  convolved_seq
 }
 
 

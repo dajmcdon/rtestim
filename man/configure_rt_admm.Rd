@@ -5,9 +5,6 @@
 \title{Rt estimation algorithm configuration}
 \usage{
 configure_rt_admm(
-  observed_counts,
-  korder,
-  weighted_past_counts = NULL,
   rho = -1,
   alpha = 0.5,
   gamma = 0.9,
@@ -18,16 +15,6 @@ configure_rt_admm(
 )
 }
 \arguments{
-\item{observed_counts}{vector of the observed daily infection counts}
-
-\item{korder}{Integer. Degree of the piecewise polynomial curve to be
-estimated. For example, \code{korder = 0} corresponds to a piecewise constant
-curve.}
-
-\item{weighted_past_counts}{the weighted sum of past infections counts with
-corresponding serial interval functions (or its Gamma approximation) as
-weights}
-
 \item{rho}{Double. An ADMM parameter; coefficient of augmented term in the
 Lagrangian function.}
 

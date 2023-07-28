@@ -9,7 +9,7 @@
 #' @return A vector or matrix of interpolated Rt estimates.
 #' @export
 interpolate_rt <- function(object, xout, ...) {
-  UseMethod("interpolate")
+  UseMethod("interpolate_rt")
 }
 
 #' @export

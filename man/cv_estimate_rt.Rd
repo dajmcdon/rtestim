@@ -8,7 +8,7 @@ cv_estimate_rt(
   observed_counts,
   korder = 3L,
   dist_gamma = c(2.5, 2.5),
-  nfold = 3,
+  nfold = 3L,
   error_measure = c("mse", "mae", "deviance"),
   x = 1:n,
   lambda = NULL,
