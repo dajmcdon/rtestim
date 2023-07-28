@@ -1,35 +1,33 @@
-interpolate_from_ref_sequence <- function(ref_sequence, sequence) {
-  r <- range(ref_sequence)
-  rr <- range(sequence)
-  if (rr[1] < r[1]) {
+interpolate_lambda <- function(lambda, new_lambda) {
+  if (min(new_lambda) < min(lambda)) {
     cli::cli_warn(
-      c("Supplied `ref_sequence` has values smaller than those used to estimate Rt originally.",
+      c("Requested `lambda` has values smaller than those used to estimate Rt.",
         i = "You may want to refit at these values.",
-        i = "Using the smallest available `ref_sequence`'s available."))
+        i = "Using the smallest `lambda`'s available."))
   }
-  if (rr[2] > r[2]) {
+  if (max(new_lambda) > max(lambda)) {
     cli::cli_warn(
-      c("Supplied `ref_sequence` has values larger than those used to estimate Rt originally.",
+      c("Requested `lambda` has values larger than those used to estimate Rt.",
         i = "You may want to refit at these values.",
-        i = "Using the largest available `ref_sequence`'s available."))
+        i = "Using the largest `lambda`'s available."))
   }
-  if (length(ref_sequence) == 1) {# degenerate case of only one ref_sequence
-    nums <- length(sequence)
+  if (length(lambda) == 1) {
+    nums <- length(new_lambda)
     left <- rep(1, nums)
     right <- left
     sfrac <- rep(1, nums)
   } else {
-    k <- length(ref_sequence)
-    sfrac <- (ref_sequence[1] - sequence) / (ref_sequence[1] - ref_sequence[k])
-    ref_sequence <- (ref_sequence[1] - ref_sequence) / (ref_sequence[1] - ref_sequence[k])
-    sfrac[sfrac < min(ref_sequence)] <- min(ref_sequence)
-    sfrac[sfrac > max(ref_sequence)] <- max(ref_sequence)
-    coord <- stats::approx(ref_sequence, seq(ref_sequence), sfrac)$y
+    k <- length(lambda)
+    sfrac <- (lambda[1] - new_lambda) / (lambda[1] - lambda[k])
+    lambda <- (lambda[1] - lambda) / (lambda[1] - lambda[k])
+    sfrac[sfrac < min(lambda)] <- min(lambda)
+    sfrac[sfrac > max(lambda)] <- max(lambda)
+    coord <- stats::approx(lambda, seq(lambda), sfrac)$y
     left <- floor(coord)
     right <- ceiling(coord)
-    sfrac <- (sfrac - ref_sequence[right]) / (ref_sequence[left] - ref_sequence[right])
+    sfrac <- (sfrac - lambda[right]) / (lambda[left] - lambda[right])
     sfrac[left == right] <- 1
-    sfrac[abs(ref_sequence[left] - ref_sequence[right]) < .Machine$double.eps] <- 1
+    sfrac[abs(lambda[left] - lambda[right]) < .Machine$double.eps] <- 1
   }
   list(left = left, right = right, frac = sfrac)
 }

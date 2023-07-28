@@ -27,15 +27,17 @@
 #' y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
 #' cv <- cv_estimate_rt(y, korder = 3, nfold = 3, nsol = 30)
 #' cv
-cv_estimate_rt <- function(observed_counts,
-                           korder = 3L,
-                           dist_gamma = c(2.5, 2.5),
-                           nfold = 3,
-                           error_measure = c("mse", "mae", "deviance"),
-                           x = 1:n,
-                           lambda = NULL,
-                           maxiter = 1e6L,
-                           ...) {
+cv_estimate_rt <- function(
+    observed_counts,
+    korder = 3L,
+    dist_gamma = c(2.5, 2.5),
+    nfold = 3,
+    error_measure = c("mse", "mae", "deviance"),
+    x = 1:n,
+    lambda = NULL,
+    maxiter = 1e6L,
+    delay_distn = NULL,
+    ...) {
 
   arg_is_pos_int(nfold)
   n <- length(observed_counts)
@@ -69,25 +71,29 @@ cv_estimate_rt <- function(observed_counts,
   )
 
   for (f in 1:nfold) {
-    ### train test splits
     train_idx <- foldid != f
     test_idx <- foldid == f
 
-    ## Run solver with the training set
     mod <- estimate_rt(
       observed_counts = observed_counts[train_idx],
       x = x[train_idx],
       korder = korder,
       lambda = lambda,
       maxiter = maxiter,
+      delay_distn = delay_distn,
       ...)
 
-    pred_rt <- stats::approx(
-      x[train_idx], observed_counts[train_idx], x[test_idx])$y
-    wpc <- delay_calculator(y[train_idx], x[train_idx])
+    interp_rt <- interpolate_rt(mod, x[test_idx])
+
+    wpc <- delay_calculator(
+      observed_counts = y[train_idx],
+      x = x[train_idx],
+      dist_gamma = dist_gamma,
+      delay_distn = delay_distn,
+      output_partial_seq = FALSE)
 
 
-    pred_observed_counts <- pred_rt * weighted_past_counts[test_idx]
+    pred_observed_counts <- interp_rt * wpc[test_idx]
     score <- colMeans(err_fun(observed_counts[test_idx], pred_observed_counts))
     cvall[f,] <- score
   }

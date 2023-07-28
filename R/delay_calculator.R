@@ -8,6 +8,10 @@
 #' number of days after the primary infection
 #'
 #' @inheritParams estimate_rt
+#' @param output_partial_seq Logical. By default, this function returns the
+#'   convolved weight vector with observed cases at the original `x` values.
+#'   However, when `x` is irregular, setting this to `FALSE` will result
+#'   in a result at the interpolated `x` sequence.
 #'
 #' @return A vector containing the total infectiousness at each
 #'   observed time point
@@ -19,9 +23,11 @@ delay_calculator <- function(
     observed_counts,
     x = NULL,
     dist_gamma = c(2.5, 2.5),
-    delay_distn = NULL) {
+    delay_distn = NULL,
+    output_partial_seq = TRUE) {
 
   arg_is_length(2, dist_gamma)
+  arg_is_lgl_scalar(output_partial_seq)
   arg_is_positive(dist_gamma)
   arg_is_positive(delay_distn, allow_null = TRUE)
   n <- length(observed_counts)
@@ -56,7 +62,8 @@ delay_calculator <- function(
 
   convolved_seq <- stats::convolve(
     y, rev(delay_distn), type = "open")[seq_along(xout)] / cw
-  if (!regular) convolved_seq <- convolved_seq[xout %in% x]
+  if (!regular && output_partial_seq)
+    convolved_seq <- convolved_seq[xout %in% x]
   return(c(0, convolved_seq[1:(n - 1)]))
 }
 

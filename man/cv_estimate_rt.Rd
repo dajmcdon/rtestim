@@ -13,6 +13,7 @@ cv_estimate_rt(
   x = 1:n,
   lambda = NULL,
   maxiter = 1000000L,
+  delay_distn = NULL,
   ...
 )
 }
@@ -59,6 +60,10 @@ decreasing order.}
 
 \item{maxiter}{Integer. Maximum number of iterations for the estimation
 algorithm.}
+
+\item{delay_distn}{in the case of a non-gamma delay distribution,
+a vector of delay probabilities may be passed here. These will be coerced
+to sum to 1, and padded with 0 in the right tail if necessary.}
 
 \item{...}{additional parameters passed to \code{estimate_rt()} function}
 }

@@ -224,3 +224,18 @@ predict.cv_poisson_rt <- function(object,
   predict(object$full_fit, which_lambda)
 }
 
+#' @export
+interpolate_rt.cv_poisson_rt <- function(
+    object,
+    xout,
+    which_lambda = c("lambda.min", "lambda.1se"),
+    ...) {
+  rlang::check_dots_empty()
+  if (is.character(which_lambda)) {
+    which_lambda <- match.arg(which_lambda)
+    which_lambda <- object[[which_lambda]]
+  } else {
+    arg_is_numeric(which_lambda, allow_null = TRUE)
+  }
+  interpolate_rt(object$full_fit, xout, lambda = which_lambda)
+}
