@@ -180,17 +180,19 @@ plot(mod)
 Finally, we use a long history of real case counts in Canada. The data is
 available from [opencovid.ca](https://opencovid.ca) and the version downloaded
 on 4 July 2023 is included in the package. We use this data to estimate $R_t$.
+
 ```{r, warning=FALSE, fig.align='center'}
-can <- estimate_rt(cancovid$incident_cases, nsol = 20, maxiter = 1e6)
-labs <- seq(as.Date("2021-01-01"), as.Date("2023-01-01"), by = "12 months")
-breaks <- which(cancovid$date %in% labs)
+can <- estimate_rt(
+  observed_counts = cancovid$incident_cases, 
+  x = cancovid$date, 
+  nsol = 20, 
+  maxiter = 1e6
+)
+
 plot(can) + 
   geom_hline(yintercept = 1) +
   coord_cartesian(ylim = c(0.5, 2)) +
-  scale_x_continuous(
-    breaks = breaks, 
-    labels = strftime(labs, "%Y"), 
-    name = "Year")
+  scale_x_date(date_breaks = "1 year", date_labels = "%Y")
 ```
 
 
