@@ -68,7 +68,7 @@ to sum to 1, and padded with 0 in the right tail if necessary.}
 \item{...}{additional parameters passed to \code{estimate_rt()} function}
 }
 \value{
-An object with S3 class \code{"cv_result"}. Among the list components:
+An object with S3 class \code{"cv_poisson_rt"}. Among the list components:
 \itemize{
 \item \code{full_fit} An object with S3 class \code{"poisson_rt"}, fitted with all
 \code{observed_counts} and \code{lambda}

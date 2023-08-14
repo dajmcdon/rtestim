@@ -12,7 +12,7 @@
 #' `deviance` calculates the deviance
 #' @param ... additional parameters passed to `estimate_rt()` function
 
-#' @return An object with S3 class `"cv_result"`. Among the list components:
+#' @return An object with S3 class `"cv_poisson_rt"`. Among the list components:
 #' * `full_fit` An object with S3 class `"poisson_rt"`, fitted with all
 #' `observed_counts` and `lambda`
 #' * `cv_scores` leave-kth-out cross validation scores
