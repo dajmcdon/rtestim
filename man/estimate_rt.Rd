@@ -11,11 +11,12 @@ estimate_rt(
   x = 1:n,
   lambda = NULL,
   nsol = 100L,
+  delay_distn = NULL,
   lambdamin = NULL,
   lambdamax = NULL,
   lambda_min_ratio = 1e-04,
   maxiter = 1e+05,
-  init = NULL
+  init = configure_rt_admm()
 )
 }
 \arguments{
@@ -34,7 +35,7 @@ distribution with some shape and scale.}
 
 \item{x}{a vector of positions at which the counts have been observed. In an
 ideal case, we would observe data at regular intervals (e.g. daily or
-weekly) but this may not always be the case.}
+weekly) but this may not always be the case. May be numeric or Date.}
 
 \item{lambda}{Vector. A user supplied sequence of tuning parameters which
 determines the balance between data fidelity and
@@ -50,6 +51,10 @@ decreasing order.}
 
 \item{nsol}{Integer. The number of tuning parameters \code{lambda} at which to
 compute Rt.}
+
+\item{delay_distn}{in the case of a non-gamma delay distribution,
+a vector of delay probabilities may be passed here. These will be coerced
+to sum to 1, and padded with 0 in the right tail if necessary.}
 
 \item{lambdamin}{Optional value for the smallest \code{lambda} to use. This should
 be greater than zero.}
@@ -100,7 +105,7 @@ difference matrix.
 }
 \examples{
 y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
-out <- estimate_rt(y, nsol = 10)
+out <- estimate_rt(y)
 plot(out)
 
 out0 <- estimate_rt(y, korder = 0L, nsol = 10)

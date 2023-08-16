@@ -40,9 +40,12 @@
 #'   distribution with some shape and scale.
 #' @param x a vector of positions at which the counts have been observed. In an
 #'   ideal case, we would observe data at regular intervals (e.g. daily or
-#'   weekly) but this may not always be the case.
+#'   weekly) but this may not always be the case. May be numeric or Date.
 #' @param nsol Integer. The number of tuning parameters `lambda` at which to
 #'   compute Rt.
+#' @param delay_distn in the case of a non-gamma delay distribution,
+#'   a vector of delay probabilities may be passed here. These will be coerced
+#'   to sum to 1, and padded with 0 in the right tail if necessary.
 #' @param lambdamin Optional value for the smallest `lambda` to use. This should
 #'   be greater than zero.
 #' @param lambdamax Optional value for the largest `lambda` to use.
@@ -70,33 +73,42 @@
 #'
 #' @examples
 #' y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
-#' out <- estimate_rt(y, nsol = 10)
+#' out <- estimate_rt(y)
 #' plot(out)
 #'
 #' out0 <- estimate_rt(y, korder = 0L, nsol = 10)
 #' plot(out0)
-estimate_rt <- function(observed_counts,
-                        korder = 3L,
-                        dist_gamma = c(2.5, 2.5),
-                        x = 1:n,
-                        lambda = NULL,
-                        nsol = 100L,
-                        lambdamin = NULL,
-                        lambdamax = NULL,
-                        lambda_min_ratio = 1e-4,
-                        maxiter = 1e5,
-                        init = NULL) {
-  # check arguments are of proper types
+estimate_rt <- function(
+    observed_counts,
+    korder = 3L,
+    dist_gamma = c(2.5, 2.5),
+    x = 1:n,
+    lambda = NULL,
+    nsol = 100L,
+    delay_distn = NULL,
+    lambdamin = NULL,
+    lambdamax = NULL,
+    lambda_min_ratio = 1e-4,
+    maxiter = 1e5,
+    init = configure_rt_admm()) {
+
   arg_is_nonneg_int(korder)
   arg_is_pos_int(nsol, maxiter)
   arg_is_scalar(korder, nsol, lambda_min_ratio)
   arg_is_scalar(lambdamin, lambdamax, allow_null = TRUE)
-  arg_is_positive(lambdamin, lambdamax, allow_null = TRUE)
+  arg_is_positive(lambdamin, lambdamax, delay_distn, allow_null = TRUE)
   arg_is_positive(lambda_min_ratio, dist_gamma)
   arg_is_length(2, dist_gamma)
   n <- length(observed_counts)
 
+  if (korder + 1 >= n)
+    cli_abort("`korder + 1` must be less than observed data length.")
+
+  if (!is.null(delay_distn)) delay_distn <- delay_distn / sum(delay_distn)
+
   # check that x is a sorted, double vector of length n
+  xin <- x
+  if (inherits(xin, "Date")) x <- as.numeric(x)
   arg_is_numeric(x)
   arg_is_length(n, x)
   if (is.unsorted(x)) {
@@ -106,26 +118,19 @@ estimate_rt <- function(observed_counts,
   }
 
   # create weighted past cases
-  if (any(observed_counts < 0)) {
-    cli::cli_abort("`observed_counts` must be non-negative")
-  }
-  if (observed_counts[1] == 0 || is.na(observed_counts[1])) {
-    cli::cli_abort("`observed_counts` must start with positive count")
-  }
-  weighted_past_counts <- delay_calculator(observed_counts, x, dist_gamma)
+  if (any(observed_counts < 0))
+    cli_abort("`observed_counts` must be non-negative")
+  if (observed_counts[1] == 0 || is.na(observed_counts[1]))
+    cli_abort("`observed_counts` must start with positive count")
 
-  # initialize parameters and variables
-  if (is.null(init)) {
-    init <- configure_rt_admm(observed_counts, korder, weighted_past_counts)
-  }
+  weighted_past_counts <- delay_calculator(
+    observed_counts, x - min(x) + 1, dist_gamma, delay_distn
+  )
+
   if (!inherits(init, "rt_admm_configuration")) {
-    cli::cli_abort("`init` must be created with `configure_rt_admm()`.")
+    cli_abort("`init` must be created with `configure_rt_admm()`.")
   }
 
-  # check that korder is less than data length
-  if (korder + 1 >= n) {
-    cli::cli_abort("`korder + 1` must be less than observed data length.")
-  }
 
   # checks on lambda, lambdamin, lambdamax
   if (is.null(lambda)) lambda <- double(nsol) # prep for create_lambda
@@ -133,12 +138,10 @@ estimate_rt <- function(observed_counts,
   if (is.null(lambdamax)) lambdamax <- -1.0
   if (length(lambda) == 0) {
     msg <- "If lambda is not specified,"
-    if (lambda_min_ratio >= 1) {
-      cli::cli_abort("{msg} lambda_min_ratio must be in (0,1).")
-    }
-    if (lambdamin > 0 && lambdamax > 0 && lambdamin >= lambdamax) {
-      cli::cli_abort("{msg} lambdamin must be < lambdamax.")
-    }
+    if (lambda_min_ratio >= 1)
+      cli_abort("{msg} lambda_min_ratio must be in (0,1).")
+    if (lambdamin > 0 && lambdamax > 0 && lambdamin >= lambdamax)
+      cli_abort("{msg} lambdamin must be < lambdamax.")
     lambda <- double(nsol)
   }
   if (length(lambda) != nsol) nsol <- length(lambda)
@@ -148,7 +151,7 @@ estimate_rt <- function(observed_counts,
     observed_counts,
     x,
     weighted_past_counts,
-    init$korder,
+    korder,
     lambda = lambda,
     lambdamax = lambdamax,
     lambdamin = lambdamin,
@@ -167,7 +170,7 @@ estimate_rt <- function(observed_counts,
   structure(
     list(
       observed_counts = observed_counts,
-      x = x,
+      x = xin,
       weighted_past_counts = weighted_past_counts,
       Rt = mod$Rt,
       lambda = drop(mod$lambda),
@@ -184,10 +187,6 @@ estimate_rt <- function(observed_counts,
 
 #' Rt estimation algorithm configuration
 #'
-#' @inheritParams estimate_rt
-#' @param weighted_past_counts the weighted sum of past infections counts with
-#'   corresponding serial interval functions (or its Gamma approximation) as
-#'   weights
 #' @param rho Double. An ADMM parameter; coefficient of augmented term in the
 #' Lagrangian function.
 #' @param alpha Double. A parameter adjusting upper bound in line search algorithm
@@ -204,36 +203,30 @@ estimate_rt <- function(observed_counts,
 #' @return a list of model parameters with class `rt_admm_configuration`
 #'
 #' @export
-configure_rt_admm <- function(observed_counts,
-                              korder,
-                              weighted_past_counts = NULL,
-                              rho = -1,
-                              alpha = 0.5,
-                              gamma = 0.9,
-                              tolerance = 1e-4,
-                              maxiter_newton = 50L,
-                              maxiter_line = 20L,
-                              verbose = 0) {
-  n <- length(observed_counts)
-  arg_is_scalar(korder, rho, alpha, gamma, tolerance, verbose,
-                maxiter_newton, maxiter_line)
+configure_rt_admm <- function(
+    rho = -1,
+    alpha = 0.5,
+    gamma = 0.9,
+    tolerance = 1e-4,
+    maxiter_newton = 50L,
+    maxiter_line = 20L,
+    verbose = 0) {
+
+  arg_is_scalar(rho, alpha, gamma, tolerance, verbose)
+  arg_is_scalar(maxiter_newton, maxiter_line)
   arg_is_positive(alpha, gamma, tolerance)
   arg_is_numeric(rho, tolerance)
   arg_is_pos_int(maxiter_newton, maxiter_line)
-  arg_is_nonneg_int(korder, verbose)
-  if (alpha >= 1) cli::cli_abort("`alpha` must be in (0, 1).")
-  if (gamma > 1) cli::cli_abort("`gamma` must be in (0, 1].")
-  if (korder + 1 >= n) {
-    cli::cli_abort("`korder + 1` must be less than observed data length.")
-  }
+  arg_is_nonneg_int(verbose)
+  if (alpha >= 1) cli_abort("`alpha` must be in (0, 1).")
+  if (gamma > 1) cli_abort("`gamma` must be in (0, 1].")
 
   structure(
     list(
-      korder = korder,
       rho = rho,
-      tolerance = tolerance,
       alpha = alpha,
       gamma = gamma,
+      tolerance = tolerance,
       maxiter_newton = maxiter_newton,
       maxiter_line = maxiter_line,
       verbose = verbose

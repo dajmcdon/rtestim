@@ -8,11 +8,12 @@ cv_estimate_rt(
   observed_counts,
   korder = 3L,
   dist_gamma = c(2.5, 2.5),
-  nfold = 3,
+  nfold = 3L,
   error_measure = c("mse", "mae", "deviance"),
   x = 1:n,
   lambda = NULL,
   maxiter = 1000000L,
+  delay_distn = NULL,
   ...
 )
 }
@@ -43,7 +44,7 @@ Must be choose from \code{mse}, \code{mae}, and \code{deviance}.
 
 \item{x}{a vector of positions at which the counts have been observed. In an
 ideal case, we would observe data at regular intervals (e.g. daily or
-weekly) but this may not always be the case.}
+weekly) but this may not always be the case. May be numeric or Date.}
 
 \item{lambda}{Vector. A user supplied sequence of tuning parameters which
 determines the balance between data fidelity and
@@ -60,10 +61,14 @@ decreasing order.}
 \item{maxiter}{Integer. Maximum number of iterations for the estimation
 algorithm.}
 
+\item{delay_distn}{in the case of a non-gamma delay distribution,
+a vector of delay probabilities may be passed here. These will be coerced
+to sum to 1, and padded with 0 in the right tail if necessary.}
+
 \item{...}{additional parameters passed to \code{estimate_rt()} function}
 }
 \value{
-An object with S3 class \code{"cv_result"}. Among the list components:
+An object with S3 class \code{"cv_poisson_rt"}. Among the list components:
 \itemize{
 \item \code{full_fit} An object with S3 class \code{"poisson_rt"}, fitted with all
 \code{observed_counts} and \code{lambda}

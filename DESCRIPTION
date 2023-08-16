@@ -1,7 +1,7 @@
 Type: Package
 Package: rtestim
 Title: Estimate the Effective Reproductive Number with Trend Filtering
-Version: 0.0.2
+Version: 0.0.3
 Authors@R: c(
     person("Daniel J.", "McDonald", , "daniel@stat.ubc.ca", role = c("aut", "cre")),
     person("Zhenglun", "Cai", , "zhenglun.cai@stat.ubc.ca", role = "aut"),
@@ -28,8 +28,7 @@ Imports:
     methods,
     Rcpp,
     rlang,
-    vctrs,
-    zoo
+    vctrs
 Suggests: 
     knitr,
     rmarkdown,
