@@ -20,7 +20,7 @@ number of days after the primary infection"><!-- mathjax --><script src="https:/
     
     <a class="navbar-brand me-2" href="../index.html">rtestim</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.3</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,7 +66,13 @@ number of days after the primary infection</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">delay_calculator</span><span class="op">(</span><span class="va">observed_counts</span>, x <span class="op">=</span> <span class="cn">NULL</span>, dist_gamma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2.5</span>, <span class="fl">2.5</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">delay_calculator</span><span class="op">(</span></span>
+<span>  <span class="va">observed_counts</span>,</span>
+<span>  x <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  dist_gamma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2.5</span>, <span class="fl">2.5</span><span class="op">)</span>,</span>
+<span>  delay_distn <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  output_partial_seq <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -78,7 +84,7 @@ number of days after the primary infection</p>
 <dt>x</dt>
 <dd><p>a vector of positions at which the counts have been observed. In an
 ideal case, we would observe data at regular intervals (e.g. daily or
-weekly) but this may not always be the case.</p></dd>
+weekly) but this may not always be the case. May be numeric or Date.</p></dd>
 
 
 <dt>dist_gamma</dt>
@@ -89,12 +95,25 @@ some period of time after having become infectious.
 As in most literature, we assume that this interval follows a gamma
 distribution with some shape and scale.</p></dd>
 
+
+<dt>delay_distn</dt>
+<dd><p>in the case of a non-gamma delay distribution,
+a vector of delay probabilities may be passed here. These will be coerced
+to sum to 1, and padded with 0 in the right tail if necessary.</p></dd>
+
+
+<dt>output_partial_seq</dt>
+<dd><p>Logical. By default, this function returns the
+convolved weight vector with observed cases at the original <code>x</code> values.
+However, when <code>x</code> is irregular, setting this to <code>FALSE</code> will result
+in a result at the interpolated <code>x</code> sequence.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>A vector of size n-1, containing the total infectiousness at each
+<p>A vector containing the total infectiousness at each
 observed time point</p>
     </div>
 

@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rtestim</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.3</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -86,19 +86,14 @@
         <dd>Estimate Rt using smoothness-penalized Poisson likelihood</dd>
       </dl><dl><dt>
           
-          <code><a href="fill_case_counts.html">fill_case_counts()</a></code> 
-        </dt>
-        <dd>Interpolate case counts for uneven spaced time points</dd>
-      </dl><dl><dt>
-          
           <code><a href="fitted.cv_poisson_rt.html">fitted(<i>&lt;cv_poisson_rt&gt;</i>)</a></code> 
         </dt>
         <dd>Fitted cv_poisson_rt</dd>
       </dl><dl><dt>
           
-          <code><a href="fold_calculator.html">fold_calculator()</a></code> 
+          <code><a href="interpolate_rt.html">interpolate_rt()</a></code> 
         </dt>
-        <dd>Helper function. Calculate the fold index for each <code>observed_counts</code></dd>
+        <dd>Interpolate (or extrapolate) Rt estimates to intermediate design points</dd>
       </dl><dl><dt>
           
           <code><a href="plot.cv_poisson_rt.html">plot(<i>&lt;cv_poisson_rt&gt;</i>)</a></code> 
@@ -109,11 +104,6 @@
           <code><a href="plot.poisson_rt.html">plot(<i>&lt;poisson_rt&gt;</i>)</a></code> 
         </dt>
         <dd>Plot estimated Rt values from a <code>poisson_rt</code> object</dd>
-      </dl><dl><dt>
-          
-          <code><a href="pred_kth_rt.html">pred_kth_rt()</a></code> 
-        </dt>
-        <dd>Helper function. Calculate Rt at hold-out set</dd>
       </dl><dl><dt>
           
           <code><a href="predict.cv_poisson_rt.html">predict(<i>&lt;cv_poisson_rt&gt;</i>)</a></code> 

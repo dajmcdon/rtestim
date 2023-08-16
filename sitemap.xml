@@ -40,16 +40,13 @@
     <loc>https://dajmcdon.github.io/rtestim/reference/estimate_rt.html</loc>
   </url>
   <url>
-    <loc>https://dajmcdon.github.io/rtestim/reference/fill_case_counts.html</loc>
-  </url>
-  <url>
     <loc>https://dajmcdon.github.io/rtestim/reference/fitted.cv_poisson_rt.html</loc>
   </url>
   <url>
-    <loc>https://dajmcdon.github.io/rtestim/reference/fold_calculator.html</loc>
+    <loc>https://dajmcdon.github.io/rtestim/reference/index.html</loc>
   </url>
   <url>
-    <loc>https://dajmcdon.github.io/rtestim/reference/index.html</loc>
+    <loc>https://dajmcdon.github.io/rtestim/reference/interpolate_rt.html</loc>
   </url>
   <url>
     <loc>https://dajmcdon.github.io/rtestim/reference/pipe.html</loc>
@@ -59,9 +56,6 @@
   </url>
   <url>
     <loc>https://dajmcdon.github.io/rtestim/reference/plot.poisson_rt.html</loc>
-  </url>
-  <url>
-    <loc>https://dajmcdon.github.io/rtestim/reference/pred_kth_rt.html</loc>
   </url>
   <url>
     <loc>https://dajmcdon.github.io/rtestim/reference/predict.cv_poisson_rt.html</loc>

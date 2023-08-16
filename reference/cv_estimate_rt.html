@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rtestim</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.3</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -55,11 +55,12 @@
 <span>  <span class="va">observed_counts</span>,</span>
 <span>  korder <span class="op">=</span> <span class="fl">3L</span>,</span>
 <span>  dist_gamma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2.5</span>, <span class="fl">2.5</span><span class="op">)</span>,</span>
-<span>  nfold <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  nfold <span class="op">=</span> <span class="fl">3L</span>,</span>
 <span>  error_measure <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mse"</span>, <span class="st">"mae"</span>, <span class="st">"deviance"</span><span class="op">)</span>,</span>
 <span>  x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="va">n</span>,</span>
 <span>  lambda <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  maxiter <span class="op">=</span> <span class="fl">1000000L</span>,</span>
+<span>  delay_distn <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -103,7 +104,7 @@ Must be choose from <code>mse</code>, <code>mae</code>, and <code>deviance</code
 <dt>x</dt>
 <dd><p>a vector of positions at which the counts have been observed. In an
 ideal case, we would observe data at regular intervals (e.g. daily or
-weekly) but this may not always be the case.</p></dd>
+weekly) but this may not always be the case. May be numeric or Date.</p></dd>
 
 
 <dt>lambda</dt>
@@ -125,6 +126,12 @@ decreasing order.</p></dd>
 algorithm.</p></dd>
 
 
+<dt>delay_distn</dt>
+<dd><p>in the case of a non-gamma delay distribution,
+a vector of delay probabilities may be passed here. These will be coerced
+to sum to 1, and padded with 0 in the right tail if necessary.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>additional parameters passed to <code><a href="estimate_rt.html">estimate_rt()</a></code> function</p></dd>
 
@@ -133,7 +140,7 @@ algorithm.</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>An object with S3 class <code>"cv_result"</code>. Among the list components:</p><ul><li><p><code>full_fit</code> An object with S3 class <code>"poisson_rt"</code>, fitted with all
+<p>An object with S3 class <code>"cv_poisson_rt"</code>. Among the list components:</p><ul><li><p><code>full_fit</code> An object with S3 class <code>"poisson_rt"</code>, fitted with all
 <code>observed_counts</code> and <code>lambda</code></p></li>
 <li><p><code>cv_scores</code> leave-kth-out cross validation scores</p></li>
 <li><p><code>cv_se</code> leave-kth-out cross validation standard error</p></li>
@@ -154,11 +161,11 @@ within one standard error.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Degree of the estimated piecewise polynomial curve: 3 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Summary of cross validation across lambda:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 lambda index cv_scores  cv_se dof</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Min Lambda   323.28773     1     8.097 1.9464   0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CV Minimizer   0.21736    24     6.645 0.8738  12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1se Lambda   235.31965     2     7.354 1.4645   0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Max Lambda     0.03233    30     7.210 0.7171  21</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                 lambda index cv_scores cv_se dof</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Min Lambda   326.73106     1     9.336 2.966   0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> CV Minimizer   0.30179    23     7.871 2.302   9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1se Lambda   326.73106     1     9.336 2.966   0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Max Lambda     0.03267    30     9.776 1.734  20</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 </code></pre></div>
     </div>
