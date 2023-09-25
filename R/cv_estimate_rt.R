@@ -57,7 +57,7 @@ cv_estimate_rt <- function(
     maxiter = maxiter,
     ...)
 
-  if (is.null(lambda)) lambda <- full_data_fit$lambda
+  if (is.null(lambda)) lambda <- full_fit$lambda
 
   foldid <- c(0, rep_len(1:nfold, n - 2), 0)
   cvall <- matrix(0, nfold, length(lambda))

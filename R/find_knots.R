@@ -29,8 +29,8 @@ find_knots.poisson_rt <- function(object, lambda, ...) {
   dof <- dof[lam_list$left] * lam_list$frac +
     dof[lam_list$right] * (1 - lam_list$frac)
   knots <- which(abs(alp) > object$tolerance)
-  r <- c(knots + object$degree, n)
-  l <- c(1, knots + object$degree + 1)
+  r <- c(knots + object$korder, n)
+  l <- c(1, knots + object$korder + 1)
   pieces <- map2(l, r, function(a, b) object$x[a:b])
   list(knots = knots, pieces = pieces, dof = dof)
 }

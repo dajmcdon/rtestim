@@ -175,7 +175,7 @@ estimate_rt <- function(
       Rt = drop(mod$Rt),
       lambda = drop(mod$lambda),
       korder = mod$korder,
-      dof = drop(mod$dof),
+      dof = drop(mod$nknots) + mod$korder + 1,
       niter = drop(mod$niter),
       convergence = (mod$niter < maxiter),
       call = match.call(),

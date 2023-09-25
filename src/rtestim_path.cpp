@@ -112,7 +112,7 @@ List rtestim_path(NumericVector y,
   List out = List::create(
     Named("Rt") = theta(_, Range(0, nsols - 1)),
     Named("lambda") = lambda[Range(0, nsols - 1)],
-    Named("degree") = korder,
+    Named("korder") = korder,
     Named("nknots") = nknots[Range(0, nsols - 1)],
     Named("niter") = niter[Range(0, nsols - 1)],
     Named("alp") = alp(_, Range(0, nsols - 1))

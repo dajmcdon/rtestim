@@ -49,7 +49,7 @@ confband.poisson_rt <- function(object, lambda, level = 0.95, ...) {
 
   nbd <- function(piece, ord) {
     n <- length(piece)
-    if (n < ord + 1) return(Matrix::Diagonal(n, x = 0))
+    if (n <= ord + 1) return(Matrix::Diagonal(n, x = 0))
     get_D(ord, piece)
   }
 
@@ -58,7 +58,8 @@ confband.poisson_rt <- function(object, lambda, level = 0.95, ...) {
   Rt <- fitted(object, lambda)
   yhat <- predict(object, lambda)
   knots <- find_knots(object, lambda)
-  Ds <- Matrix::bdiag(lapply(knots$pieces, nbd, ord = object$degree))
+
+  Ds <- Matrix::bdiag(lapply(knots$pieces, nbd, ord = object$korder))
   # The procedure for this approximation:
   # 0. Pretend we knew the knots (and lambda is fixed + known) --> Ds
   # 1. pretend we had used ||Ds r||_2^2 with the same lambda
@@ -93,7 +94,7 @@ fmt_perc <- function(probs, digits = 3) {
 
 #' @exportS3Method print rt_confidence_band
 print.rt_confidence_band <- function(x, ...) {
-  cat("An `rt_confidence_band` object.\n")
+  cat("An `rt_confidence_band` object.\n\n")
   cat(paste("* lambda =", round(attr(x, "lambda"), 3), "\n"))
   cat(paste("* degrees of freedom =", attr(x, "dof"), "\n"))
   cat("\n")
