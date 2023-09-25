@@ -2,15 +2,15 @@
 % Please edit documentation in R/find_knots.R
 \name{find_knots}
 \alias{find_knots}
-\title{Find the knots for an estimated `poisson_rt` object.}
+\title{Find the knots for an estimated \code{poisson_rt} object.}
 \usage{
 find_knots(object, lambda, ...)
 }
 \arguments{
-\item{object}{A fitted `poisson_rt` object.}
+\item{object}{A fitted \code{poisson_rt} object.}
 
 \item{lambda}{A scalar value of the penalty parameter. If this value is not
-present in the `object$lambda` sequence, the result will be approximate
+present in the \code{object$lambda} sequence, the result will be approximate
 based on interpolating linearly between the available values.}
 }
 \value{

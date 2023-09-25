@@ -7,7 +7,7 @@
 \method{plot}{rt_confidence_band}(x, colour = "#3A448F", ...)
 }
 \arguments{
-\item{x}{An object of class `rt_confidence_band` as produced by `confband()`.}
+\item{x}{An object of class \code{rt_confidence_band} as produced by \code{confband()}.}
 
 \item{colour}{The colour of the desired plot}
 
@@ -15,7 +15,7 @@
 }
 \description{
 Produces a figure showing a single estimated Rt value along with approximate
-confidence bands. The result is a [ggplot2::ggplot()]. Additional user
+confidence bands. The result is a \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}. Additional user
 modifications can be added as desired.
 }
 \examples{

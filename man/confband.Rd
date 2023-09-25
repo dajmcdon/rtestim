@@ -7,10 +7,10 @@
 confband(object, lambda, level = 0.95, ...)
 }
 \arguments{
-\item{object}{a `poisson_rt` or `cv_poisson_rt` object.}
+\item{object}{a \code{poisson_rt} or \code{cv_poisson_rt} object.}
 
 \item{lambda}{the selected lambda. May be a scalar value, or in the case of
-`cv_poisson_rt` objects, `"lambda.min"` or `"lambda.max"`.}
+\code{cv_poisson_rt} objects, \code{"lambda.min"} or \code{"lambda.max"}.}
 
 \item{level}{the desired confidence level(s). These will be sorted if
 necessary.}
@@ -18,8 +18,8 @@ necessary.}
 \item{...}{additional arguments for methods. Unused.}
 }
 \value{
-A `data.frame` containing the estimated `Rt` at the chosen `lambda`,
- and confidence limits corresponding to `level`
+A \code{data.frame} containing the estimated \code{Rt} at the chosen \code{lambda},
+and confidence limits corresponding to \code{level}
 }
 \description{
 Create an approximate confidence band for the Rt estimate. Note that the
