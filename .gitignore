@@ -10,3 +10,5 @@ src/*.dll
 *.Rapp.history
 .vscode
 docs
+/doc/
+/Meta/

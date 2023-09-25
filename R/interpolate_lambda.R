@@ -1,19 +1,19 @@
 interpolate_lambda <- function(lambda, new_lambda) {
-  r <- range(lambda)
-  rr <- range(new_lambda)
-  if (rr[1] < r[1]) {
-    cli::cli_warn(
-      c("Supplied `lambda` has values smaller than those used to estimate Rt originally.",
+  if (min(new_lambda) < min(lambda)) {
+    cli::cli_warn(c(
+      "Requested `lambda` has values smaller than those used to estimate Rt.",
         i = "You may want to refit at these values.",
-        i = "Using the smallest available `lambda`'s."))
+        i = "Using the smallest `lambda`'s available."
+    ))
   }
-  if (rr[2] > r[2]) {
-    cli::cli_warn(
-      c("Supplied `lambda` has values larger than those used to estimate Rt originally.",
+  if (max(new_lambda) > max(lambda)) {
+    cli::cli_warn(c(
+      "Requested `lambda` has values larger than those used to estimate Rt.",
         i = "You may want to refit at these values.",
-        i = "Using the largest available `lambda`'s."))
+        i = "Using the largest `lambda`'s available."
+    ))
   }
-  if (length(lambda) == 1) {# degenerate case of only one lambda
+  if (length(lambda) == 1) {
     nums <- length(new_lambda)
     left <- rep(1, nums)
     right <- left

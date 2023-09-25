@@ -8,90 +8,65 @@
 #' number of days after the primary infection
 #'
 #' @inheritParams estimate_rt
+#' @param output_partial_seq Logical. By default, this function returns the
+#'   convolved weight vector with observed cases at the original `x` values.
+#'   However, when `x` is irregular, setting this to `FALSE` will result
+#'   in a result at the interpolated `x` sequence.
 #'
-#' @return A vector of size n-1, containing the total infectiousness at each
+#' @return A vector containing the total infectiousness at each
 #'   observed time point
 #' @export
 #'
 #' @examples
 #' delay_calculator(c(3,2,5,3,1), dist_gamma = c(2.5, 2.5))
-delay_calculator <- function(observed_counts, x = NULL,
-                             dist_gamma = c(2.5, 2.5)) {
+delay_calculator <- function(
+    observed_counts,
+    x = NULL,
+    dist_gamma = c(2.5, 2.5),
+    delay_distn = NULL,
+    output_partial_seq = TRUE) {
+
   arg_is_length(2, dist_gamma)
+  arg_is_lgl_scalar(output_partial_seq)
   arg_is_positive(dist_gamma)
+  arg_is_positive(delay_distn, allow_null = TRUE)
   n <- length(observed_counts)
   arg_is_length(n, x, allow_null = TRUE)
-  if (!is.null(x)) {
-    if (any(is.na(x)))
-      cli::cli_abort("x may not contain missing values.")
+  if (is.null(x)) x <- 1:n
+  else {
+    if (any(is.na(x))) cli_abort("x may not contain missing values.")
     if (is.unsorted(x, strictly = TRUE))
-      cli::cli_abort("x must be sorted and contain no duplicates.")
-  } else {
-    x <- 1:n
+      cli_abort("x must be sorted and contain no duplicates.")
   }
 
+  if (inherits(x, "Date")) x <- as.numeric(x)
+  arg_is_numeric(x)
+  if (!is.null(delay_distn)) delay_distn <- delay_distn / sum(delay_distn)
   regular <- vctrs::vec_unique_count(diff(x)) == 1L
+  if (regular) xout <- x
+  else xout <- seq(from = min(x), to = max(x), by = min(diff(x)))
 
-
-  if (!regular) {
-    helper_result <- fill_case_counts(x, observed_counts)
-    full_counts <- helper_result$full_counts
-    missing_idx <- helper_result$missing_idx
-
-    full_n <- length(full_counts)
-    x <- 1:full_n
-    w <- discretize_gamma(x, dist_gamma[1], dist_gamma[2])
-    cw <- cumsum(w)
-    convolved_seq <- stats::convolve(full_counts, rev(w), type = "open")[1:full_n] / cw
-    convolved_seq <- convolved_seq[!missing_idx]
-
+  if (is.null(delay_distn)) {
+    delay_distn <- discretize_gamma(xout, dist_gamma[1], dist_gamma[2])
   } else {
-    n <- length(observed_counts)
-    x <- 1:n
-    w <- discretize_gamma(x, dist_gamma[1], dist_gamma[2])
-    cw <- cumsum(w)
-    convolved_seq <- stats::convolve(observed_counts, rev(w), type = "open")[1:n] / cw
-
+    if (length(delay_distn) > length(xout)) {
+      cli_abort(
+        "User specified `delay_distn` must have no more than {length(xout)} elements."
+      )
+    }
+    # pad the tail with zero if too short
+    delay_distn <- c(delay_distn, rep(0, length(xout) - length(delay_distn)))
   }
-  return(c(convolved_seq[1], convolved_seq[1:(n - 1)]))
+
+  y <- stats::approx(x, observed_counts, xout = xout)$y
+  cw <- cumsum(delay_distn)
+
+  convolved_seq <- stats::convolve(y, rev(delay_distn), type = "open")
+  convolved_seq <- convolved_seq[seq_along(xout)] / cw
+  convolved_seq <- c(convolved_seq[1], convolved_seq[-length(convolved_seq)])
+  if (!regular && output_partial_seq)
+    convolved_seq <- convolved_seq[xout %in% x]
+  convolved_seq
 }
 
 
-
-#' Interpolate case counts for uneven spaced time points
-#'
-#' Given observation time points `x` and observed case counts `observed_counts`,
-#' this function finds the minimal difference `m` from consecutive `x` and
-#' construct a full and even `x` with difference `m`. This function then find
-#' the missing index and interpolate the observed case counts using
-#' `na.fill` method with argument `fill = "extend"`
-#'
-#' @inheritParams delay_calculator
-#'
-#' @return interpolated `observed_counts`
-#' @export
-#'
-#' @examples
-#' x1 <- c(1,3,4,5,7,9)
-#' o1 <- 2*x1
-#' filled_o1 <- fill_case_counts(x1, o1)
-#' o1_true <- 2*c(1:9)
-#' # o1_true should equal filled_o1
-fill_case_counts <- function(x, observed_counts) {
-  min_diff <- min(diff(x))
-  full_x <- seq(1, max(x), min_diff)
-  n_full <- length(full_x)
-  full_x <- round(full_x, 5) # avoid numerical issue
-  full_case_counts <- rep(NA, n_full)
-
-  missing_idx <- !full_x %in% x
-  non_missing_idx <- full_x %in% x
-  full_case_counts[non_missing_idx] <- observed_counts
-
-  output <- list()
-
-  output$full_counts <- zoo::na.fill(full_case_counts, fill = "extend")
-  output$missing_idx <- missing_idx
-
-  return(output)
-}

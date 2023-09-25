@@ -1,19 +1,26 @@
 Type: Package
 Package: rtestim
-Title: What the Package Does (Title Case)
-Version: 0.0.1
+Title: Estimate the Effective Reproductive Number with Trend Filtering
+Version: 0.0.3
 Authors@R: c(
     person("Daniel J.", "McDonald", , "daniel@stat.ubc.ca", role = c("aut", "cre")),
     person("Zhenglun", "Cai", , "zhenglun.cai@stat.ubc.ca", role = "aut"),
     person("Jiaping", "Liu", , "jiaping.liu@stat.ubc.ca", role = "aut")
   )
-Description: More about what it does (maybe more than one line) Use four
-    spaces when indenting paragraphs within the Description.
+Description: This package uses Poisson likelihood with trend filtering
+    penalty (a type of regularized nonparametric regression) to estimate
+    the effective reproductive number, Rt. This value roughly says "how
+    many new infections will result from each new infection today".
+    Values larger than 1 indicate that an epidemic is growing while those
+    less than 1 indicate decline.
 License: MIT + file LICENSE
-URL: https://dajmcdon.github.io/rtestim/
+URL: https://github.com/dajmcdon/rtestim,
+    https://dajmcdon.github.io/rtestim/
+BugReports: https://github.com/dajmcdon/rtestim/issues
 Depends: 
     dspline,
-    Matrix
+    Matrix,
+    R (>= 3.6.2)
 Imports: 
     cli,
     ggplot2,
@@ -23,20 +30,22 @@ Imports:
     rlang,
     tibble,
     vctrs,
-    zoo
 Suggests: 
+    knitr,
+    rmarkdown,
     testthat (>= 3.0.0),
     xml2
 LinkingTo: 
-    BH,
     dspline,
     Rcpp,
     RcppEigen,
     testthat
+VignetteBuilder: 
+    knitr
 Remotes:
     ryantibs/dspline
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
+Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
-SystemRequirements: C++11

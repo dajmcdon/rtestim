@@ -3,10 +3,10 @@
 #include <Rmath.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "dptf.h"
 extern "C" {
-  #include "tf_dp.h"
+#include "tf_dp.h"
 }
+#include "dptf.h"
 
 /**
  * Filter mean (i.e., exponential of natural parameter) trend for 0th-order
@@ -32,11 +32,12 @@ Rcpp::NumericVector dptf(Rcpp::NumericVector y, double lam) {
  * @return filtered mean (exponential of natural parameter) trend
  */
 // [[Rcpp::export]]
-Rcpp::NumericVector dptf_past(Rcpp::NumericVector y,
-                              double lam,
-                              Rcpp::NumericVector w) {
+Rcpp::NumericVector weight_dptf(Rcpp::NumericVector y,
+                                double lam,
+                                Rcpp::NumericVector w) {
   int n = y.size();
   Rcpp::NumericVector beta(n);
+  lam = n * lam;
   tf_dp_past(n, y.begin(), w.begin(), lam, beta.begin());
   return beta;
 }

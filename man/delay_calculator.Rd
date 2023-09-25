@@ -4,14 +4,20 @@
 \alias{delay_calculator}
 \title{Calculate the total infectiousness at each observed time point.}
 \usage{
-delay_calculator(observed_counts, x = NULL, dist_gamma = c(2.5, 2.5))
+delay_calculator(
+  observed_counts,
+  x = NULL,
+  dist_gamma = c(2.5, 2.5),
+  delay_distn = NULL,
+  output_partial_seq = TRUE
+)
 }
 \arguments{
 \item{observed_counts}{vector of the observed daily infection counts}
 
 \item{x}{a vector of positions at which the counts have been observed. In an
 ideal case, we would observe data at regular intervals (e.g. daily or
-weekly) but this may not always be the case.}
+weekly) but this may not always be the case. May be numeric or Date.}
 
 \item{dist_gamma}{Vector of length 2. These are the shape and scale for the
 assumed serial interval distribution. Roughly, this distribution describes
@@ -19,10 +25,19 @@ the probability of an infectious individual infecting someone else after
 some period of time after having become infectious.
 As in most literature, we assume that this interval follows a gamma
 distribution with some shape and scale.}
+
+\item{delay_distn}{in the case of a non-gamma delay distribution,
+a vector of delay probabilities may be passed here. These will be coerced
+to sum to 1, and padded with 0 in the right tail if necessary.}
+
+\item{output_partial_seq}{Logical. By default, this function returns the
+convolved weight vector with observed cases at the original \code{x} values.
+However, when \code{x} is irregular, setting this to \code{FALSE} will result
+in a result at the interpolated \code{x} sequence.}
 }
 \value{
-A vector of size n-1, containing the total infectiousness at each
-  observed time point
+A vector containing the total infectiousness at each
+observed time point
 }
 \description{
 The total infectiousness at each observed time point is calculated
