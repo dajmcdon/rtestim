@@ -120,9 +120,9 @@ print.rt_confidence_band <- function(x, ...) {
 #' cb <- confband(out, out$lambda[2], level = c(0.95, 0.8, 0.5))
 #' plot(cb)
 plot.rt_confidence_band <- function(x, colour = "#3A448F", ...) {
-  x$x <- attr(x, "xval")
+  x$xval <- attr(x, "xval")
   CIs <- names(x)[grep("[0-9]", names(x))]
-  plt <- ggplot2::ggplot(x, ggplot2::aes(x = x)) +
+  plt <- ggplot2::ggplot(x, ggplot2::aes(x = .data$xval)) +
     ggplot2::geom_line(ggplot2::aes(y = .data$Rt), colour = colour) +
     ggplot2::theme_bw()
 
