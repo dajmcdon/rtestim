@@ -82,6 +82,7 @@ cv_estimate_rt <- function(
     mod <- estimate_rt(
       observed_counts = observed_counts[train_idx],
       x = x[train_idx],
+      dist_gamma = dist_gamma,
       korder = korder,
       lambda = lambda,
       maxiter = maxiter,
