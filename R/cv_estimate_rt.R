@@ -52,9 +52,11 @@ cv_estimate_rt <- function(
   full_fit <- estimate_rt(
     observed_counts = observed_counts,
     korder = korder,
+    dist_gamma = dist_gamma,
     x = xin,
     lambda = lambda,
     maxiter = maxiter,
+    delay_distn = delay_distn,
     ...)
 
   if (is.null(lambda)) lambda <- full_fit$lambda
