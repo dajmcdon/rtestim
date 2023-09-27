@@ -49,15 +49,17 @@ cv_estimate_rt <- function(
   if (nfold == 1) cli_abort("nfold must be greater than 1")
 
   ## Run program one time to create lambda
-  full_data_fit <- estimate_rt(
+  full_fit <- estimate_rt(
     observed_counts = observed_counts,
     korder = korder,
+    dist_gamma = dist_gamma,
     x = xin,
     lambda = lambda,
     maxiter = maxiter,
+    delay_distn = delay_distn,
     ...)
 
-  if (is.null(lambda)) lambda <- full_data_fit$lambda
+  if (is.null(lambda)) lambda <- full_fit$lambda
 
   foldid <- c(0, rep_len(1:nfold, n - 2), 0)
   cvall <- matrix(0, nfold, length(lambda))
@@ -80,6 +82,7 @@ cv_estimate_rt <- function(
     mod <- estimate_rt(
       observed_counts = observed_counts[train_idx],
       x = x[train_idx],
+      dist_gamma = dist_gamma,
       korder = korder,
       lambda = lambda,
       maxiter = maxiter,
@@ -93,7 +96,8 @@ cv_estimate_rt <- function(
       x = x[train_idx] - min(x[train_idx]) + 1,
       dist_gamma = dist_gamma,
       delay_distn = delay_distn,
-      output_partial_seq = FALSE)
+      output_partial_seq = FALSE
+    )
 
 
     pred_observed_counts <- interp_rt * wpc[test_idx]
@@ -107,13 +111,15 @@ cv_estimate_rt <- function(
   i0 <- which.min(cv_scores)
 
   structure(
-    list(
-      full_fit = full_data_fit,
-      cv_scores = cv_scores,
-      cv_se = cv_se,
-      lambda = lambda,
-      lambda.min = lambda[which.min(cv_scores)],
-      lambda.1se = max(lambda[cv_scores <= cv_scores[i0] + cv_se[i0]]),
+    enlist(
+      full_fit,
+      cv_scores,
+      cv_se,
+      lambda,
+      lambda.min = lambda[i0],
+      lambda.1se = max(
+        lambda[cv_scores <= cv_scores[i0] + cv_se[i0]],
+        na.rm = TRUE),
       call = match.call()
     ),
     class = "cv_poisson_rt"

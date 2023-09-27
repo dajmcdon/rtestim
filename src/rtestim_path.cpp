@@ -36,7 +36,7 @@ List rtestim_path(NumericVector y,
   // Placeholders for solutions
   NumericMatrix theta(n, nsol);
   NumericVector niter(nsol);
-  NumericVector dof(nsol);
+  NumericVector nknots(nsol);
 
   // Build D matrices as needed
   Eigen::SparseMatrix<double> D;
@@ -50,6 +50,8 @@ List rtestim_path(NumericVector y,
     DkDk = Dk.transpose() * Dk;
     m = Dk.rows();
   }
+
+  NumericMatrix alp(m - 1, nsol);
 
   // Generate lambda sequence if necessary
   if (abs(lambda[nsol - 1]) < tolerance / 100 && lambdamax <= 0) {
@@ -73,8 +75,7 @@ List rtestim_path(NumericVector y,
 
   // Outer loop to compute solution path
   for (int i = 0; i < nsol; i++) {
-    if (verbose > 0)
-      Rcout << ".";
+    if (verbose > 0) Rcout << ".";
     Rcpp::checkUserInterrupt();
 
     if (korder == 0) {
@@ -87,35 +88,34 @@ List rtestim_path(NumericVector y,
                   tolerance, iters);
       niter[i] = iters;
       maxiter -= iters + 1;
-      if (maxiter < 0)
-        nsols = i + 1;
+      if (maxiter < 0) nsols = i + 1;
     }
 
     // Store solution
     if (korder == int(0)) {
       theta(_, i) = beta;
-      dof[i] = sum(abs(diff(beta)) > tolerance);
+      alp(_, i) = diff(beta);
     } else {
       theta(_, i) = exp(beta);
-      dof[i] = sum(abs(diff(alpha)) > tolerance);
+      alp(_, i) = diff(alpha);
     }
+    nknots[i] = sum(abs(alp(_, i)) > tolerance);
 
     // Verbose handlers
-    if (verbose > 1)
-      Rcout << niter(i);
-    if (verbose > 2)
-      Rcout << "(" << lambda(i) << ")";
-    if (verbose > 0)
-      Rcout << std::endl;
-    if (maxiter < 0)
-      break;
+    if (verbose > 1) Rcout << niter(i);
+    if (verbose > 2) Rcout << "(" << lambda(i) << ")";
+    if (verbose > 0) Rcout << std::endl;
+    if (maxiter < 0) break;
   }
 
   // Return
-  List out = List::create(Named("Rt") = theta(_, Range(0, nsols - 1)),
-                          Named("lambda") = lambda[Range(0, nsols - 1)],
-                          Named("korder") = korder,
-                          Named("dof") = dof[Range(0, nsols - 1)],
-                          Named("niter") = niter[Range(0, nsols - 1)]);
+  List out = List::create(
+    Named("Rt") = theta(_, Range(0, nsols - 1)),
+    Named("lambda") = lambda[Range(0, nsols - 1)],
+    Named("korder") = korder,
+    Named("nknots") = nknots[Range(0, nsols - 1)],
+    Named("niter") = niter[Range(0, nsols - 1)],
+    Named("alp") = alp(_, Range(0, nsols - 1))
+  );
   return out;
 }

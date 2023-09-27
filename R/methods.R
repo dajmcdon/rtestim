@@ -100,11 +100,7 @@ fitted.poisson_rt <- function(object, lambda = NULL, ...) {
   if (is.null(lambda)) return(object$Rt)
 
   lam_list <- interpolate_lambda(object$lambda, lambda)
-  k <- length(lambda)
-  log_r <- log(object$Rt)
-  ret <- log_r[ ,lam_list$left, drop = FALSE] %*% diag(lam_list$frac, k, k) +
-    log_r[ ,lam_list$right, drop = FALSE] %*% diag(1 - lam_list$frac, k, k)
-  drop(exp(ret))
+  interpolate_mat(object$Rt, lam_list, lambda, take_log = TRUE)
 }
 
 #' @importFrom stats coef

@@ -28,7 +28,8 @@ Imports:
     methods,
     Rcpp,
     rlang,
-    vctrs
+    tibble,
+    vctrs,
 Suggests: 
     knitr,
     rmarkdown,

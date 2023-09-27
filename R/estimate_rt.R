@@ -168,17 +168,19 @@ estimate_rt <- function(
   )
 
   structure(
-    list(
-      observed_counts = observed_counts,
+    enlist(
+      observed_counts,
       x = xin,
-      weighted_past_counts = weighted_past_counts,
-      Rt = mod$Rt,
+      weighted_past_counts,
+      Rt = drop(mod$Rt),
       lambda = drop(mod$lambda),
       korder = mod$korder,
-      dof = drop(mod$dof),
+      dof = drop(mod$nknots) + mod$korder + 1,
       niter = drop(mod$niter),
       convergence = (mod$niter < maxiter),
-      call = match.call()
+      call = match.call(),
+      alp = drop(mod$alp),
+      tolerance = init$tolerance
     ),
     class = "poisson_rt"
   )
@@ -222,14 +224,14 @@ configure_rt_admm <- function(
   if (gamma > 1) cli_abort("`gamma` must be in (0, 1].")
 
   structure(
-    list(
-      rho = rho,
-      alpha = alpha,
-      gamma = gamma,
-      tolerance = tolerance,
-      maxiter_newton = maxiter_newton,
-      maxiter_line = maxiter_line,
-      verbose = verbose
+    enlist(
+      rho,
+      alpha,
+      gamma,
+      tolerance,
+      maxiter_newton,
+      maxiter_line,
+      verbose
     ),
     class = "rt_admm_configuration"
   )
