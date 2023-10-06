@@ -102,7 +102,11 @@ cv_estimate_rt <- function(
 
     pred_observed_counts <- interp_rt * wpc[test_idx]
     score <- colMeans(err_fun(observed_counts[test_idx], pred_observed_counts))
-    cvall[f,] <- score
+    tryCatch(cvall[f,] <- score,
+             error = function(w) {
+               print("Error in `cvall[f,] <- score`. Please increase the maximum iteration `maxiter`.")
+               stop()
+              })
   }
 
   ### Calculate CV summary
