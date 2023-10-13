@@ -8,10 +8,10 @@
 #' number of days after the primary infection
 #'
 #' @inheritParams estimate_rt
-#' @param output_partial_seq Logical. By default, this function returns the
-#'   convolved weight vector with observed cases at the original `x` values.
-#'   However, when `x` is irregular, setting this to `FALSE` will result
-#'   in a result at the interpolated `x` sequence.
+#' @param xout a vector of positions at for which the results should be returned.
+#'   By default, this will be the same as `x`, but in the case that observations
+#'   are unequally spaced, alternatives may be desired. Note that `xout` must
+#'   satisfy `min(x) <= min(xout)` and `max(x) >= max(xout)`.
 #'
 #' @return A vector containing the total infectiousness at each
 #'   observed time point
@@ -24,49 +24,69 @@ delay_calculator <- function(
     x = NULL,
     dist_gamma = c(2.5, 2.5),
     delay_distn = NULL,
-    output_partial_seq = TRUE) {
+    xout = x) {
 
   arg_is_length(2, dist_gamma)
-  arg_is_lgl_scalar(output_partial_seq)
   arg_is_positive(dist_gamma)
   arg_is_positive(delay_distn, allow_null = TRUE)
   n <- length(observed_counts)
   arg_is_length(n, x, allow_null = TRUE)
   if (is.null(x)) x <- 1:n
   else {
-    if (any(is.na(x))) cli_abort("x may not contain missing values.")
+    if (any(is.na(x))) cli_abort("`x` may not contain missing values.")
     if (is.unsorted(x, strictly = TRUE))
-      cli_abort("x must be sorted and contain no duplicates.")
+      cli_abort("`x` must be sorted and contain no duplicates.")
   }
 
   if (inherits(x, "Date")) x <- as.numeric(x)
   arg_is_numeric(x)
   if (!is.null(delay_distn)) delay_distn <- delay_distn / sum(delay_distn)
-  regular <- vctrs::vec_unique_count(diff(x)) == 1L
-  if (regular) xout <- x
-  else xout <- seq(from = min(x), to = max(x), by = min(diff(x)))
+
+  if (any(is.na(xout))) cli_abort("`xout` may not contain missing values.")
+  if (is.unsorted(xout, strictly = TRUE))
+    cli_abort("`xout` must be sorted and contain no duplicates.")
+  if (inherits(xout, "Date")) xout <- as.numeric(xout)
+  arg_is_numeric(xout)
+  if (min(xout) < min(x)) cli_abort("`min(xout)` man not be less than `min(x)`.")
+  if (max(xout) > max(x)) cli_abort("`max(xout)` man not exceed `max(x)`.")
+
+  allx <- union(x, xout)
+  dallx <- diff(allx)
+
+  ## TODO: handle weekly / monthly incidence automatically
+  # regular <- vctrs::vec_unique_count(dallx) == 1L
+  # if (!regular) {
+  min_spacing <- 1L  #gcd(unique(dallx))
+  allx <- seq(from = min(x), to = max(x), by = min_spacing)
+  # }
 
   if (is.null(delay_distn)) {
-    delay_distn <- discretize_gamma(xout, dist_gamma[1], dist_gamma[2])
+    delay_distn <- discretize_gamma(allx, dist_gamma[1], dist_gamma[2])
   } else {
-    if (length(delay_distn) > length(xout)) {
+    if (length(delay_distn) > length(allx)) {
       cli_abort(
-        "User specified `delay_distn` must have no more than {length(xout)} elements."
+        "User specified `delay_distn` must have no more than {length(allx)} elements."
       )
     }
     # pad the tail with zero if too short
-    delay_distn <- c(delay_distn, rep(0, length(xout) - length(delay_distn)))
+    delay_distn <- c(delay_distn, rep(0, length(allx) - length(delay_distn)))
   }
 
-  y <- stats::approx(x, observed_counts, xout = xout)$y
+  y <- stats::approx(x, observed_counts, xout = allx)$y
   cw <- cumsum(delay_distn)
-
   convolved_seq <- stats::convolve(y, rev(delay_distn), type = "open")
-  convolved_seq <- convolved_seq[seq_along(xout)] / cw
+  convolved_seq <- convolved_seq[seq_along(allx)] / cw
   convolved_seq <- c(convolved_seq[1], convolved_seq[-length(convolved_seq)])
-  if (!regular && output_partial_seq)
-    convolved_seq <- convolved_seq[xout %in% x]
-  convolved_seq
+  convolved_seq[allx %in% xout]
 }
 
 
+gcd <- function(x, na.rm = FALSE) {
+  if (na.rm) x <- x[!is.na(x)]
+  if (anyNA(x)) return(NA)
+  stopifnot(is.numeric(x))
+  if (length(x) < 2L) return(x)
+  if (!rlang::is_integerish(x)) cli_abort("`x` must contain only integers.")
+  x <- x[x != 0]
+  compute_gcd(x)
+}

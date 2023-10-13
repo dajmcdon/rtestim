@@ -9,7 +9,7 @@ delay_calculator(
   x = NULL,
   dist_gamma = c(2.5, 2.5),
   delay_distn = NULL,
-  output_partial_seq = TRUE
+  xout = x
 )
 }
 \arguments{
@@ -30,10 +30,10 @@ distribution with some shape and scale.}
 a vector of delay probabilities may be passed here. These will be coerced
 to sum to 1, and padded with 0 in the right tail if necessary.}
 
-\item{output_partial_seq}{Logical. By default, this function returns the
-convolved weight vector with observed cases at the original \code{x} values.
-However, when \code{x} is irregular, setting this to \code{FALSE} will result
-in a result at the interpolated \code{x} sequence.}
+\item{xout}{a vector of positions at for which the results should be returned.
+By default, this will be the same as \code{x}, but in the case that observations
+are unequally spaced, alternatives may be desired. Note that \code{xout} must
+satisfy \code{min(x) <= min(xout)} and \code{max(x) >= max(xout)}.}
 }
 \value{
 A vector containing the total infectiousness at each

@@ -53,3 +53,7 @@ line_search <- function(s, lambda, alpha, gamma, y, x, w, n, ord, theta, theta_o
     .Call(`_rtestim_line_search`, s, lambda, alpha, gamma, y, x, w, n, ord, theta, theta_old, M)
 }
 
+compute_gcd <- function(x) {
+    .Call(`_rtestim_compute_gcd`, x)
+}
+

@@ -14,6 +14,7 @@ cv_estimate_rt(
   lambda = NULL,
   maxiter = 1000000L,
   delay_distn = NULL,
+  invert_splits = FALSE,
   ...
 )
 }
@@ -64,6 +65,13 @@ algorithm.}
 \item{delay_distn}{in the case of a non-gamma delay distribution,
 a vector of delay probabilities may be passed here. These will be coerced
 to sum to 1, and padded with 0 in the right tail if necessary.}
+
+\item{invert_splits}{Logical.
+Typical K-fold CV would use K-1 folds for the training
+set while reserving 1 fold for evaluation (repeating the split K times).
+Setting this to true inverts this process, using a much smaller training
+set with a larger evaluation set. This tends to result in larger values
+of \code{lambda} that minimize CV.}
 
 \item{...}{additional parameters passed to \code{estimate_rt()} function}
 }

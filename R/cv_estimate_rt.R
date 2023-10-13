@@ -10,6 +10,12 @@
 #' Must be choose from `mse`, `mae`, and `deviance`.
 #' `mse` calculates the mean square error; `mae` calculates the mean absolute error;
 #' `deviance` calculates the deviance
+#' @param invert_splits Logical.
+#'   Typical K-fold CV would use K-1 folds for the training
+#'   set while reserving 1 fold for evaluation (repeating the split K times).
+#'   Setting this to true inverts this process, using a much smaller training
+#'   set with a larger evaluation set. This tends to result in larger values
+#'   of `lambda` that minimize CV.
 #' @param ... additional parameters passed to `estimate_rt()` function
 
 #' @return An object with S3 class `"cv_poisson_rt"`. Among the list components:
@@ -37,6 +43,7 @@ cv_estimate_rt <- function(
     lambda = NULL,
     maxiter = 1e6L,
     delay_distn = NULL,
+    invert_splits = FALSE,
     ...) {
 
   arg_is_pos_int(nfold)
@@ -72,12 +79,12 @@ cv_estimate_rt <- function(
       devr <- y * log(m) - m
       devy <- y * log(y) - y
       devy[y == 0] <- 0
-      2 * (devr - devy) }
+      2 * (devy - devr) }
   )
 
   for (f in 1:nfold) {
-    train_idx <- foldid != f
-    test_idx <- foldid == f
+    train_idx <- if (invert_splits) foldid %in% c(0, f) else foldid != f
+    test_idx <- !train_idx
 
     mod <- estimate_rt(
       observed_counts = observed_counts[train_idx],
@@ -86,8 +93,8 @@ cv_estimate_rt <- function(
       korder = korder,
       lambda = lambda,
       maxiter = maxiter,
-      delay_distn = delay_distn,
-      ...)
+      delay_distn = delay_distn)
+      #...)
 
     interp_rt <- interpolate_rt(mod, x[test_idx])
 
@@ -96,11 +103,11 @@ cv_estimate_rt <- function(
       x = x[train_idx] - min(x[train_idx]) + 1,
       dist_gamma = dist_gamma,
       delay_distn = delay_distn,
-      output_partial_seq = FALSE
+      xout = x[test_idx] - min(x[train_idx]) + 1
     )
 
 
-    pred_observed_counts <- interp_rt * wpc[test_idx]
+    pred_observed_counts <- interp_rt * wpc
     score <- colMeans(err_fun(observed_counts[test_idx], pred_observed_counts))
     cvall[f,] <- score
   }

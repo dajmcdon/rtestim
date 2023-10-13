@@ -29,13 +29,14 @@ Imports:
     Rcpp,
     rlang,
     tibble,
-    vctrs,
-Suggests: 
+    vctrs
+Suggests:
     knitr,
     rmarkdown,
     testthat (>= 3.0.0),
     xml2
-LinkingTo: 
+LinkingTo:
+    BH,
     dspline,
     Rcpp,
     RcppEigen,

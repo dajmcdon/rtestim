@@ -163,3 +163,30 @@ double line_search(double s,
   }
   return s;
 }
+
+
+
+// [[Rcpp::depends(BH)]]
+
+#include <boost/integer/common_factor.hpp>
+
+// [[Rcpp::export]]
+int compute_gcd(IntegerVector x) {
+  std::sort(x.begin(), x.end());
+  int g = 0;
+  int n = x.length();
+  if (n == 0) {
+    g = 0;
+  } else if (n == 1) {
+    g = x[0];
+  } else if (n == 2) {
+    g = boost::integer::gcd(x[0], x[1]);
+  } else {
+    g = boost::integer::gcd(x[0], x[1]);
+    for (int i = 2; i < n; i++) {
+      g = boost::integer::gcd(g, x[i]);
+      if (g == 1) break;
+    }
+  }
+  return g;
+}
