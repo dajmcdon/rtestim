@@ -69,8 +69,8 @@ cv_estimate_rt <- function(
     mse = function(y, m) (y - m)^2,
     mae = function(y, m) abs(y - m),
     deviance = function(y, m) {
-      devr <- y * log(m) - m
-      devy <- y * log(y) - y
+      devr <- m * log(m) - m
+      devy <- m * log(y) - y
       devy[y == 0] <- 0
       2 * (devr - devy) }
   )
