@@ -14,6 +14,7 @@ cv_estimate_rt(
   lambda = NULL,
   maxiter = 1000000L,
   delay_distn = NULL,
+  delay_distn_periodicity = NULL,
   invert_splits = FALSE,
   ...
 )
@@ -65,6 +66,16 @@ algorithm.}
 \item{delay_distn}{in the case of a non-gamma delay distribution,
 a vector of delay probabilities may be passed here. These will be coerced
 to sum to 1, and padded with 0 in the right tail if necessary.}
+
+\item{delay_distn_periodicity}{Controls the relationship between the spacing
+of the computed delay distribution and the spacing of \code{x}. In the default
+case, \code{x} would be regular on the sequence \code{1:length(observed_cases)},
+and this would
+be 1. But if \code{x} is a \code{Date} object or spaced irregularly, the relationship
+becomes more complicated. For example, weekly data when \code{x} is a date in
+the form \code{YYYY-MM-DD} requires specifying \code{delay_distn_periodicity = "1 week"}.
+Or if \code{observed_cases} were reported on Monday, Wednesday, and Friday,
+then \code{delay_distn_periodicity = "1 day"} would be most appropriate.}
 
 \item{invert_splits}{Logical.
 Typical K-fold CV would use K-1 folds for the training
