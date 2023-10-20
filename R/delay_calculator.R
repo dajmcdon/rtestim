@@ -24,6 +24,7 @@ delay_calculator <- function(
     x = NULL,
     dist_gamma = c(2.5, 2.5),
     delay_distn = NULL,
+    delay_distn_periodicity = NULL,
     xout = x) {
 
   arg_is_length(2, dist_gamma)
@@ -31,11 +32,13 @@ delay_calculator <- function(
   arg_is_positive(delay_distn, allow_null = TRUE)
   n <- length(observed_counts)
   arg_is_length(n, x, allow_null = TRUE)
-  if (is.null(x)) x <- 1:n
-  else {
+  if (is.null(x)) {
+    x <- 1:n
+  } else {
     if (any(is.na(x))) cli_abort("`x` may not contain missing values.")
-    if (is.unsorted(x, strictly = TRUE))
+    if (is.unsorted(x, strictly = TRUE)) {
       cli_abort("`x` must be sorted and contain no duplicates.")
+    }
   }
 
   if (inherits(x, "Date")) x <- as.numeric(x)
@@ -50,22 +53,32 @@ delay_calculator <- function(
   if (min(xout) < min(x)) cli_abort("`min(xout)` man not be less than `min(x)`.")
   if (max(xout) > max(x)) cli_abort("`max(xout)` man not exceed `max(x)`.")
 
-  allx <- union(x, xout)
-  dallx <- diff(allx)
-
-  ## TODO: handle weekly / monthly incidence automatically
-  # regular <- vctrs::vec_unique_count(dallx) == 1L
-  # if (!regular) {
-  min_spacing <- 1L  #gcd(unique(dallx))
-  allx <- seq(from = min(x), to = max(x), by = min_spacing)
-  # }
+  ddx <- gcd(unique(diff(x)))
+  if (is.null(delay_distn_periodicity)) {
+    ddp <- ddx
+  } else if (is.character(delay_distn_periodicity)) {
+    ddp <- new_period(delay_distn_periodicity)
+    ddp <- vctrs::field(ddp, "day")
+  } else if (is.numeric(delay_distn_periodicity)) {
+    ddp <- delay_distn_periodicity
+  } else {
+    cli::cli_abort("`delay_distn_periodicity` must be scalar character or numeric.")
+  }
+  if (ddp %% ddx != 0) {
+    cli::cli_abort(c(
+      "`delay_distn_periodicity` may be at most the minimum spacing in `x`,",
+      "!" = "and must divide the minimum spacing evenly.",
+      i = "`delay_distn_periodicity` = {.val {ddp}} compared to {.val {ddx}} for `x`."
+    ))
+  }
+  allx <- seq(from = min(x), to = max(x), by = ddp)
 
   if (is.null(delay_distn)) {
-    delay_distn <- discretize_gamma(allx, dist_gamma[1], dist_gamma[2])
+    delay_distn <- discretize_gamma(allx - min(x) + ddp, dist_gamma[1], dist_gamma[2])
   } else {
     if (length(delay_distn) > length(allx)) {
       cli_abort(
-        "User specified `delay_distn` must have no more than {length(allx)} elements."
+        "User specified `delay_distn` must have no more than {.val {length(allx)}} elements."
       )
     }
     # pad the tail with zero if too short
@@ -78,15 +91,4 @@ delay_calculator <- function(
   convolved_seq <- convolved_seq[seq_along(allx)] / cw
   convolved_seq <- c(convolved_seq[1], convolved_seq[-length(convolved_seq)])
   convolved_seq[allx %in% xout]
-}
-
-
-gcd <- function(x, na.rm = FALSE) {
-  if (na.rm) x <- x[!is.na(x)]
-  if (anyNA(x)) return(NA)
-  stopifnot(is.numeric(x))
-  if (length(x) < 2L) return(x)
-  if (!rlang::is_integerish(x)) cli_abort("`x` must contain only integers.")
-  x <- x[x != 0]
-  compute_gcd(x)
 }

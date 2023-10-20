@@ -43,6 +43,7 @@ cv_estimate_rt <- function(
     lambda = NULL,
     maxiter = 1e6L,
     delay_distn = NULL,
+    delay_distn_periodicity = NULL,
     invert_splits = FALSE,
     ...) {
 
@@ -64,9 +65,13 @@ cv_estimate_rt <- function(
     lambda = lambda,
     maxiter = maxiter,
     delay_distn = delay_distn,
+    delay_distn_periodicity = delay_distn_periodicity,
     ...)
 
   if (is.null(lambda)) lambda <- full_fit$lambda
+  if (is.null(delay_distn_periodicity)) {
+    delay_distn_periodicity <- full_fit$delay_distn_periodicity
+  }
 
   foldid <- c(0, rep_len(1:nfold, n - 2), 0)
   cvall <- matrix(0, nfold, length(lambda))
@@ -93,19 +98,20 @@ cv_estimate_rt <- function(
       korder = korder,
       lambda = lambda,
       maxiter = maxiter,
-      delay_distn = delay_distn)
-      #...)
+      delay_distn = delay_distn,
+      delay_distn_periodicity = delay_distn_periodicity,
+      ...)
 
     interp_rt <- interpolate_rt(mod, x[test_idx])
 
     wpc <- delay_calculator(
       observed_counts = observed_counts[train_idx],
-      x = x[train_idx] - min(x[train_idx]) + 1,
+      x = x[train_idx],
       dist_gamma = dist_gamma,
       delay_distn = delay_distn,
-      xout = x[test_idx] - min(x[train_idx]) + 1
+      delay_distn_periodicity = delay_distn_periodicity,
+      xout = x[test_idx]
     )
-
 
     pred_observed_counts <- interp_rt * wpc
     score <- colMeans(err_fun(observed_counts[test_idx], pred_observed_counts))

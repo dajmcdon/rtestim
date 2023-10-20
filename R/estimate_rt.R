@@ -46,6 +46,15 @@
 #' @param delay_distn in the case of a non-gamma delay distribution,
 #'   a vector of delay probabilities may be passed here. These will be coerced
 #'   to sum to 1, and padded with 0 in the right tail if necessary.
+#' @param delay_distn_periodicity Controls the relationship between the spacing
+#'   of the computed delay distribution and the spacing of `x`. In the default
+#'   case, `x` would be regular on the sequence `1:length(observed_cases)`,
+#'   and this would
+#'   be 1. But if `x` is a `Date` object or spaced irregularly, the relationship
+#'   becomes more complicated. For example, weekly data when `x` is a date in
+#'   the form `YYYY-MM-DD` requires specifying `delay_distn_periodicity = "1 week"`.
+#'   Or if `observed_cases` were reported on Monday, Wednesday, and Friday,
+#'   then `delay_distn_periodicity = "1 day"` would be most appropriate.
 #' @param lambdamin Optional value for the smallest `lambda` to use. This should
 #'   be greater than zero.
 #' @param lambdamax Optional value for the largest `lambda` to use.
@@ -86,6 +95,7 @@ estimate_rt <- function(
     lambda = NULL,
     nsol = 100L,
     delay_distn = NULL,
+    delay_distn_periodicity = NULL,
     lambdamin = NULL,
     lambdamax = NULL,
     lambda_min_ratio = 1e-4,
@@ -95,7 +105,7 @@ estimate_rt <- function(
   arg_is_nonneg_int(korder)
   arg_is_pos_int(nsol, maxiter)
   arg_is_scalar(korder, nsol, lambda_min_ratio)
-  arg_is_scalar(lambdamin, lambdamax, allow_null = TRUE)
+  arg_is_scalar(lambdamin, lambdamax, delay_distn_periodicity, allow_null = TRUE)
   arg_is_positive(lambdamin, lambdamax, delay_distn, allow_null = TRUE)
   arg_is_positive(lambda_min_ratio, dist_gamma)
   arg_is_length(2, dist_gamma)
@@ -108,14 +118,13 @@ estimate_rt <- function(
 
   # check that x is a sorted, double vector of length n
   xin <- x
-  if (inherits(xin, "Date")) x <- as.numeric(x)
+  if (inherits(x, "Date")) x <- as.numeric(x)
   arg_is_numeric(x)
   arg_is_length(n, x)
-  if (is.unsorted(x)) {
-    ord <- order(x)
-    x <- x[ord]
-    observed_counts <- observed_counts[ord]
+  if (is.unsorted(x, strictly = TRUE)) {
+    cli::cli_abort("`x` must be sorted in increasing order without duplicates.")
   }
+
 
   # create weighted past cases
   if (any(observed_counts < 0))
@@ -124,7 +133,7 @@ estimate_rt <- function(
     cli_abort("`observed_counts` must start with positive count")
 
   weighted_past_counts <- delay_calculator(
-    observed_counts, x - min(x) + 1, dist_gamma, delay_distn
+    observed_counts, x, dist_gamma, delay_distn, delay_distn_periodicity
   )
 
   if (!inherits(init, "rt_admm_configuration")) {
@@ -180,6 +189,7 @@ estimate_rt <- function(
       convergence = (mod$niter < maxiter),
       call = match.call(),
       alp = drop(mod$alp),
+      delay_distn_periodicity,
       tolerance = init$tolerance
     ),
     class = "poisson_rt"
@@ -201,6 +211,7 @@ estimate_rt <- function(
 #' @param maxiter_line Integer. Maximum number of iterations for the linesearch
 #'   algorithm in the proximal Newton method.
 #' @param verbose Integer.
+#' @param ... space for future extensions
 #'
 #' @return a list of model parameters with class `rt_admm_configuration`
 #'
@@ -212,8 +223,10 @@ configure_rt_admm <- function(
     tolerance = 1e-4,
     maxiter_newton = 50L,
     maxiter_line = 20L,
-    verbose = 0) {
+    verbose = 0,
+    ...) {
 
+  rlang::check_dots_empty()
   arg_is_scalar(rho, alpha, gamma, tolerance, verbose)
   arg_is_scalar(maxiter_newton, maxiter_line)
   arg_is_positive(alpha, gamma, tolerance)
