@@ -37,11 +37,14 @@ strextract <- function(pattern, x) {
 
 gcd <- function(x, na.rm = FALSE) {
   if (na.rm) x <- x[!is.na(x)]
-  if (anyNA(x)) return(NA)
+  if (anyNA(x)) {
+    return(NA)
+  }
   stopifnot(is.numeric(x))
-  if (length(x) < 2L) return(x)
+  if (length(x) < 2L) {
+    return(x)
+  }
   if (!rlang::is_integerish(x)) cli_abort("`x` must contain only integers.")
   x <- x[x != 0]
   compute_gcd(x)
 }
-

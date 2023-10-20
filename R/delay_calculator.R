@@ -18,7 +18,7 @@
 #' @export
 #'
 #' @examples
-#' delay_calculator(c(3,2,5,3,1), dist_gamma = c(2.5, 2.5))
+#' delay_calculator(c(3, 2, 5, 3, 1), dist_gamma = c(2.5, 2.5))
 delay_calculator <- function(
     observed_counts,
     x = NULL,
@@ -26,7 +26,6 @@ delay_calculator <- function(
     delay_distn = NULL,
     delay_distn_periodicity = NULL,
     xout = x) {
-
   arg_is_length(2, dist_gamma)
   arg_is_positive(dist_gamma)
   arg_is_positive(delay_distn, allow_null = TRUE)
@@ -46,8 +45,9 @@ delay_calculator <- function(
   if (!is.null(delay_distn)) delay_distn <- delay_distn / sum(delay_distn)
 
   if (any(is.na(xout))) cli_abort("`xout` may not contain missing values.")
-  if (is.unsorted(xout, strictly = TRUE))
+  if (is.unsorted(xout, strictly = TRUE)) {
     cli_abort("`xout` must be sorted and contain no duplicates.")
+  }
   if (inherits(xout, "Date")) xout <- as.numeric(xout)
   arg_is_numeric(xout)
   if (min(xout) < min(x)) cli_abort("`min(xout)` man not be less than `min(x)`.")

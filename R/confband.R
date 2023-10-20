@@ -1,5 +1,3 @@
-
-
 #' Add confidence bands to estimated Rt curves
 #'
 #' Create an approximate confidence band for the Rt estimate. Note that the
@@ -17,7 +15,7 @@
 #' @export
 #'
 #' @examples
-#' y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
+#' y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
 #' out <- estimate_rt(y, nsol = 10)
 #' head(confband(out, out$lambda[2]))
 #' head(confband(out, out$lambda[2], level = c(0.95, 0.8, 0.5)))
@@ -35,8 +33,11 @@ confband.cv_poisson_rt <- function(
     level = 0.95, ...) {
   rlang::check_dots_empty()
   arg_is_probabilities(level)
-  if (is.character(lambda)) lambda <- object[[match.arg(lambda)]]
-  else arg_is_numeric_scalar(lambda)
+  if (is.character(lambda)) {
+    lambda <- object[[match.arg(lambda)]]
+  } else {
+    arg_is_numeric_scalar(lambda)
+  }
   confband(object$full_fit, lambda = lambda, level = level)
 }
 
@@ -49,7 +50,9 @@ confband.poisson_rt <- function(object, lambda, level = 0.95, ...) {
 
   nbd <- function(piece, ord) {
     n <- length(piece)
-    if (n <= ord + 1) return(Matrix::Diagonal(n, x = 0))
+    if (n <= ord + 1) {
+      return(Matrix::Diagonal(n, x = 0))
+    }
     get_D(ord, piece)
   }
 
@@ -89,7 +92,8 @@ confband.poisson_rt <- function(object, lambda, level = 0.95, ...) {
 fmt_perc <- function(probs, digits = 3) {
   paste0(
     format(100 * probs, trim = TRUE, scientific = FALSE, digits = digits),
-    "%")
+    "%"
+  )
 }
 
 #' @exportS3Method print rt_confidence_band

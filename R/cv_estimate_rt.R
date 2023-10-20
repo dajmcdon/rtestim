@@ -46,7 +46,6 @@ cv_estimate_rt <- function(
     delay_distn_periodicity = NULL,
     invert_splits = FALSE,
     ...) {
-
   arg_is_pos_int(nfold)
   n <- length(observed_counts)
   arg_is_length(n, x)
@@ -66,7 +65,8 @@ cv_estimate_rt <- function(
     maxiter = maxiter,
     delay_distn = delay_distn,
     delay_distn_periodicity = delay_distn_periodicity,
-    ...)
+    ...
+  )
 
   if (is.null(lambda)) lambda <- full_fit$lambda
   if (is.null(delay_distn_periodicity)) {
@@ -76,15 +76,15 @@ cv_estimate_rt <- function(
   foldid <- c(0, rep_len(1:nfold, n - 2), 0)
   cvall <- matrix(0, nfold, length(lambda))
   error_measure <- match.arg(error_measure)
-  err_fun <- switch(
-    error_measure,
+  err_fun <- switch(error_measure,
     mse = function(y, m) (y - m)^2,
     mae = function(y, m) abs(y - m),
     deviance = function(y, m) {
       devr <- y * log(m) - m
       devy <- y * log(y) - y
       devy[y == 0] <- 0
-      2 * (devy - devr) }
+      2 * (devy - devr)
+    }
   )
 
   for (f in 1:nfold) {
@@ -100,7 +100,8 @@ cv_estimate_rt <- function(
       maxiter = maxiter,
       delay_distn = delay_distn,
       delay_distn_periodicity = delay_distn_periodicity,
-      ...)
+      ...
+    )
 
     interp_rt <- interpolate_rt(mod, x[test_idx])
 
@@ -115,7 +116,7 @@ cv_estimate_rt <- function(
 
     pred_observed_counts <- interp_rt * wpc
     score <- colMeans(err_fun(observed_counts[test_idx], pred_observed_counts))
-    cvall[f,] <- score
+    cvall[f, ] <- score
   }
 
   ### Calculate CV summary
@@ -132,7 +133,8 @@ cv_estimate_rt <- function(
       lambda.min = lambda[i0],
       lambda.1se = max(
         lambda[cv_scores <= cv_scores[i0] + cv_se[i0]],
-        na.rm = TRUE),
+        na.rm = TRUE
+      ),
       call = match.call()
     ),
     class = "cv_poisson_rt"

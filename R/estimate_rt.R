@@ -101,7 +101,6 @@ estimate_rt <- function(
     lambda_min_ratio = 1e-4,
     maxiter = 1e5,
     init = configure_rt_admm()) {
-
   arg_is_nonneg_int(korder)
   arg_is_pos_int(nsol, maxiter)
   arg_is_scalar(korder, nsol, lambda_min_ratio)
@@ -111,8 +110,9 @@ estimate_rt <- function(
   arg_is_length(2, dist_gamma)
   n <- length(observed_counts)
 
-  if (korder + 1 >= n)
+  if (korder + 1 >= n) {
     cli_abort("`korder + 1` must be less than observed data length.")
+  }
 
   if (!is.null(delay_distn)) delay_distn <- delay_distn / sum(delay_distn)
 
@@ -127,10 +127,12 @@ estimate_rt <- function(
 
 
   # create weighted past cases
-  if (any(observed_counts < 0))
+  if (any(observed_counts < 0)) {
     cli_abort("`observed_counts` must be non-negative")
-  if (observed_counts[1] == 0 || is.na(observed_counts[1]))
+  }
+  if (observed_counts[1] == 0 || is.na(observed_counts[1])) {
     cli_abort("`observed_counts` must start with positive count")
+  }
 
   weighted_past_counts <- delay_calculator(
     observed_counts, x, dist_gamma, delay_distn, delay_distn_periodicity
@@ -147,10 +149,12 @@ estimate_rt <- function(
   if (is.null(lambdamax)) lambdamax <- -1.0
   if (length(lambda) == 0) {
     msg <- "If lambda is not specified,"
-    if (lambda_min_ratio >= 1)
+    if (lambda_min_ratio >= 1) {
       cli_abort("{msg} lambda_min_ratio must be in (0,1).")
-    if (lambdamin > 0 && lambdamax > 0 && lambdamin >= lambdamax)
+    }
+    if (lambdamin > 0 && lambdamax > 0 && lambdamin >= lambdamax) {
       cli_abort("{msg} lambdamin must be < lambdamax.")
+    }
     lambda <- double(nsol)
   }
   if (length(lambda) != nsol) nsol <- length(lambda)
@@ -225,7 +229,6 @@ configure_rt_admm <- function(
     maxiter_line = 20L,
     verbose = 0,
     ...) {
-
   rlang::check_dots_empty()
   arg_is_scalar(rho, alpha, gamma, tolerance, verbose)
   arg_is_scalar(maxiter_newton, maxiter_line)

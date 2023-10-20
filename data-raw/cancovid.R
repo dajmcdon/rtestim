@@ -2,7 +2,7 @@
 ## run on 4 July 2023
 res <- httr::GET(
   url = "https://api.opencovid.ca/timeseries?",
-  query = list('fmt' = 'csv', 'geo' = 'can', 'stat' = 'cases')
+  query = list("fmt" = "csv", "geo" = "can", "stat" = "cases")
 )
 cancovid <- httr::content(res)
 first_case <- min(which(cancovid$value > 0))
