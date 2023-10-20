@@ -94,7 +94,18 @@ arg_is_positive = function(..., allow_null = FALSE) {
     tests = function(name, value) {
       if (!((is.numeric(value) && all(value > 0)) |
             (is.null(value) & allow_null)))
-        cli_abort("All {.val {name}} must be whole positive number(s).")
+        cli_abort("All {.val {name}} must be positive number(s).")
+    }
+  )
+}
+
+arg_is_nonnegative = function(..., allow_null = FALSE) {
+  handle_arg_list(
+    ...,
+    tests = function(name, value) {
+      if (!((is.numeric(value) && all(value >= 0)) |
+            (is.null(value) & allow_null)))
+        cli_abort("All {.val {name}} must be nonnegative number(s).")
     }
   )
 }
