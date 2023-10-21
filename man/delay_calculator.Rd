@@ -59,5 +59,5 @@ of the symptom onset of a secondary infection occurred a given
 number of days after the primary infection
 }
 \examples{
-delay_calculator(c(3,2,5,3,1), dist_gamma = c(2.5, 2.5))
+delay_calculator(c(3, 2, 5, 3, 1), dist_gamma = c(2.5, 2.5))
 }

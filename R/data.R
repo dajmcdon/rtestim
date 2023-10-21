@@ -1,13 +1,3 @@
-# package level documentation
-
-#' @importFrom Rcpp sourceCpp
-#' @importFrom magrittr %>%
-#' @importFrom rlang .data %||%
-#' @importFrom methods is
-#' @import Matrix dspline
-#' @useDynLib rtestim, .registration = TRUE
-NULL
-
 #' Canadian Incident COVID-19 Cases
 #'
 #' This dataset contains 3+ years of incident COVID-19 case counts
