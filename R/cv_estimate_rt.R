@@ -10,6 +10,17 @@
 #' Must be choose from `mse`, `mae`, and `deviance`.
 #' `mse` calculates the mean square error; `mae` calculates the mean absolute error;
 #' `deviance` calculates the deviance
+#' @param regular_splits Logical.
+#'   If `TRUE`, the folds for k-fold cross-validation are chosen by placing
+#'   every kth point into the same fold. The first and last points are not
+#'   included in any fold and are always included in building the predictive
+#'   model. As an example, with 15 data points and `kfold = 4`, the points are
+#'   assigned to folds in the following way:
+#'   \deqn{
+#'   0 \; 1 \; 2 \; 3 \; 4 \; 1 \; 2 \; 3 \;  4 \; 1 \; 2 \; 3 \; 4 \; 1 \; 0
+#'   }{0 1 2 3 4 1 2 3 4 1 2 3 4 1 0} where 0 indicates no assignment.
+#'   Therefore, the folds are not random and running `cv_estimate_rt()` twice
+#'    will give the same result.
 #' @param invert_splits Logical.
 #'   Typical K-fold CV would use K-1 folds for the training
 #'   set while reserving 1 fold for evaluation (repeating the split K times).
@@ -38,12 +49,13 @@ cv_estimate_rt <- function(
     korder = 3L,
     dist_gamma = c(2.5, 2.5),
     nfold = 3L,
-    error_measure = c("mse", "mae", "deviance"),
+    error_measure = c("deviance", "mse", "mae"),
     x = 1:n,
     lambda = NULL,
     maxiter = 1e6L,
     delay_distn = NULL,
     delay_distn_periodicity = NULL,
+    regular_splits = FALSE,
     invert_splits = FALSE,
     ...) {
   arg_is_pos_int(nfold)
@@ -73,7 +85,12 @@ cv_estimate_rt <- function(
     delay_distn_periodicity <- full_fit$delay_distn_periodicity
   }
 
-  foldid <- c(0, rep_len(1:nfold, n - 2), 0)
+  if (regular_splits) {
+    middle_fold <- rep_len(1:nfold, n - 2)
+  } else {
+    middle_fold <- sample.int(nfold, n - 2, replace = TRUE)
+  }
+  foldid <- c(0, middle_fold, 0)
   cvall <- matrix(0, nfold, length(lambda))
   error_measure <- match.arg(error_measure)
   err_fun <- switch(error_measure,

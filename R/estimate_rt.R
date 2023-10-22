@@ -5,8 +5,8 @@
 #' disease can be estimated by solving the smoothness penalized Poisson
 #' regression (trend filtering) of the form:
 #'
-#' \eqn{\hat{\theta} = argmin_{\theta} (\frac{1}{n} \sum_{i=1}^n w_i e^{\theta_i} -
-#'   y_i\theta_i) + \lambda||D^{(k+1)}\theta||_1, }
+#' \deqn{\hat{\theta} = \argmin_{\theta} \frac{1}{n} \sum_{i=1}^n (w_i e^{\theta_i} -
+#'   y_i\theta_i) + \lambda\Vert D^{(k+1)}\theta\Vert_1, }
 #'
 #' where \eqn{R_t = e^{\theta}}, \eqn{y_i} is the observed case count at day
 #' \eqn{i}, \eqn{w_i} is the weighted past counts at day \eqn{i}, \eqn{\lambda}
