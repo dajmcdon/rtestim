@@ -62,17 +62,17 @@ cv_estimate_rt <- function(
   if (is.null(lambda)) lambda <- full_fit$lambda
 
   foldid <- c(0, rep_len(1:nfold, n - 2), 0)
-  cvall <- matrix(0, nfold, length(lambda))
+  cvall <- matrix(NA, nfold, length(lambda))
   error_measure <- match.arg(error_measure)
   err_fun <- switch(
     error_measure,
     mse = function(y, m) (y - m)^2,
     mae = function(y, m) abs(y - m),
     deviance = function(y, m) {
-      devr <- m * log(m) - m
-      devy <- m * log(y) - y
+      devr <- y * log(m) - m
+      devy <- y * log(y) - y
       devy[y == 0] <- 0
-      2 * (devr - devy) }
+      2 * (devy - devr) }
   )
 
   for (f in 1:nfold) {
@@ -99,15 +99,17 @@ cv_estimate_rt <- function(
       output_partial_seq = FALSE
     )
 
-
     pred_observed_counts <- interp_rt * wpc[test_idx]
     score <- colMeans(err_fun(observed_counts[test_idx], pred_observed_counts))
-    tryCatch(cvall[f,] <- score,
-             error = function(w) {
-               print("Error in `cvall[f,] <- score`. Please increase the maximum iteration `maxiter`.")
-               stop()
-              })
+    cvall[f, seq_along(score)] <- score
+    if(length(lambda) != length(score)) {
+      cli::cli_warn(glue::glue("`lambda` sequence is not fully visited for fold {f} due to insufficient iteration. Please increase `maxiter`."))
+    }
   }
+  index <- apply(cvall, 2, function(x) any(is.na(x)))
+  cvall <- cvall[, !index]
+  lambda <- lambda[!index]
+
 
   ### Calculate CV summary
   cv_scores <- colMeans(cvall)

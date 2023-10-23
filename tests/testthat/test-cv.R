@@ -7,13 +7,12 @@ test_that("cv passes correct parameters to inner solvers (when lamdba is not
             expect_identical(cv$lambda, mod$lambda)
           })
 
-test_that("test CV returns an error message when max iteration is too low for
-          the size of candidate set & vice versa", {
+test_that("test CV returns a warning message when max iteration is insufficient
+          for all lambda to converge", {
   set.seed(1001)
   y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
-  expect_error(
-    cv_estimate_rt(y, korder = 3, nfold = 3, nsol = 400))
-  expect_no_error(
-    cv_estimate_rt(y, korder = 3, nfold = 3, nsol = 300)
-    )
+  expect_warning(
+    cv_estimate_rt(y, korder = 3, nfold = 3, nsol = 5, maxiter = 1e2L))
+  expect_no_warning(
+    cv_estimate_rt(y, korder = 3, nfold = 3, nsol = 5, maxiter = 1e4L))
 })

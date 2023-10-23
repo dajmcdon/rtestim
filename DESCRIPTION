@@ -23,6 +23,7 @@ Depends:
     R (>= 3.6.2)
 Imports: 
     cli,
+    glue,
     ggplot2,
     magrittr,
     methods,
