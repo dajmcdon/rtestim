@@ -38,7 +38,6 @@ cv_estimate_rt <- function(
     maxiter = 1e6L,
     delay_distn = NULL,
     ...) {
-
   arg_is_pos_int(nfold)
   n <- length(observed_counts)
   arg_is_length(n, x)
@@ -57,22 +56,23 @@ cv_estimate_rt <- function(
     lambda = lambda,
     maxiter = maxiter,
     delay_distn = delay_distn,
-    ...)
+    ...
+  )
 
   if (is.null(lambda)) lambda <- full_fit$lambda
 
   foldid <- c(0, rep_len(1:nfold, n - 2), 0)
   cvall <- matrix(NA, nfold, length(lambda))
   error_measure <- match.arg(error_measure)
-  err_fun <- switch(
-    error_measure,
+  err_fun <- switch(error_measure,
     mse = function(y, m) (y - m)^2,
     mae = function(y, m) abs(y - m),
     deviance = function(y, m) {
       devr <- y * log(m) - m
       devy <- y * log(y) - y
       devy[y == 0] <- 0
-      2 * (devy - devr) }
+      2 * (devy - devr)
+    }
   )
 
   for (f in 1:nfold) {
@@ -87,7 +87,8 @@ cv_estimate_rt <- function(
       lambda = lambda,
       maxiter = maxiter,
       delay_distn = delay_distn,
-      ...)
+      ...
+    )
 
     interp_rt <- interpolate_rt(mod, x[test_idx])
 
@@ -102,8 +103,10 @@ cv_estimate_rt <- function(
     pred_observed_counts <- interp_rt * wpc[test_idx]
     score <- colMeans(err_fun(observed_counts[test_idx], pred_observed_counts))
     cvall[f, seq_along(score)] <- score
-    if(length(lambda) != length(score)) {
-      cli::cli_warn(glue::glue("`lambda` sequence is not fully visited for fold {f} due to insufficient iteration. Please increase `maxiter`."))
+    if (length(lambda) != length(score)) {
+      cli::cli_warn(c("`lambda` sequence is not fully visited for fold {.val {f}} due to insufficient iteration.",
+        "!" = "Please increase `maxiter`."
+      ))
     }
   }
   index <- apply(cvall, 2, function(x) any(is.na(x)))
@@ -125,7 +128,8 @@ cv_estimate_rt <- function(
       lambda.min = lambda[i0],
       lambda.1se = max(
         lambda[cv_scores <= cv_scores[i0] + cv_se[i0]],
-        na.rm = TRUE),
+        na.rm = TRUE
+      ),
       call = match.call()
     ),
     class = "cv_poisson_rt"
