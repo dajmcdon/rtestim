@@ -41,7 +41,7 @@ the form \code{YYYY-MM-DD} requires specifying \code{delay_distn_periodicity = "
 Or if \code{observed_cases} were reported on Monday, Wednesday, and Friday,
 then \code{delay_distn_periodicity = "1 day"} would be most appropriate.}
 
-\item{xout}{a vector of positions at for which the results should be returned.
+\item{xout}{a vector of positions at which the results should be returned.
 By default, this will be the same as \code{x}, but in the case that observations
 are unequally spaced, alternatives may be desired. Note that \code{xout} must
 satisfy \code{min(x) <= min(xout)} and \code{max(x) >= max(xout)}.}
