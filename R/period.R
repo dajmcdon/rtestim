@@ -6,7 +6,7 @@ new_period <- function(x) {
   names_in <- tolower(strextract("[a-zA-Z]+$", x))
   names_allowed <- paste0(rlang::fn_fmls_names(default_period), "s")
   if (length(n) == 0L || length(names_in) == 0L ||
-      is.na(pmatch(names_in, names_allowed))) {
+    is.na(pmatch(names_in, names_allowed))) {
     cli_abort(c(
       "Requested periodicity {.var {names_in}} is not available.",
       i = "Input must be a positive integer followed by one of {.val {names_allowed}}."

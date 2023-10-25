@@ -94,7 +94,7 @@ delay_calculator <- function(
   y <- stats::approx(x, observed_counts, xout = allx)$y
   cw <- cumsum(delay_distn)
   convolved_seq <- stats::convolve(y, rev(delay_distn), type = "open")
-  convolved_seq <- convolved_seq[seq_along(allx)] /  cw
+  convolved_seq <- convolved_seq[seq_along(allx)] / cw
   if (abs(delay_distn[1]) < sqrt(.Machine$double.eps)) {
     convolved_seq <- c(convolved_seq[2], convolved_seq[-1])
   }

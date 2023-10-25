@@ -54,13 +54,16 @@ test_that("delay calculator correctly handles periodicity", {
   expect_error(delay_calculator(yw, xw, xout = xd))
   expect_error(delay_calculator(yw, xw, xout = xd[xd <= max(xw)]))
   expect_error(delay_calculator(
-    yw, xw, delay_distn_periodicity = "1 week", xout = xd[xd <= max(xw)]
+    yw, xw,
+    delay_distn_periodicity = "1 week", xout = xd[xd <= max(xw)]
   ))
   dweekly <- delay_calculator(
-    yw, xw, delay_distn_periodicity = 1, xout = xd[xd <= max(xw)]
+    yw, xw,
+    delay_distn_periodicity = 1, xout = xd[xd <= max(xw)]
   )
   dweekly_text <- delay_calculator(
-    yw, xw, delay_distn_periodicity = "1 day", xout = xd[xd <= max(xw)]
+    yw, xw,
+    delay_distn_periodicity = "1 day", xout = xd[xd <= max(xw)]
   )
   expect_identical(dweekly, dweekly_text)
   ddaily <- delay_calculator(yd[xd <= max(xw)], xd[xd <= max(xw)])
@@ -78,14 +81,17 @@ test_that("delay calculator correctly handles periodicity", {
     stats::convolve(yw, rev(dwn), type = "open")[seq_along(yw)] / cumsum(dwn)
   )
   expect_error(delay_calculator(
-    yw, xw, delay_distn = delay_distn, delay_distn_periodicity = 7,
+    yw, xw,
+    delay_distn = delay_distn, delay_distn_periodicity = 7,
     xout = xd[xd <= max(xw)]
   ))
   s <- xd <= max(xw)
   expect_equal(
     delay_calculator(
-      yw, xw, delay_distn = delay_distn, delay_distn_periodicity = 1,
-      xout = xd[s]),
+      yw, xw,
+      delay_distn = delay_distn, delay_distn_periodicity = 1,
+      xout = xd[s]
+    ),
     stats::convolve(yd[s], rev(ddn[s]), type = "open")[seq(sum(s))] / cumsum(ddn[s])
   )
 
