@@ -15,11 +15,10 @@ test_that("delay calculator with even spacing works", {
   delay_calculator_output <- delay_calculator(counts, delay_distn = w)
   w <- c(w, rep(0, n - length(w)))
   cw <- cumsum(w)
-  manual_output <- double(n - 1)
-  for (j in 2:n) {
-    manual_output[j - 1] <- sum(w[1:(j - 1)] * counts[(j - 1):1] / cw[(j - 1)])
+  manual_output <- double(n)
+  for (j in 1:n) {
+    manual_output[j] <- sum(w[1:(j)] * counts[j:1]) / cw[j]
   }
-  manual_output <- c(manual_output[1], manual_output)
   expect_equal(manual_output, delay_calculator_output)
 })
 
