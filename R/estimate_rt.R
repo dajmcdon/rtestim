@@ -105,7 +105,8 @@ estimate_rt <- function(
   arg_is_pos_int(nsol, maxiter)
   arg_is_scalar(korder, nsol, lambda_min_ratio)
   arg_is_scalar(lambdamin, lambdamax, delay_distn_periodicity, allow_null = TRUE)
-  arg_is_positive(lambdamin, lambdamax, delay_distn, allow_null = TRUE)
+  arg_is_positive(lambdamin, lambdamax, allow_null = TRUE)
+  arg_is_nonnegative(delay_distn, allow_null = TRUE)
   arg_is_positive(lambda_min_ratio, dist_gamma)
   arg_is_length(2, dist_gamma)
   n <- length(observed_counts)
@@ -114,9 +115,6 @@ estimate_rt <- function(
     cli_abort("`korder + 1` must be less than observed data length.")
   }
 
-  if (!is.null(delay_distn)) delay_distn <- delay_distn / sum(delay_distn)
-
-  # check that x is a sorted, double vector of length n
   xin <- x
   if (inherits(x, "Date")) x <- as.numeric(x)
   arg_is_numeric(x)
@@ -126,14 +124,12 @@ estimate_rt <- function(
   }
 
 
-  # create weighted past cases
   if (any(observed_counts < 0)) {
     cli_abort("`observed_counts` must be non-negative")
   }
   if (observed_counts[1] == 0 || is.na(observed_counts[1])) {
     cli_abort("`observed_counts` must start with positive count")
   }
-
   weighted_past_counts <- delay_calculator(
     observed_counts, x, dist_gamma, delay_distn, delay_distn_periodicity
   )

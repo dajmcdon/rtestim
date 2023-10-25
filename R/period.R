@@ -1,15 +1,15 @@
 new_period <- function(x) {
   arg_is_scalar(x)
+  arg_is_chr(x)
 
-  n <- as.numeric(strextract("^[0-9]+", x))
-  if (length(n) == 0L) n <- 1L
-  names_in <- strextract("[a-zA-Z]+$", x)
-  if (length(names_in) == 0L) names_in <- "days"
+  n <- as.integer(strextract("^[0-9]+", x))
+  names_in <- tolower(strextract("[a-zA-Z]+$", x))
   names_allowed <- paste0(rlang::fn_fmls_names(default_period), "s")
-  if (is.na(pmatch(names_in, names_allowed))) {
+  if (length(n) == 0L || length(names_in) == 0L ||
+      is.na(pmatch(names_in, names_allowed))) {
     cli_abort(c(
       "Requested periodicity {.var {names_in}} is not available.",
-      i = "Must be one of {.val {names_allowed}}."
+      i = "Input must be a positive integer followed by one of {.val {names_allowed}}."
     ))
   }
   names_in <- gsub("s$", "", names_in)
@@ -18,8 +18,9 @@ new_period <- function(x) {
   vctrs::new_rcrd(res, class = "period")
 }
 
-default_period <- function(year = 0, quarter = 0, month = 0, week = 0, day = 0) {
-  enlist(year = year, month = month + 3 * quarter, day = day + 7 * week)
+default_period <- function(year = 0L, quarter = 0L, month = 0L, week = 0L,
+                           day = 0L) {
+  enlist(year = year, month = month + 3L * quarter, day = day + 7L * week)
 }
 
 #' @method format period
@@ -41,10 +42,10 @@ gcd <- function(x, na.rm = FALSE) {
     return(NA)
   }
   stopifnot(is.numeric(x))
-  if (length(x) < 2L) {
-    return(x)
-  }
   if (!rlang::is_integerish(x)) cli_abort("`x` must contain only integers.")
+  if (length(x) == 1L) {
+    return(as.integer(x))
+  }
   x <- x[x != 0]
   compute_gcd(x)
 }

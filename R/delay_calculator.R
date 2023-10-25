@@ -8,7 +8,7 @@
 #' number of days after the primary infection
 #'
 #' @inheritParams estimate_rt
-#' @param xout a vector of positions at for which the results should be returned.
+#' @param xout a vector of positions at which the results should be returned.
 #'   By default, this will be the same as `x`, but in the case that observations
 #'   are unequally spaced, alternatives may be desired. Note that `xout` must
 #'   satisfy `min(x) <= min(xout)` and `max(x) >= max(xout)`.
@@ -28,7 +28,7 @@ delay_calculator <- function(
     xout = x) {
   arg_is_length(2, dist_gamma)
   arg_is_positive(dist_gamma)
-  arg_is_positive(delay_distn, allow_null = TRUE)
+  arg_is_nonnegative(delay_distn, allow_null = TRUE)
   n <- length(observed_counts)
   arg_is_length(n, x, allow_null = TRUE)
   if (is.null(x)) {
@@ -36,7 +36,7 @@ delay_calculator <- function(
   } else {
     if (any(is.na(x))) cli_abort("`x` may not contain missing values.")
     if (is.unsorted(x, strictly = TRUE)) {
-      cli_abort("`x` must be sorted and contain no duplicates.")
+      cli_abort("`x` must be strictly sorted and contain no duplicates.")
     }
   }
 
@@ -62,9 +62,9 @@ delay_calculator <- function(
   } else if (is.numeric(delay_distn_periodicity)) {
     ddp <- delay_distn_periodicity
   } else {
-    cli::cli_abort("`delay_distn_periodicity` must be scalar character or numeric.")
+    cli::cli_abort("`delay_distn_periodicity` must be a scalar, character or numeric.")
   }
-  if (ddp %% ddx != 0) {
+  if (ddx %% ddp != 0) {
     cli::cli_abort(c(
       "`delay_distn_periodicity` may be at most the minimum spacing in `x`,",
       "!" = "and must divide the minimum spacing evenly.",
@@ -72,23 +72,31 @@ delay_calculator <- function(
     ))
   }
   allx <- seq(from = min(x), to = max(x), by = ddp)
+  ddxout <- gcd(unique(diff(xout)))
+  if (ddxout < ddp) {
+    cli::cli_abort(c(
+      "The minimum spacing in `xout` must be at least `delay_distn_periodicity`.",
+      i = "`delay_distn_periodicity` = {.val {ddp}} compared to {.val {ddxout}} for `xout`."
+    ))
+  }
 
   if (is.null(delay_distn)) {
-    delay_distn <- discretize_gamma(allx - min(x) + ddp, dist_gamma[1], dist_gamma[2])
+    delay_distn <- discretize_gamma(allx - min(x), dist_gamma[1], dist_gamma[2])
   } else {
     if (length(delay_distn) > length(allx)) {
       cli_abort(
         "User specified `delay_distn` must have no more than {.val {length(allx)}} elements."
       )
     }
-    # pad the tail with zero if too short
     delay_distn <- c(delay_distn, rep(0, length(allx) - length(delay_distn)))
   }
 
   y <- stats::approx(x, observed_counts, xout = allx)$y
   cw <- cumsum(delay_distn)
   convolved_seq <- stats::convolve(y, rev(delay_distn), type = "open")
-  convolved_seq <- convolved_seq[seq_along(allx)] / cw
-  convolved_seq <- c(convolved_seq[1], convolved_seq[-length(convolved_seq)])
+  convolved_seq <- convolved_seq[seq_along(allx)] /  cw
+  if (abs(delay_distn[1]) < sqrt(.Machine$double.eps)) {
+    convolved_seq <- c(convolved_seq[2], convolved_seq[-1])
+  }
   convolved_seq[allx %in% xout]
 }
