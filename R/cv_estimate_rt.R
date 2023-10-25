@@ -91,7 +91,8 @@ cv_estimate_rt <- function(
     middle_fold <- sample.int(nfold, n - 2, replace = TRUE)
   }
   foldid <- c(0, middle_fold, 0)
-  cvall <- matrix(0, nfold, length(lambda))
+  cvall <- matrix(NA, nfold, length(lambda))
+
   error_measure <- match.arg(error_measure)
   err_fun <- switch(error_measure,
     mse = function(y, m) (y - m)^2,
@@ -131,10 +132,22 @@ cv_estimate_rt <- function(
       xout = x[test_idx]
     )
 
+
     pred_observed_counts <- interp_rt * wpc
     score <- colMeans(err_fun(observed_counts[test_idx], pred_observed_counts))
-    cvall[f, ] <- score
+    cvall[f, seq_along(score)] <- score
+    if (length(lambda) != length(score)) {
+      cli::cli_warn(c(
+        "Estimation for the full `lambda` sequence did not occur for fold {.val {f}}",
+        "because the maximum number of iterations was exhausted.",
+        "i" = "You may wish to increase `maxiter` from the current {.val {maxiter}}."
+      ))
+    }
   }
+  index <- apply(cvall, 2, function(x) any(is.na(x)))
+  cvall <- cvall[, !index]
+  lambda <- lambda[!index]
+
 
   ### Calculate CV summary
   cv_scores <- colMeans(cvall)
