@@ -1,7 +1,6 @@
 #' @method summary cv_poisson_rt
 #' @export
 summary.cv_poisson_rt <- function(object, ...) {
-
   rlang::check_dots_empty()
 
   tab <- with(object, data.frame(
@@ -9,7 +8,7 @@ summary.cv_poisson_rt <- function(object, ...) {
     index = seq_along(lambda),
     cv_scores = cv_scores,
     cv_se = cv_se,
-    dof = full_fit$dof
+    dof = full_fit$dof[seq_along(lambda)]
   ))
   n <- nrow(tab)
   if (n > 5) {
@@ -39,12 +38,11 @@ print.summary.cv_poisson_rt <- function(
     x,
     digits = max(3, getOption("digits") - 3),
     ...) {
-
   rlang::check_dots_empty()
 
-  lambda_warning = NULL
-  if (x$table$index[2] == 1) lambda_warning = "smallest"
-  if (x$table$index[2] == x$table$index[4]) lambda_warning = "largest"
+  lambda_warning <- NULL
+  if (x$table$index[2] == 1) lambda_warning <- "smallest"
+  if (nrow(x$table) > 3 & x$table$index[2] == x$table$index[4]) lambda_warning <- "largest"
 
   cat("\nCall:", deparse(x$call), fill = TRUE)
   cat("\nDegree of the estimated piecewise polynomial curve:", x$korder, "\n")
@@ -94,7 +92,6 @@ print.summary.cv_poisson_rt <- function(
 #' plot(cv, NULL)
 plot.cv_poisson_rt <- function(
     x, which_lambda = c("cv_scores", "lambda.min", "lambda.1se"), ...) {
-
   rlang::check_dots_empty()
   plt_scores <- FALSE
   if (is.character(which_lambda)) {
@@ -114,15 +111,16 @@ plot.cv_poisson_rt <- function(
       lower = cv_scores - cv_se
     ))
     plt <- ggplot2::ggplot(df) +
-      ggplot2::geom_errorbar(ggplot2::aes(x = .data$lambda,
-                                          y = .data$cv_scores,
-                                          ymin = .data$lower,
-                                          ymax = .data$upper,
-                                          width = 0.1)) +
+      ggplot2::geom_errorbar(ggplot2::aes(
+        x = .data$lambda,
+        y = .data$cv_scores,
+        ymin = .data$lower,
+        ymax = .data$upper,
+        width = 0.1)) +
       ggplot2::geom_point(ggplot2::aes(x = .data$lambda, y = .data$cv_scores),
-                          color = "darkblue") +
-      ggplot2::geom_vline(xintercept = x$lambda.min, linetype = 'dotted') +
-      ggplot2::geom_vline(xintercept = x$lambda.1se, linetype = 'dotted') +
+        color = "darkblue") +
+      ggplot2::geom_vline(xintercept = x$lambda.min, linetype = "dotted") +
+      ggplot2::geom_vline(xintercept = x$lambda.1se, linetype = "dotted") +
       ggplot2::theme_bw() +
       ggplot2::labs(x = "Lambda", y = "CV scores") +
       ggplot2::scale_x_log10()
