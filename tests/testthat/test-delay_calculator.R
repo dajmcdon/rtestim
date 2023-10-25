@@ -2,13 +2,11 @@ test_that("delay calculator with even spacing works", {
   counts <- c(1:5, 5:1)
   n <- length(counts)
   delay_calculator_output <- delay_calculator(observed_counts = counts)
-  manual_output <- double(n - 1)
-  w <- discretize_gamma(1:n)
+  manual_output <- double(n)
+  w <- discretize_gamma(0:(n - 1))
   cw <- cumsum(w)
-  for (j in 2:n) {
-    manual_output[j - 1] <- sum(w[1:(j - 1)] * counts[(j - 1):1] / cw[(j - 1)])
-  }
-  manual_output <- c(manual_output[1], manual_output)
+  for (j in 1:n) manual_output[j] <- sum(w[1:j] * counts[j:1] / cw[j])
+  manual_output[1] <- manual_output[2] # first value is 0 / 0
   expect_equal(manual_output, delay_calculator_output)
 
   w <- c(1, 2, 3, 2, 1, 1)
@@ -16,9 +14,7 @@ test_that("delay calculator with even spacing works", {
   w <- c(w, rep(0, n - length(w)))
   cw <- cumsum(w)
   manual_output <- double(n)
-  for (j in 1:n) {
-    manual_output[j] <- sum(w[1:(j)] * counts[j:1]) / cw[j]
-  }
+  for (j in 1:n) manual_output[j] <- sum(w[1:(j)] * counts[j:1]) / cw[j]
   expect_equal(manual_output, delay_calculator_output)
 })
 
