@@ -84,17 +84,24 @@ delay_calculator <- function(
     delay_distn <- discretize_gamma(allx - min(x), dist_gamma[1], dist_gamma[2])
   } else {
     if (length(delay_distn) > length(allx)) {
-      cli_abort(
-        "User specified `delay_distn` must have no more than {.val {length(allx)}} elements."
-      )
+      cli::cli_warn(c(
+        "User specified `delay_distn` has {.val {length(delay_distn)}} when",
+        "only {.val {length(allx)}} are necessary.",
+        i = "Truncating to match."
+      ))
+      delay_distn <- delay_distn[seq_along(allx)]
+    } else {
+      delay_distn <- c(delay_distn, rep(0, length(allx) - length(delay_distn)))
     }
-    delay_distn <- c(delay_distn, rep(0, length(allx) - length(delay_distn)))
   }
 
   y <- stats::approx(x, observed_counts, xout = allx)$y
   cw <- cumsum(delay_distn)
   convolved_seq <- stats::convolve(y, rev(delay_distn), type = "open")
   convolved_seq <- convolved_seq[seq_along(allx)] / cw
+  # when delay_distn[1] == 0, we're putting no weight on today.
+  # This is typical and results in division by zero for the first observation
+  # in convolved_seq
   if (abs(delay_distn[1]) < sqrt(.Machine$double.eps)) {
     convolved_seq <- c(convolved_seq[2], convolved_seq[-1])
   }
