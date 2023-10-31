@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rtestim</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.4</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -56,11 +56,14 @@
 <span>  korder <span class="op">=</span> <span class="fl">3L</span>,</span>
 <span>  dist_gamma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2.5</span>, <span class="fl">2.5</span><span class="op">)</span>,</span>
 <span>  nfold <span class="op">=</span> <span class="fl">3L</span>,</span>
-<span>  error_measure <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mse"</span>, <span class="st">"mae"</span>, <span class="st">"deviance"</span><span class="op">)</span>,</span>
+<span>  error_measure <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"deviance"</span>, <span class="st">"mse"</span>, <span class="st">"mae"</span><span class="op">)</span>,</span>
 <span>  x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="va">n</span>,</span>
 <span>  lambda <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  maxiter <span class="op">=</span> <span class="fl">1000000L</span>,</span>
 <span>  delay_distn <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  delay_distn_periodicity <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  regular_splits <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  invert_splits <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -132,6 +135,41 @@ a vector of delay probabilities may be passed here. These will be coerced
 to sum to 1, and padded with 0 in the right tail if necessary.</p></dd>
 
 
+<dt>delay_distn_periodicity</dt>
+<dd><p>Controls the relationship between the spacing
+of the computed delay distribution and the spacing of <code>x</code>. In the default
+case, <code>x</code> would be regular on the sequence <code>1:length(observed_cases)</code>,
+and this would
+be 1. But if <code>x</code> is a <code>Date</code> object or spaced irregularly, the relationship
+becomes more complicated. For example, weekly data when <code>x</code> is a date in
+the form <code>YYYY-MM-DD</code> requires specifying <code>delay_distn_periodicity = "1 week"</code>.
+Or if <code>observed_cases</code> were reported on Monday, Wednesday, and Friday,
+then <code>delay_distn_periodicity = "1 day"</code> would be most appropriate.</p></dd>
+
+
+<dt>regular_splits</dt>
+<dd><p>Logical.
+If <code>TRUE</code>, the folds for k-fold cross-validation are chosen by placing
+every kth point into the same fold. The first and last points are not
+included in any fold and are always included in building the predictive
+model. As an example, with 15 data points and <code>kfold = 4</code>, the points are
+assigned to folds in the following way:
+$$
+  0 \; 1 \; 2 \; 3 \; 4 \; 1 \; 2 \; 3 \;  4 \; 1 \; 2 \; 3 \; 4 \; 1 \; 0
+  $$ where 0 indicates no assignment.
+Therefore, the folds are not random and running <code>cv_estimate_rt()</code> twice
+will give the same result.</p></dd>
+
+
+<dt>invert_splits</dt>
+<dd><p>Logical.
+Typical K-fold CV would use K-1 folds for the training
+set while reserving 1 fold for evaluation (repeating the split K times).
+Setting this to true inverts this process, using a much smaller training
+set with a larger evaluation set. This tends to result in larger values
+of <code>lambda</code> that minimize CV.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>additional parameters passed to <code><a href="estimate_rt.html">estimate_rt()</a></code> function</p></dd>
 
@@ -162,10 +200,10 @@ within one standard error.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Summary of cross validation across lambda:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                 lambda index cv_scores  cv_se dof</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Min Lambda   397.72340     1     6.649 0.6707   4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CV Minimizer   1.30865    19     5.925 0.6143  10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1se Lambda   289.50103     2     6.182 0.6397   4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Max Lambda     0.03977    30     7.321 0.6199  24</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Min Lambda   289.25078     1     1.466 0.2204   4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> CV Minimizer  43.02178     7     1.309 0.2376   4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1se Lambda   289.25078     1     1.466 0.2204   4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Max Lambda     0.02893    30     1.894 0.2453  26</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 </code></pre></div>
     </div>
@@ -174,7 +212,7 @@ within one standard error.</p></li>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p></p><p>Developed by Daniel J. McDonald, Zhenglun Cai, Jiaping Liu.</p>
+  <p></p><p>Developed by Daniel J. McDonald, Jiaping Liu, Zhenglun Cai.</p>
 </div>
 
 <div class="pkgdown-footer-right">

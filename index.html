@@ -36,7 +36,7 @@
     
     <a class="navbar-brand me-2" href="index.html">rtestim</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.4</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -93,7 +93,7 @@
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/dajmcdon/rtestim" class="external-link">rtestim</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
 <span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span>  Time <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">101</span>, </span>
+<span>  Time <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">101</span>,</span>
 <span>  incident_cases <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">rpois</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">dnorm</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">100</span>, <span class="fl">50</span>, <span class="fl">15</span><span class="op">)</span> <span class="op">*</span> <span class="fl">500</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">dat</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">Time</span>, <span class="va">incident_cases</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
@@ -109,7 +109,7 @@
 <p>A built in function for cross-validation can be used to select the tuning parameter.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod_cv</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/cv_estimate_rt.html">cv_estimate_rt</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">incident_cases</span>, nsol <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mod_cv</span>, which_lambda <span class="op">=</span> <span class="st">'lambda.1se'</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mod_cv</span>, which_lambda <span class="op">=</span> <span class="st">"lambda.1se"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-cv-estimate-1.png" width="80%" style="display: block; margin: auto;"></p>
 </div>
 </div>
@@ -141,8 +141,8 @@
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
 <li>Daniel J. McDonald <br><small class="roles"> Author, maintainer </small>  </li>
-<li>Zhenglun Cai <br><small class="roles"> Author </small>  </li>
 <li>Jiaping Liu <br><small class="roles"> Author </small>  </li>
+<li>Zhenglun Cai <br><small class="roles"> Author </small>  </li>
 </ul>
 </div>
 
@@ -159,7 +159,7 @@
 
     <footer><div class="pkgdown-footer-left">
   <p></p>
-<p>Developed by Daniel J. McDonald, Zhenglun Cai, Jiaping Liu.</p>
+<p>Developed by Daniel J. McDonald, Jiaping Liu, Zhenglun Cai.</p>
 </div>
 
 <div class="pkgdown-footer-right">

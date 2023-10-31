@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rtestim</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.4</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -186,7 +186,7 @@ error is within one standard error of the minimum, called
 <p>Users may wish to visualize the particular <span class="math inline">\(\mathop{\{R_t\}_{t=1}^n}\)</span> which minimizes
 the cross-validation error while prioritizing smoothness.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mod_cv</span>, which_lambda <span class="op">=</span> <span class="st">'lambda.1se'</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mod_cv</span>, which_lambda <span class="op">=</span> <span class="st">"lambda.1se"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="rtestim_files/figure-html/unnamed-chunk-6-1.png" width="80%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
@@ -199,7 +199,7 @@ intervals. To demonstrate this, we generate a sequence of integers
 representing the days at which we observe the case counts.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">observation_incr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">rpois</a></span><span class="op">(</span><span class="fl">101</span>, lambda <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
-<span><span class="va">observation_incr</span><span class="op">[</span><span class="va">observation_incr</span> <span class="op">==</span> <span class="fl">0</span><span class="op">]</span> <span class="op">=</span> <span class="fl">1</span></span>
+<span><span class="va">observation_incr</span><span class="op">[</span><span class="va">observation_incr</span> <span class="op">==</span> <span class="fl">0</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
 <span><span class="va">observation_time</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cumsum.html" class="external-link">cumsum</a></span><span class="op">(</span><span class="va">observation_incr</span><span class="op">)</span></span></code></pre></div>
 <p>We can then fit the model by passing the observation time point as
 <code>x</code>.</p>
@@ -231,13 +231,13 @@ and the version downloaded on 4 July 2023 is included in the package. We
 use this data to estimate <span class="math inline">\(R_t\)</span>.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">can</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/estimate_rt.html">estimate_rt</a></span><span class="op">(</span></span>
-<span>  observed_counts <span class="op">=</span> <span class="va">cancovid</span><span class="op">$</span><span class="va">incident_cases</span>, </span>
-<span>  x <span class="op">=</span> <span class="va">cancovid</span><span class="op">$</span><span class="va">date</span>, </span>
-<span>  nsol <span class="op">=</span> <span class="fl">20</span>, </span>
+<span>  observed_counts <span class="op">=</span> <span class="va">cancovid</span><span class="op">$</span><span class="va">incident_cases</span>,</span>
+<span>  x <span class="op">=</span> <span class="va">cancovid</span><span class="op">$</span><span class="va">date</span>,</span>
+<span>  nsol <span class="op">=</span> <span class="fl">20</span>,</span>
 <span>  maxiter <span class="op">=</span> <span class="fl">1e6</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">can</span><span class="op">)</span> <span class="op">+</span> </span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">can</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_date.html" class="external-link">scale_x_date</a></span><span class="op">(</span>date_breaks <span class="op">=</span> <span class="st">"1 year"</span>, date_labels <span class="op">=</span> <span class="st">"%Y"</span><span class="op">)</span></span></code></pre></div>
@@ -251,7 +251,7 @@ use this data to estimate <span class="math inline">\(R_t\)</span>.</p>
 
     <footer><div class="pkgdown-footer-left">
   <p></p>
-<p>Developed by Daniel J. McDonald, Zhenglun Cai, Jiaping Liu.</p>
+<p>Developed by Daniel J. McDonald, Jiaping Liu, Zhenglun Cai.</p>
 </div>
 
 <div class="pkgdown-footer-right">
