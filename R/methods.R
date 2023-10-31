@@ -14,12 +14,14 @@ summary.poisson_rt <- function(object, ...) {
     lambda = lambda[xlam],
     index = xlam,
     approx_dof = dof[xlam],
-    niterations = niter[xlam]))
+    niterations = niter[xlam]
+  ))
   lambda <- object$lambda
   rownames(tab) <- names(xlam)
   out <- structure(
     list(call = object$call, table = tab, korder = object$korder, nlam = ns),
-    class = "summary.poisson_rt")
+    class = "summary.poisson_rt"
+  )
   out
 }
 
@@ -59,8 +61,8 @@ print.poisson_rt <- function(x, digits = min(3, getOption("digits") - 3), ...) {
 #'
 #' @importFrom rlang .data
 #' @examples
-#' y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
-#' out <- estimate_rt(y, lambda = log(c(1.1,1.3,1.5)))
+#' y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
+#' out <- estimate_rt(y, lambda = log(c(1.1, 1.3, 1.5)))
 #' plot(out)
 plot.poisson_rt <- function(x, lambda = NULL, ...) {
   arg_is_positive(lambda, allow_null = TRUE)
@@ -82,8 +84,11 @@ plot.poisson_rt <- function(x, lambda = NULL, ...) {
 
   plt <- ggplot2::ggplot(
     df,
-    ggplot2::aes(.data$Time, .data$Rt, colour = .data$lambda,
-                 group = .data$lambda)) +
+    ggplot2::aes(.data$Time, .data$Rt,
+      colour = .data$lambda,
+      group = .data$lambda
+    )
+  ) +
     ggplot2::geom_line() +
     ggplot2::theme_bw() +
     ggplot2::scale_colour_viridis_c(trans = "log10")
@@ -97,7 +102,9 @@ fitted.poisson_rt <- function(object, lambda = NULL, ...) {
   rlang::check_dots_empty()
   arg_is_positive(lambda, allow_null = TRUE)
 
-  if (is.null(lambda)) return(object$Rt)
+  if (is.null(lambda)) {
+    return(object$Rt)
+  }
 
   lam_list <- interpolate_lambda(object$lambda, lambda)
   interpolate_mat(object$Rt, lam_list, lambda, take_log = TRUE)
@@ -126,7 +133,7 @@ coef.poisson_rt <- fitted.poisson_rt
 #'
 #' @importFrom stats predict
 #' @examples
-#' y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
+#' y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
 #' out <- estimate_rt(y, nsol = 10)
 #' preds <- predict(out)
 #' plot(y)
@@ -152,4 +159,3 @@ interpolate_rt.poisson_rt <- function(object, xout, lambda = NULL, ...) {
   })
   exp(interp)
 }
-

@@ -21,7 +21,8 @@ summary.cv_poisson_rt <- function(object, ...) {
 
   out <- structure(
     list(call = object$call, table = tab, korder = object$full_fit$korder),
-    class = "summary.cv_poisson_rt")
+    class = "summary.cv_poisson_rt"
+  )
   out
 }
 
@@ -42,13 +43,17 @@ print.summary.cv_poisson_rt <- function(
 
   lambda_warning <- NULL
   if (x$table$index[2] == 1) lambda_warning <- "smallest"
-  if (nrow(x$table) > 3 & x$table$index[2] == x$table$index[4]) lambda_warning <- "largest"
+  if (nrow(x$table) > 3 & x$table$index[2] == x$table$index[4]) {
+    lambda_warning <- "largest"
+  }
 
   cat("\nCall:", deparse(x$call), fill = TRUE)
   cat("\nDegree of the estimated piecewise polynomial curve:", x$korder, "\n")
   if (!is.null(lambda_warning)) {
-    cat("Warning: the CV minimum occurred at the", lambda_warning,
-        "lambda in the path.\n\n")
+    cat(
+      "Warning: the CV minimum occurred at the", lambda_warning,
+      "lambda in the path.\n\n"
+    )
   }
   cat("\nSummary of cross validation across lambda:\n")
   print(x$tab, digits = digits)
@@ -96,8 +101,11 @@ plot.cv_poisson_rt <- function(
   plt_scores <- FALSE
   if (is.character(which_lambda)) {
     which_lambda <- match.arg(which_lambda)
-    if (which_lambda == "cv_scores") plt_scores <- TRUE
-    else which_lambda <- x[[which_lambda]]
+    if (which_lambda == "cv_scores") {
+      plt_scores <- TRUE
+    } else {
+      which_lambda <- x[[which_lambda]]
+    }
   } else {
     arg_is_numeric(which_lambda, allow_null = TRUE)
   }
@@ -116,9 +124,11 @@ plot.cv_poisson_rt <- function(
         y = .data$cv_scores,
         ymin = .data$lower,
         ymax = .data$upper,
-        width = 0.1)) +
+        width = 0.1
+      )) +
       ggplot2::geom_point(ggplot2::aes(x = .data$lambda, y = .data$cv_scores),
-        color = "darkblue") +
+        color = "darkblue"
+      ) +
       ggplot2::geom_vline(xintercept = x$lambda.min, linetype = "dotted") +
       ggplot2::geom_vline(xintercept = x$lambda.1se, linetype = "dotted") +
       ggplot2::theme_bw() +

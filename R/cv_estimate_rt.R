@@ -10,6 +10,23 @@
 #' Must be choose from `mse`, `mae`, and `deviance`.
 #' `mse` calculates the mean square error; `mae` calculates the mean absolute error;
 #' `deviance` calculates the deviance
+#' @param regular_splits Logical.
+#'   If `TRUE`, the folds for k-fold cross-validation are chosen by placing
+#'   every kth point into the same fold. The first and last points are not
+#'   included in any fold and are always included in building the predictive
+#'   model. As an example, with 15 data points and `kfold = 4`, the points are
+#'   assigned to folds in the following way:
+#'   \deqn{
+#'   0 \; 1 \; 2 \; 3 \; 4 \; 1 \; 2 \; 3 \;  4 \; 1 \; 2 \; 3 \; 4 \; 1 \; 0
+#'   }{0 1 2 3 4 1 2 3 4 1 2 3 4 1 0} where 0 indicates no assignment.
+#'   Therefore, the folds are not random and running `cv_estimate_rt()` twice
+#'    will give the same result.
+#' @param invert_splits Logical.
+#'   Typical K-fold CV would use K-1 folds for the training
+#'   set while reserving 1 fold for evaluation (repeating the split K times).
+#'   Setting this to true inverts this process, using a much smaller training
+#'   set with a larger evaluation set. This tends to result in larger values
+#'   of `lambda` that minimize CV.
 #' @param ... additional parameters passed to `estimate_rt()` function
 
 #' @return An object with S3 class `"cv_poisson_rt"`. Among the list components:
@@ -32,11 +49,14 @@ cv_estimate_rt <- function(
     korder = 3L,
     dist_gamma = c(2.5, 2.5),
     nfold = 3L,
-    error_measure = c("mse", "mae", "deviance"),
+    error_measure = c("deviance", "mse", "mae"),
     x = 1:n,
     lambda = NULL,
     maxiter = 1e6L,
     delay_distn = NULL,
+    delay_distn_periodicity = NULL,
+    regular_splits = FALSE,
+    invert_splits = FALSE,
     ...) {
   arg_is_pos_int(nfold)
   n <- length(observed_counts)
@@ -56,13 +76,23 @@ cv_estimate_rt <- function(
     lambda = lambda,
     maxiter = maxiter,
     delay_distn = delay_distn,
+    delay_distn_periodicity = delay_distn_periodicity,
     ...
   )
 
   if (is.null(lambda)) lambda <- full_fit$lambda
+  if (is.null(delay_distn_periodicity)) {
+    delay_distn_periodicity <- full_fit$delay_distn_periodicity
+  }
 
-  foldid <- c(0, rep_len(1:nfold, n - 2), 0)
+  if (regular_splits) {
+    middle_fold <- rep_len(1:nfold, n - 2)
+  } else {
+    middle_fold <- sample.int(nfold, n - 2, replace = TRUE)
+  }
+  foldid <- c(0, middle_fold, 0)
   cvall <- matrix(NA, nfold, length(lambda))
+
   error_measure <- match.arg(error_measure)
   err_fun <- switch(error_measure,
     mse = function(y, m) (y - m)^2,
@@ -76,8 +106,8 @@ cv_estimate_rt <- function(
   )
 
   for (f in 1:nfold) {
-    train_idx <- foldid != f
-    test_idx <- foldid == f
+    train_idx <- if (invert_splits) foldid %in% c(0, f) else foldid != f
+    test_idx <- !train_idx
 
     mod <- estimate_rt(
       observed_counts = observed_counts[train_idx],
@@ -87,6 +117,7 @@ cv_estimate_rt <- function(
       lambda = lambda,
       maxiter = maxiter,
       delay_distn = delay_distn,
+      delay_distn_periodicity = delay_distn_periodicity,
       ...
     )
 
@@ -94,18 +125,22 @@ cv_estimate_rt <- function(
 
     wpc <- delay_calculator(
       observed_counts = observed_counts[train_idx],
-      x = x[train_idx] - min(x[train_idx]) + 1,
+      x = x[train_idx],
       dist_gamma = dist_gamma,
       delay_distn = delay_distn,
-      output_partial_seq = FALSE
+      delay_distn_periodicity = delay_distn_periodicity,
+      xout = x[test_idx]
     )
 
-    pred_observed_counts <- interp_rt * wpc[test_idx]
+
+    pred_observed_counts <- interp_rt * wpc
     score <- colMeans(err_fun(observed_counts[test_idx], pred_observed_counts))
     cvall[f, seq_along(score)] <- score
     if (length(lambda) != length(score)) {
-      cli::cli_warn(c("`lambda` sequence is not fully visited for fold {.val {f}} due to insufficient iteration.",
-        "!" = "Please increase `maxiter`."
+      cli::cli_warn(c(
+        "Estimation for the full `lambda` sequence did not occur for fold {.val {f}}",
+        "because the maximum number of iterations was exhausted.",
+        "i" = "You may wish to increase `maxiter` from the current {.val {maxiter}}."
       ))
     }
   }

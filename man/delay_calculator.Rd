@@ -9,7 +9,8 @@ delay_calculator(
   x = NULL,
   dist_gamma = c(2.5, 2.5),
   delay_distn = NULL,
-  output_partial_seq = TRUE
+  delay_distn_periodicity = NULL,
+  xout = x
 )
 }
 \arguments{
@@ -30,10 +31,20 @@ distribution with some shape and scale.}
 a vector of delay probabilities may be passed here. These will be coerced
 to sum to 1, and padded with 0 in the right tail if necessary.}
 
-\item{output_partial_seq}{Logical. By default, this function returns the
-convolved weight vector with observed cases at the original \code{x} values.
-However, when \code{x} is irregular, setting this to \code{FALSE} will result
-in a result at the interpolated \code{x} sequence.}
+\item{delay_distn_periodicity}{Controls the relationship between the spacing
+of the computed delay distribution and the spacing of \code{x}. In the default
+case, \code{x} would be regular on the sequence \code{1:length(observed_cases)},
+and this would
+be 1. But if \code{x} is a \code{Date} object or spaced irregularly, the relationship
+becomes more complicated. For example, weekly data when \code{x} is a date in
+the form \code{YYYY-MM-DD} requires specifying \code{delay_distn_periodicity = "1 week"}.
+Or if \code{observed_cases} were reported on Monday, Wednesday, and Friday,
+then \code{delay_distn_periodicity = "1 day"} would be most appropriate.}
+
+\item{xout}{a vector of positions at which the results should be returned.
+By default, this will be the same as \code{x}, but in the case that observations
+are unequally spaced, alternatives may be desired. Note that \code{xout} must
+satisfy \code{min(x) <= min(xout)} and \code{max(x) >= max(xout)}.}
 }
 \value{
 A vector containing the total infectiousness at each
@@ -48,5 +59,5 @@ of the symptom onset of a secondary infection occurred a given
 number of days after the primary infection
 }
 \examples{
-delay_calculator(c(3,2,5,3,1), dist_gamma = c(2.5, 2.5))
+delay_calculator(c(3, 2, 5, 3, 1), dist_gamma = c(2.5, 2.5))
 }

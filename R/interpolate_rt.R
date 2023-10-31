@@ -1,4 +1,3 @@
-
 #' Interpolate (or extrapolate) Rt estimates to intermediate design points
 #'
 #' @param object A fitted object produced by `estimate_rt()` or `cv_estimate_rt()`.

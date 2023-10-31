@@ -20,6 +20,4 @@ test_that("building the D matrix works", {
   z <- c(1:7, 9:10)
   expect_identical(get_D(2, z), dspline::d_mat(3, z, TRUE)) # note 2 vs 3
   expect_identical(get_Dtil(2, z), dspline::d_mat(2, z, FALSE))
-
 })
-

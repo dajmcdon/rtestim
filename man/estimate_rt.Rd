@@ -12,6 +12,7 @@ estimate_rt(
   lambda = NULL,
   nsol = 100L,
   delay_distn = NULL,
+  delay_distn_periodicity = NULL,
   lambdamin = NULL,
   lambdamax = NULL,
   lambda_min_ratio = 1e-04,
@@ -56,6 +57,16 @@ compute Rt.}
 a vector of delay probabilities may be passed here. These will be coerced
 to sum to 1, and padded with 0 in the right tail if necessary.}
 
+\item{delay_distn_periodicity}{Controls the relationship between the spacing
+of the computed delay distribution and the spacing of \code{x}. In the default
+case, \code{x} would be regular on the sequence \code{1:length(observed_cases)},
+and this would
+be 1. But if \code{x} is a \code{Date} object or spaced irregularly, the relationship
+becomes more complicated. For example, weekly data when \code{x} is a date in
+the form \code{YYYY-MM-DD} requires specifying \code{delay_distn_periodicity = "1 week"}.
+Or if \code{observed_cases} were reported on Monday, Wednesday, and Friday,
+then \code{delay_distn_periodicity = "1 day"} would be most appropriate.}
+
 \item{lambdamin}{Optional value for the smallest \code{lambda} to use. This should
 be greater than zero.}
 
@@ -95,8 +106,8 @@ The Effective Reproduction Number \eqn{R_t} of an infectious
 disease can be estimated by solving the smoothness penalized Poisson
 regression (trend filtering) of the form:
 
-\eqn{\hat{\theta} = argmin_{\theta} (\frac{1}{n} \sum_{i=1}^n w_i e^{\theta_i} -
-  y_i\theta_i) + \lambda||D^{(k+1)}\theta||_1, }
+\deqn{\hat{\theta} = \argmin_{\theta} \frac{1}{n} \sum_{i=1}^n (w_i e^{\theta_i} -
+  y_i\theta_i) + \lambda\Vert D^{(k+1)}\theta\Vert_1, }
 
 where \eqn{R_t = e^{\theta}}, \eqn{y_i} is the observed case count at day
 \eqn{i}, \eqn{w_i} is the weighted past counts at day \eqn{i}, \eqn{\lambda}

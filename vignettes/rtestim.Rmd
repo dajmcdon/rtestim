@@ -18,8 +18,8 @@ theme_set(theme_bw())
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  dpi = 300, 
-  collapse = FALSE, 
+  dpi = 300,
+  collapse = FALSE,
   comment = "#>",
   fig.asp = 0.618,
   fig.width = 6,
@@ -135,7 +135,7 @@ Users may wish to visualize the particular $\Rtseq$ which minimizes the
 cross-validation error while prioritizing smoothness.
 
 ```{r, fig.align='center'}
-plot(mod_cv, which_lambda = 'lambda.1se')
+plot(mod_cv, which_lambda = "lambda.1se")
 ```
 
 
@@ -149,7 +149,7 @@ representing the days at which we observe the case counts.
 
 ```{r}
 observation_incr <- rpois(101, lambda = 1)
-observation_incr[observation_incr == 0] = 1
+observation_incr[observation_incr == 0] <- 1
 observation_time <- cumsum(observation_incr)
 ```
 
@@ -183,13 +183,13 @@ on 4 July 2023 is included in the package. We use this data to estimate $R_t$.
 
 ```{r, warning=FALSE, fig.align='center'}
 can <- estimate_rt(
-  observed_counts = cancovid$incident_cases, 
-  x = cancovid$date, 
-  nsol = 20, 
+  observed_counts = cancovid$incident_cases,
+  x = cancovid$date,
+  nsol = 20,
   maxiter = 1e6
 )
 
-plot(can) + 
+plot(can) +
   geom_hline(yintercept = 1) +
   coord_cartesian(ylim = c(0.5, 2)) +
   scale_x_date(date_breaks = "1 year", date_labels = "%Y")

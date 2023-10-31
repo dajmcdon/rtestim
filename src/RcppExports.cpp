@@ -211,6 +211,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// compute_gcd
+int compute_gcd(IntegerVector x);
+RcppExport SEXP _rtestim_compute_gcd(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< IntegerVector >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(compute_gcd(x));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_rtestim_prox_newton_testing", (DL_FUNC) &_rtestim_prox_newton_testing, 11},
@@ -226,6 +237,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rtestim_pois_obj", (DL_FUNC) &_rtestim_pois_obj, 6},
     {"_rtestim_gaussianized_data", (DL_FUNC) &_rtestim_gaussianized_data, 3},
     {"_rtestim_line_search", (DL_FUNC) &_rtestim_line_search, 12},
+    {"_rtestim_compute_gcd", (DL_FUNC) &_rtestim_compute_gcd, 1},
     {NULL, NULL, 0}
 };
 

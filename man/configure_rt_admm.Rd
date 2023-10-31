@@ -11,7 +11,8 @@ configure_rt_admm(
   tolerance = 1e-04,
   maxiter_newton = 50L,
   maxiter_line = 20L,
-  verbose = 0
+  verbose = 0,
+  ...
 )
 }
 \arguments{
@@ -33,6 +34,8 @@ Newton iteration.}
 algorithm in the proximal Newton method.}
 
 \item{verbose}{Integer.}
+
+\item{...}{space for future extensions}
 }
 \value{
 a list of model parameters with class \code{rt_admm_configuration}

@@ -2,15 +2,15 @@ interpolate_lambda <- function(lambda, new_lambda) {
   if (min(new_lambda) < min(lambda)) {
     cli::cli_warn(c(
       "Requested `lambda` has values smaller than those used to estimate Rt.",
-        i = "You may want to refit at these values.",
-        i = "Using the smallest `lambda`'s available."
+      i = "You may want to refit at these values.",
+      i = "Using the smallest `lambda`'s available."
     ))
   }
   if (max(new_lambda) > max(lambda)) {
     cli::cli_warn(c(
       "Requested `lambda` has values larger than those used to estimate Rt.",
-        i = "You may want to refit at these values.",
-        i = "Using the largest `lambda`'s available."
+      i = "You may want to refit at these values.",
+      i = "Using the largest `lambda`'s available."
     ))
   }
   if (length(lambda) == 1) {

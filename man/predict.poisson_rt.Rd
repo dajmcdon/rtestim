@@ -26,7 +26,7 @@ Note: This function is not intended for "new x" or to produce forecasts, but
 rather to examine how Rt relates to observables.
 }
 \examples{
-y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
+y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
 out <- estimate_rt(y, nsol = 10)
 preds <- predict(out)
 plot(y)

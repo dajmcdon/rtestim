@@ -9,11 +9,14 @@ cv_estimate_rt(
   korder = 3L,
   dist_gamma = c(2.5, 2.5),
   nfold = 3L,
-  error_measure = c("mse", "mae", "deviance"),
+  error_measure = c("deviance", "mse", "mae"),
   x = 1:n,
   lambda = NULL,
   maxiter = 1000000L,
   delay_distn = NULL,
+  delay_distn_periodicity = NULL,
+  regular_splits = FALSE,
+  invert_splits = FALSE,
   ...
 )
 }
@@ -64,6 +67,35 @@ algorithm.}
 \item{delay_distn}{in the case of a non-gamma delay distribution,
 a vector of delay probabilities may be passed here. These will be coerced
 to sum to 1, and padded with 0 in the right tail if necessary.}
+
+\item{delay_distn_periodicity}{Controls the relationship between the spacing
+of the computed delay distribution and the spacing of \code{x}. In the default
+case, \code{x} would be regular on the sequence \code{1:length(observed_cases)},
+and this would
+be 1. But if \code{x} is a \code{Date} object or spaced irregularly, the relationship
+becomes more complicated. For example, weekly data when \code{x} is a date in
+the form \code{YYYY-MM-DD} requires specifying \code{delay_distn_periodicity = "1 week"}.
+Or if \code{observed_cases} were reported on Monday, Wednesday, and Friday,
+then \code{delay_distn_periodicity = "1 day"} would be most appropriate.}
+
+\item{regular_splits}{Logical.
+If \code{TRUE}, the folds for k-fold cross-validation are chosen by placing
+every kth point into the same fold. The first and last points are not
+included in any fold and are always included in building the predictive
+model. As an example, with 15 data points and \code{kfold = 4}, the points are
+assigned to folds in the following way:
+\deqn{
+  0 \; 1 \; 2 \; 3 \; 4 \; 1 \; 2 \; 3 \;  4 \; 1 \; 2 \; 3 \; 4 \; 1 \; 0
+  }{0 1 2 3 4 1 2 3 4 1 2 3 4 1 0} where 0 indicates no assignment.
+Therefore, the folds are not random and running \code{cv_estimate_rt()} twice
+will give the same result.}
+
+\item{invert_splits}{Logical.
+Typical K-fold CV would use K-1 folds for the training
+set while reserving 1 fold for evaluation (repeating the split K times).
+Setting this to true inverts this process, using a much smaller training
+set with a larger evaluation set. This tends to result in larger values
+of \code{lambda} that minimize CV.}
 
 \item{...}{additional parameters passed to \code{estimate_rt()} function}
 }

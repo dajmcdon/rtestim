@@ -36,7 +36,7 @@ set.seed(12345)
 library(rtestim)
 library(ggplot2)
 dat <- data.frame(
-  Time = 1:101, 
+  Time = 1:101,
   incident_cases = c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
 )
 ggplot(dat, aes(Time, incident_cases)) +
@@ -64,7 +64,7 @@ tuning parameter.
 
 ``` r
 mod_cv <- cv_estimate_rt(dat$incident_cases, nsol = 20)
-plot(mod_cv, which_lambda = 'lambda.1se')
+plot(mod_cv, which_lambda = "lambda.1se")
 ```
 
 <img src="man/figures/README-cv-estimate-1.png" width="80%" style="display: block; margin: auto;" />

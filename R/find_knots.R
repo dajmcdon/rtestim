@@ -1,4 +1,3 @@
-
 #' Find the knots for an estimated `poisson_rt` object.
 #'
 #' Produces the lengths of the segments between knots as well as the number

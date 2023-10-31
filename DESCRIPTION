@@ -1,11 +1,11 @@
 Type: Package
 Package: rtestim
 Title: Estimate the Effective Reproductive Number with Trend Filtering
-Version: 0.0.3
+Version: 0.0.4
 Authors@R: c(
     person("Daniel J.", "McDonald", , "daniel@stat.ubc.ca", role = c("aut", "cre")),
-    person("Zhenglun", "Cai", , "zhenglun.cai@stat.ubc.ca", role = "aut"),
-    person("Jiaping", "Liu", , "jiaping.liu@stat.ubc.ca", role = "aut")
+    person("Jiaping", "Liu", , "jiaping.liu@stat.ubc.ca", role = "aut"),
+    person("Zhenglun", "Cai", , "zhenglun.cai@stat.ubc.ca", role = "aut")
   )
 Description: This package uses Poisson likelihood with trend filtering
     penalty (a type of regularized nonparametric regression) to estimate
@@ -29,13 +29,14 @@ Imports:
     Rcpp,
     rlang,
     tibble,
-    vctrs,
-Suggests: 
+    vctrs
+Suggests:
     knitr,
     rmarkdown,
     testthat (>= 3.0.0),
     xml2
-LinkingTo: 
+LinkingTo:
+    BH,
     dspline,
     Rcpp,
     RcppEigen,
@@ -43,7 +44,7 @@ LinkingTo:
 VignetteBuilder: 
     knitr
 Remotes:
-    ryantibs/dspline
+    glmgen/dspline
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true

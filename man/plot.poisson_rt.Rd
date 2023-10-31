@@ -20,7 +20,7 @@ values of the penalty. The result is a \code{\link[ggplot2:ggplot]{ggplot2::ggpl
 modifications can be added as desired.
 }
 \examples{
-y <- c(1, rpois(100, dnorm(1:100, 50, 15)*500 + 1))
-out <- estimate_rt(y, lambda = log(c(1.1,1.3,1.5)))
+y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
+out <- estimate_rt(y, lambda = log(c(1.1, 1.3, 1.5)))
 plot(out)
 }

@@ -1,0 +1,28 @@
+test_that("strextract grabs the right text", {
+  expect_identical(strextract("^[0-9]+", "23 weeks"), "23")
+  expect_identical(strextract("^[0-9]+", "2weeks"), "2")
+  expect_identical(strextract("^[0-9]+", "2weeks4"), "2")
+  expect_identical(strextract("^[0-9]+", "weeks2"), character())
+
+  expect_identical(strextract("[a-zA-Z]+$", "23 weeks"), "weeks")
+  expect_identical(strextract("[a-zA-Z]+$", "2weeks"), "weeks")
+  expect_identical(strextract("[a-zA-Z]+$", "2weeks4"), character())
+  expect_identical(strextract("[a-zA-Z]+$", "weeks2"), character())
+  expect_identical(strextract("[a-zA-Z]+$", "weeks2days"), "days")
+})
+
+test_that("period returns scalar integer period", {
+  expect_error(new_period(c(1, 3)))
+  expect_error(new_period(1))
+  expect_error(new_period("1"))
+  expect_error(new_period("2weeks4"))
+  expect_error(new_period("weeks4"))
+  expect_error(new_period("3 seconds"))
+  expect_identical(vctrs::field(new_period("23 weeks"), "day"), 23L * 7L)
+  expect_identical(vctrs::field(new_period("2weeks"), "day"), 2L * 7L)
+  expect_identical(vctrs::field(new_period("4 d"), "day"), 4L)
+  expect_identical(vctrs::field(new_period("4 D"), "day"), 4L)
+  expect_identical(vctrs::field(new_period("4 M"), "day"), 0L)
+  expect_identical(vctrs::field(new_period("4 M"), "month"), 4L)
+  expect_identical(vctrs::field(new_period("4 Q"), "month"), 12L)
+})
