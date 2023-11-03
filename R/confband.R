@@ -133,7 +133,7 @@ plot.rt_confidence_band <- function(x, colour = "#3A448F", ...) {
   xlab <- ifelse(inherits(attr(x, "xval"), "Date"), "Date", "Time")
   ylab <- paste(
     "Estimated Rt with",
-    paste(fmt_perc(rev(attr(cb, "CIs"))), collapse = ", "),
+    paste(fmt_perc(rev(attr(x, "CIs"))), collapse = ", "),
     "\nconfidence bands"
   )
   plt <- ggplot2::ggplot(x, ggplot2::aes(x = .data$xval)) +
@@ -145,7 +145,7 @@ plot.rt_confidence_band <- function(x, colour = "#3A448F", ...) {
 
   ncis <- length(CIs) / 2
   v <- ncis:1 / ncis
-  names(v) <- fmt_perc(attr(cb, "CIs"))
+  names(v) <- fmt_perc(attr(x, "CIs"))
   plot_cis(plt, CIs, colour) +
     ggplot2::geom_hline(yintercept = 1)
 }
