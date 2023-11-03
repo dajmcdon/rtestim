@@ -195,5 +195,15 @@ plot(can) +
   scale_x_date(date_breaks = "1 year", date_labels = "%Y")
 ```
 
+## Approximate confidence bands
 
+We also provide functionality for computing approximate confidence bands for
+Rt based on normal approximations and the delta method. These are intended to 
+be fast and to provide some idea of uncertainty, but they likely don't have 
+guaranteed coverage.
 
+```{r}
+can_cb <- confband(can, lambda = can$lambda[10], level = c(.5, .8, .95))
+can_cb
+plot(can_cb) + coord_cartesian(ylim = c(0, 2.5))
+```

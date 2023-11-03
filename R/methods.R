@@ -82,6 +82,7 @@ plot.poisson_rt <- function(x, lambda = NULL, ...) {
     Time = rep(x$x, k)
   )
 
+  xlab <- ifelse(inherits(x$x, "Date"), "Date", "Time")
   plt <- ggplot2::ggplot(
     df,
     ggplot2::aes(.data$Time, .data$Rt,
@@ -90,8 +91,11 @@ plot.poisson_rt <- function(x, lambda = NULL, ...) {
     )
   ) +
     ggplot2::geom_line() +
+    ggplot2::ylab("Estimated Rt") +
+    ggplot2::xlab(xlab) +
     ggplot2::theme_bw() +
-    ggplot2::scale_colour_viridis_c(trans = "log10")
+    ggplot2::scale_colour_viridis_c(trans = "log10") +
+    ggplot2::geom_hline(yintercept = 1)
   if (k == 1) plt <- plt + ggplot2::theme(legend.position = "none")
   plt
 }
