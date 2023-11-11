@@ -59,21 +59,25 @@ confband.poisson_rt <- function(object, lambda, level = 0.95, ...) {
   y <- object$observed_counts
   n <- length(y)
   Rt <- fitted(object, lambda)
+  wt <- object$weighted_past_counts
   yhat <- predict(object, lambda)
   knots <- find_knots(object, lambda)
 
   Ds <- Matrix::bdiag(lapply(knots$pieces, nbd, ord = object$korder))
   # The procedure for this approximation:
+  # 00. theta is natural parameter in exp family
   # 0. Pretend we knew the knots (and lambda is fixed + known) --> Ds
-  # 1. pretend we had used ||Ds r||_2^2 with the same lambda
+  # 1. pretend we had used ||Ds theta||_2^2 with the same lambda and normal
+  #    likelihood.
   # 2. Apply multivariate delta method
-  #   a. Var(y) = (I * exp(theta) + lambda (Ds'Ds))^(-1)
-  #   b. g(theta) = exp(theta) / w
-  #   c. g'(theta) = exp(theta) / w = r
-  #   d. Need Var(y) * g'(theta)^2 -->
+  #   a. Var(\hat\mu) = (I * 1/theta^2 + lambda (Ds'Ds))^(-1), evaluated at
+  #      \theta = \hat\mu
+  #   b. g(mu) = mu / w
+  #   c. g'(u) = 1 / w
+  #   d. Need Var(\hat\mu) * g'(mu)^2 -->
   covs <- diag(Matrix::solve(
-    Matrix::Diagonal(n, yhat) + lambda * Matrix::crossprod(Ds)
-  )) * Rt^2
+    Matrix::Diagonal(n, 1 / yhat^2) + lambda * Matrix::crossprod(Ds)
+  )) / wt^2
   a <- (1 - level) / 2
   a <- c(a, rev(1 - a))
   cb <- outer(sqrt(covs), stats::qt(a, n - knots$dof))
@@ -126,11 +130,24 @@ print.rt_confidence_band <- function(x, ...) {
 plot.rt_confidence_band <- function(x, colour = "#3A448F", ...) {
   x$xval <- attr(x, "xval")
   CIs <- names(x)[grep("[0-9]", names(x))]
+  xlab <- ifelse(inherits(attr(x, "xval"), "Date"), "Date", "Time")
+  ylab <- paste(
+    "Estimated Rt with",
+    paste(fmt_perc(rev(attr(x, "CIs"))), collapse = ", "),
+    "\nconfidence bands"
+  )
   plt <- ggplot2::ggplot(x, ggplot2::aes(x = .data$xval)) +
     ggplot2::geom_line(ggplot2::aes(y = .data$Rt), colour = colour) +
-    ggplot2::theme_bw()
+    ggplot2::theme_bw() +
+    ggplot2::xlab(xlab) +
+    ggplot2::ylab(ylab)
 
-  plot_cis(plt, CIs, colour)
+
+  ncis <- length(CIs) / 2
+  v <- ncis:1 / ncis
+  names(v) <- fmt_perc(attr(x, "CIs"))
+  plot_cis(plt, CIs, colour) +
+    ggplot2::geom_hline(yintercept = 1)
 }
 
 plot_cis <- function(plot, CIs, fill = "#3A448F",
