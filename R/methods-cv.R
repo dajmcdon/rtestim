@@ -14,7 +14,7 @@ summary.cv_poisson_rt <- function(object, ...) {
   if (n > 5) {
     l1 <- which(abs(object$lambda - object$lambda.min) < 1e-10)
     l2 <- which(abs(object$lambda - object$lambda.1se) < 1e-10)
-    idx <- c(1, l1, l2, n)
+    idx <- c(n, l1, l2, 1)
     tab <- tab[idx, ]
     rownames(tab) <- c("Min Lambda", "CV Minimizer", "1se Lambda", "Max Lambda")
   }
