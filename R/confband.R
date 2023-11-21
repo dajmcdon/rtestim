@@ -51,7 +51,7 @@ confband.poisson_rt <- function(object, lambda, level = 0.95, ...) {
   nbd <- function(piece, ord) {
     n <- length(piece)
     if (n <= ord + 1) {
-      return(Matrix::Diagonal(n, x = 0))
+      return(Matrix::Diagonal(n, x = 1))
     }
     get_D(ord, piece)
   }
@@ -59,11 +59,14 @@ confband.poisson_rt <- function(object, lambda, level = 0.95, ...) {
   y <- object$observed_counts
   n <- length(y)
   Rt <- fitted(object, lambda)
+  kn <- find_knots(object, lambda)
   wt <- object$weighted_past_counts
+  # wt <- map2(kn$l, kn$r, function(a, b) object$weighted_past_counts[a:b])
   yhat <- predict(object, lambda)
-  knots <- find_knots(object, lambda)
+  # yhat <- map2(kn$l, kn$r, function(a, b) yhat[a:b])
 
-  Ds <- Matrix::bdiag(lapply(knots$pieces, nbd, ord = object$korder))
+  # Ds <- lapply(kn$xpieces, nbd, ord = object$korder)
+  # browser()
   # The procedure for this approximation:
   # 00. theta is natural parameter in exp family
   # 0. Pretend we knew the knots (and lambda is fixed + known) --> Ds
@@ -75,19 +78,33 @@ confband.poisson_rt <- function(object, lambda, level = 0.95, ...) {
   #   b. g(mu) = mu / w
   #   c. g'(u) = 1 / w
   #   d. Need Var(\hat\mu) * g'(mu)^2 -->
-  covs <- diag(Matrix::solve(
-    Matrix::Diagonal(n, 1 / yhat^2) + lambda * Matrix::crossprod(Ds)
-  )) / wt^2
+  # Do it blockwise, try the easy way, use ginv if this fails
+  # covs <- pmap(list(Ds, wt, yhat), function(D, w, yh) {
+  #   n <- length(w)
+  #   kernel <- Matrix::Diagonal(n, x = 1 / yh^2) + lambda * Matrix::crossprod(D)
+  #   t1 <- diag(Matrix::solve(kernel, Matrix::Diagonal(n, x = 1/w^2)))
+  #   if (any(t1 < 0)) t1 <- diag(MASS::ginv(as.matrix(kernel))) / w^2
+  #   t1
+  # })
+  # covs <- unlist(covs)
+  # covs <- diag(Matrix::solve(
+  #   Matrix::Diagonal(n, 1 / yhat^2) + lambda * Matrix::crossprod(Ds)
+  # )) / wt^2
+  #
+  D <- get_D(object$korder, object$x)
+  kernel <- Matrix::Diagonal(x = 1 / yhat^2) + lambda * Matrix::crossprod(D)
+  covs <- diag(Matrix::solve(kernel)) / wt^2
+
   a <- (1 - level) / 2
   a <- c(a, rev(1 - a))
-  cb <- outer(sqrt(covs), stats::qt(a, n - knots$dof))
+  cb <- outer(sqrt(covs), stats::qt(a, n - kn$dof))
   cb <- pmax(Rt + cb, 0)
   colnames(cb) <- fmt_perc(a)
   tibble::new_tibble(
     vctrs::vec_cbind(Rt = Rt, cb),
     lambda = lambda,
     CIs = level,
-    dof = knots$dof,
+    dof = kn$dof,
     xval = object$x,
     class = "rt_confidence_band"
   )

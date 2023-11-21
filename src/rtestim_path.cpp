@@ -99,7 +99,7 @@ List rtestim_path(NumericVector y,
       theta(_, i) = exp(beta);
       alp(_, i) = diff(alpha);
     }
-    nknots[i] = sum(abs(alp(_, i)) > tolerance);
+    nknots[i] = sum(abs(alp(_, i)) > 1e-10);
 
     // Verbose handlers
     if (verbose > 1) Rcout << niter(i);
