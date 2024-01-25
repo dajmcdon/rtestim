@@ -42,7 +42,6 @@ delay_calculator <- function(
 
   if (inherits(x, "Date")) x <- as.numeric(x)
   arg_is_numeric(x)
-  if (!is.null(delay_distn)) delay_distn <- delay_distn / sum(delay_distn)
 
   if (any(is.na(xout))) cli_abort("`xout` may not contain missing values.")
   if (is.unsorted(xout, strictly = TRUE)) {
@@ -93,6 +92,7 @@ delay_calculator <- function(
     } else {
       delay_distn <- c(delay_distn, rep(0, length(allx) - length(delay_distn)))
     }
+    delay_distn <- delay_distn / sum(delay_distn)
   }
 
   y <- stats::approx(x, observed_counts, xout = allx)$y
