@@ -92,7 +92,7 @@ Next, we fit the model and visualize the resulting $\Rtseq$:
 
 ```{r, fig.align='center'}
 mod <- estimate_rt(observed_counts = case_counts, nsol = 20)
-plot(mod) + geom_hline(yintercept = 1)
+plot(mod)
 ```
 
 `{rtestim}` estimates a spectrum of $\Rtseq$s for a range of $\lambda$ values,
@@ -185,14 +185,12 @@ on 4 July 2023 is included in the package. We use this data to estimate $R_t$.
 can <- estimate_rt(
   observed_counts = cancovid$incident_cases,
   x = cancovid$date,
+  korder = 2,
   nsol = 20,
-  maxiter = 1e6
+  maxiter = 1e5
 )
 
-plot(can) +
-  geom_hline(yintercept = 1) +
-  coord_cartesian(ylim = c(0.5, 2)) +
-  scale_x_date(date_breaks = "1 year", date_labels = "%Y")
+plot(can) + coord_cartesian(ylim = c(0.5, 2))
 ```
 
 ## Approximate confidence bands
@@ -205,5 +203,5 @@ guaranteed coverage.
 ```{r}
 can_cb <- confband(can, lambda = can$lambda[10], level = c(.5, .8, .95))
 can_cb
-plot(can_cb) + coord_cartesian(ylim = c(0, 2.5))
+plot(can_cb) + coord_cartesian(ylim = c(0.5, 2))
 ```
