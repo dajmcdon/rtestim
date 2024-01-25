@@ -200,7 +200,7 @@ Rt based on normal approximations and the delta method. These are intended to
 be fast and to provide some idea of uncertainty, but they likely don't have 
 guaranteed coverage.
 
-```{r}
+```{r, fig.align='center'}
 can_cb <- confband(can, lambda = can$lambda[10], level = c(.5, .8, .95))
 can_cb
 plot(can_cb) + coord_cartesian(ylim = c(0.5, 2))
