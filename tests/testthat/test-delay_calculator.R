@@ -97,3 +97,40 @@ test_that("delay calculator correctly handles periodicity", {
     cw[xw - min(xw) + 1]
   )
 })
+
+test_that("delay calculator accommodates alternative delays", {
+  y <- cancovid$incident_cases[1:100]
+  wpc <- delay_calculator(y)
+
+  dist_gamma <- discretize_gamma(0:99)
+
+  expect_equal(wpc, delay_calculator(y, delay_distn = dist_gamma))
+
+  # wrong dimensions
+  d_mat <- matrix(1, nrow = 200, ncol = 200)
+  d_mat[upper.tri(d_mat)] <- 0
+  expect_error(delay_calculator(y, delay_distn = d_mat))
+
+  # not lower triangular
+  d_mat <- matrix(1, nrow = 100, ncol = 100)
+  expect_error(delay_calculator(y, delay_distn = d_mat))
+
+  d_mat[upper.tri(d_mat, diag = TRUE)] <- 0
+  expect_error(delay_calculator(y, delay_distn = d_mat))
+
+  d_mat[1,1] <- 1
+  roll_avg <- cumsum(y) / seq_along(y)
+  roll_avg <- c(roll_avg[1], roll_avg[-100])
+  expect_equal(roll_avg, delay_calculator(y, delay_distn = d_mat))
+  expect_equal(
+    roll_avg,
+    delay_calculator(y, delay_distn = drop0(as(d_mat, "CsparseMatrix")))
+  )
+
+  d_mat <- matrix(0, 100, 100)
+  d_mat[1,1] <- 1
+  for (i in 2:100) d_mat[i,1:i] <- rev(dist_gamma[1:i])
+  d_mat <- drop0(as(d_mat, "CsparseMatrix"))
+  d_mat <- d_mat / rowSums(d_mat)
+  expect_equal(wpc, delay_calculator(y, delay_distn = d_mat))
+})
