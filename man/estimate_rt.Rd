@@ -54,7 +54,7 @@ decreasing order.}
 compute Rt.}
 
 \item{delay_distn}{in the case of a non-gamma delay distribution,
-a vector or matrix (or \code{Matrix::Matrix}) of delay probabilities may be
+a vector or matrix (or \code{Matrix::Matrix()}) of delay probabilities may be
 passed here. For a vector, these will be coerced
 to sum to 1, and padded with 0 in the right tail if necessary. If a
 time-varying delay matrix, it must be lower-triangular. Each row will be
