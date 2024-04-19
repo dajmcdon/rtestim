@@ -28,8 +28,11 @@ As in most literature, we assume that this interval follows a gamma
 distribution with some shape and scale.}
 
 \item{delay_distn}{in the case of a non-gamma delay distribution,
-a vector of delay probabilities may be passed here. These will be coerced
-to sum to 1, and padded with 0 in the right tail if necessary.}
+a vector or matrix (or \code{Matrix::Matrix}) of delay probabilities may be
+passed here. For a vector, these will be coerced
+to sum to 1, and padded with 0 in the right tail if necessary. If a
+time-varying delay matrix, it must be lower-triangular. Each row will be
+silently coerced to sum to 1.}
 
 \item{delay_distn_periodicity}{Controls the relationship between the spacing
 of the computed delay distribution and the spacing of \code{x}. In the default
@@ -48,15 +51,17 @@ satisfy \code{min(x) <= min(xout)} and \code{max(x) >= max(xout)}.}
 }
 \value{
 A vector containing the total infectiousness at each
-observed time point
+point \code{xout}.
 }
 \description{
 The total infectiousness at each observed time point is calculated
-by \eqn{\sum_{a=1}^t I_{t-s}w_s}, where \eqn{I} denotes the vector containing
-all observed case counts, and \eqn{w} denotes the serial interval
-distribution. The serial interval distribution expresses the probability
-of the symptom onset of a secondary infection occurred a given
-number of days after the primary infection
+by \eqn{\sum_{s=1}^t I_{t-s}w_s}, where \eqn{I} denotes the vector containing
+observed incidence, and \eqn{w} denotes the generation interval
+distribution. Typically, the generation interval is challenging to estimate
+from data, so the serial interval is used instead. The serial interval
+distribution expresses the probability
+of a secondary infection caused by a primary infection which occurred \eqn{s}
+days earlier.
 }
 \examples{
 delay_calculator(c(3, 2, 5, 3, 1), dist_gamma = c(2.5, 2.5))
