@@ -31,9 +31,14 @@ Imports:
     tibble,
     vctrs
 Suggests:
+    dplyr,
+    forcats,
     knitr,
+    nnet,
     rmarkdown,
+    R (>= 4.0),
     testthat (>= 3.0.0),
+    tidyr,
     xml2
 LinkingTo:
     BH,
