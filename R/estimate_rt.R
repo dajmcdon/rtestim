@@ -48,7 +48,7 @@
 #'   passed here. For a vector, these will be coerced
 #'   to sum to 1, and padded with 0 in the right tail if necessary. If a
 #'   time-varying delay matrix, it must be lower-triangular. Each row will be
-#'   silently coerced to sum to 1.
+#'   silently coerced to sum to 1. See also `vignette("delay-distributions")`.
 #' @param delay_distn_periodicity Controls the relationship between the spacing
 #'   of the computed delay distribution and the spacing of `x`. In the default
 #'   case, `x` would be regular on the sequence `1:length(observed_cases)`,
