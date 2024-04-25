@@ -190,3 +190,19 @@ int compute_gcd(IntegerVector x) {
   }
   return g;
 }
+
+// [[Rcpp::export]]
+NumericVector calc_delays(NumericVector x, NumericVector y) {
+  int n = x.size();
+  double s = 0.0;
+  NumericVector out(n);
+
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j <= i; j++) {
+      out[i] += x[i-j] * y[j];
+    }
+    s += y[i];
+    out[i] /= s;
+  }
+  return out;
+}

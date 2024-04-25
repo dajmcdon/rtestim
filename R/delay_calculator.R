@@ -95,10 +95,8 @@ delay_calculator <- function(
     delay_distn <- delay_distn / sum(delay_distn)
   }
 
-  y <- stats::approx(x, observed_counts, xout = allx)$y
-  cw <- cumsum(delay_distn)
-  convolved_seq <- stats::convolve(y, rev(delay_distn), type = "open")
-  convolved_seq <- convolved_seq[seq_along(allx)] / cw
+  convolved_seq <- fast_convolve(y, delay_distn)
+  # (polish up the beginning of the delay calculation)
   # when delay_distn[1] == 0, we're putting no weight on today.
   # This is typical and results in division by zero for the first observation
   # in convolved_seq
