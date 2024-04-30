@@ -7,6 +7,7 @@ test_that("fast convolution matches existing version", {
   cw <- cumsum(delay_distn)
   convolved_seq <- stats::convolve(y, rev(delay_distn), type = "open")
   convolved_seq <- convolved_seq[seq_along(y)] / cw
+  convolved_seq[1] <- 0 # there's an Inf here
 
   exact_convolved_seq <- function(y, delay) {
     n <- length(delay)
@@ -15,7 +16,8 @@ test_that("fast convolution matches existing version", {
   }
 
   ecs <- exact_convolved_seq(y, delay_distn)
-  expect_equal(ecs[2:100], convolved_seq[2:100])
+  ecs[1] <- 0 # there's an NaN here
+  expect_equal(ecs, convolved_seq)
 
   fcs <- fast_convolve(y, delay_distn)
   expect_equal(ecs, fcs)
@@ -53,4 +55,20 @@ test_that("negatives no longer appear in convolution", {
 
   skip_on_ci() # seeds not necessarily reproducible
   expect_true(all(convolved_seq[1:2] < 0))
+})
+
+test_that("difficult case of potential negatives still works", {
+  set.seed(12345)
+  n <- 99
+  y <- c(0, 0, 1, 2, 4, 4, 2, 0, 0, 1, rep(0, 20), rpois(69, 4))
+  delay <- c(discretize_gamma(0:9), rep(0, n - 10))
+
+  o <- fast_convolve(y, delay) # should be exact
+  expect_true(all(o >= 0))
+
+  y <- c(y, 1, 2, 3)
+  delay <- c(delay, 0, 0, 0) # now uses fft
+  o2 <- fast_convolve(y, delay)
+  expect_true(all(o2 >= 0))
+  expect_equal(o[1:n], o2[1:n])
 })

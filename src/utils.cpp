@@ -202,7 +202,7 @@ NumericVector calc_delays(NumericVector x, NumericVector y) {
       out[i] += x[i-j] * y[j];
     }
     s += y[i];
-    out[i] /= s;
+    if (s > 1e-16) out[i] /= s;
   }
   return out;
 }
