@@ -41,7 +41,9 @@ weighted sum of previous incidence, multiplied by $R_t$:
 \mathbb{E}[I_t \mid I_1,\ldots,I_{t-1}] = R_t \sum_{a=1}^t w_a I_{t-a},
 \end{equation}
 calculated by convolving the
-preceding $a$ days of new infections with the discretized generation (or serial) interval distribution $w$ of length $t$. It is the allowable distributions $\{w\}_{a=1}^n$ that are the focus.
+preceding $a$ days of new infections with the discretized generation (or serial)
+interval distribution $w$ of length $t$. It is the allowable distributions 
+$\{w\}_{a=1}^n$ that are the focus.
 
 ## Discretization
 
@@ -99,7 +101,7 @@ plot(can_default) + coord_cartesian(ylim = c(0.5, 2))
 ## Constant, non-parametric delay distribution
 
 If we don't believe that the Gamma distribution closely approximates the serial
-interval distribution, the we can specify our own manually. For example,
+interval distribution, then we can specify our own distribution manually. For example,
 [Backer et al., Table S1](https://doi.org/10.2807/1560-7917.ES.2022.27.6.2200042)
 gives observed serial intervals for the Omicron (SGTF) and Delta (non-SGTF)
 COVID-19 variants during 2 weeks in 2021 in the Netherlands. For the sake of 
