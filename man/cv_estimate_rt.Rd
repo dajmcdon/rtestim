@@ -65,8 +65,11 @@ decreasing order.}
 algorithm.}
 
 \item{delay_distn}{in the case of a non-gamma delay distribution,
-a vector of delay probabilities may be passed here. These will be coerced
-to sum to 1, and padded with 0 in the right tail if necessary.}
+a vector or matrix (or \code{Matrix::Matrix()}) of delay probabilities may be
+passed here. For a vector, these will be coerced
+to sum to 1, and padded with 0 in the right tail if necessary. If a
+time-varying delay matrix, it must be lower-triangular. Each row will be
+silently coerced to sum to 1. See also \code{vignette("delay-distributions")}.}
 
 \item{delay_distn_periodicity}{Controls the relationship between the spacing
 of the computed delay distribution and the spacing of \code{x}. In the default
