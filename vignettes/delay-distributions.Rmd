@@ -163,6 +163,7 @@ example, to create the correct matrix using the Baker et al. delays, the
 necessary code is the following.
 
 ```{r backer-matrix, eval=FALSE}
+# library(Matrix)
 n <- nrow(cancovid)
 backer_delay <- c(0, delay, rep(0, n - length(delay) - 1))
 delay_mat <- matrix(0, n, n)
@@ -305,7 +306,7 @@ Using the estimated proportions, we label each date with the dominant variant
 at the time (and restrict ourselves to the time period of the included case
 data).
 
-```{r, fig.height=1, echo=FALSE}
+```{r, echo=FALSE, fig.height=1}
 ggplot(can_pred_class, aes(x = Date, fill = fct_relevel(var, "Ancestral lineage"))) + 
   geom_ribbon(aes(ymax = 1, ymin = 0)) +
   scale_y_continuous(expand = expansion(0)) +
@@ -392,6 +393,7 @@ Finally, we use these delays during the period they were most prevalent to
 estimate Rt. First, we build the delay matrix.
 
 ```{r tvar-matrix}
+library(Matrix)
 n <- nrow(cancovid)
 delay_mat <- matrix(0, n, n)
 delay_mat[1,1] <- 1

@@ -82,18 +82,18 @@ confband.poisson_rt <- function(object, lambda, level = 0.95, ...) {
   # covs <- pmap(list(Ds, wt, yhat), function(D, w, yh) {
   #   n <- length(w)
   #   kernel <- Matrix::Diagonal(n, x = 1 / yh^2) + lambda * Matrix::crossprod(D)
-  #   t1 <- diag(Matrix::solve(kernel, Matrix::Diagonal(n, x = 1/w^2)))
+  #   t1 <- Matrix::diag(Matrix::solve(kernel, Matrix::Diagonal(n, x = 1/w^2)))
   #   if (any(t1 < 0)) t1 <- diag(MASS::ginv(as.matrix(kernel))) / w^2
   #   t1
   # })
   # covs <- unlist(covs)
-  # covs <- diag(Matrix::solve(
+  # covs <- Matrix::diag(Matrix::solve(
   #   Matrix::Diagonal(n, 1 / yhat^2) + lambda * Matrix::crossprod(Ds)
   # )) / wt^2
   #
   D <- get_D(object$korder, object$x)
   kernel <- Matrix::Diagonal(x = 1 / yhat^2) + lambda * Matrix::crossprod(D)
-  covs <- diag(Matrix::solve(kernel)) / wt^2
+  covs <- Matrix::diag(Matrix::solve(kernel)) / wt^2
 
   a <- (1 - level) / 2
   a <- c(a, rev(1 - a))

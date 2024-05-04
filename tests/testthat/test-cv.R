@@ -9,6 +9,12 @@ test_that("cv passes correct parameters to inner solvers (when lamdba is not
 test_that("test CV returns a warning message when max iteration is insufficient", {
   set.seed(1001)
   y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
-  expect_warning(cv_estimate_rt(y, korder = 3, nfold = 3, nsol = 30L, maxiter = 50L))
+
+
+  suppressWarnings( # creates 2 warnings, only the first is captured
+    expect_warning(
+      cv_estimate_rt(y, korder = 3, nfold = 3, nsol = 30L, maxiter = 50L)
+    )
+  )
   expect_no_warning(cv_estimate_rt(y, korder = 3, nfold = 3, nsol = 5, maxiter = 1e4L))
 })

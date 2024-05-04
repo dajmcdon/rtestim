@@ -18,13 +18,13 @@ URL: https://github.com/dajmcdon/rtestim,
     https://dajmcdon.github.io/rtestim/
 BugReports: https://github.com/dajmcdon/rtestim/issues
 Depends: 
-    dspline,
-    Matrix,
     R (>= 3.6.2)
 Imports: 
     cli,
+    dspline,
     ggplot2,
     magrittr,
+    Matrix,
     methods,
     Rcpp,
     rlang,

@@ -1,4 +1,5 @@
 test_that("building the D matrix works", {
+  library(Matrix)
   n <- 10
   x <- 1:n
   Id <- get_D(-1, x)
