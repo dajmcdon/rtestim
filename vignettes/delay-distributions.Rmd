@@ -164,10 +164,10 @@ necessary code is the following.
 
 ```{r backer-matrix, eval=FALSE}
 n <- nrow(cancovid)
-backer_delay <- rev(c(0, delay, rep(0, n - length(delay) - 1)))
+backer_delay <- c(0, delay, rep(0, n - length(delay) - 1))
 delay_mat <- matrix(0, n, n)
 delay_mat[1,1] <- 1
-for (iter in 2:n) delay_mat[iter, 1:iter] <- backer_delay[1:iter]
+for (iter in 2:n) delay_mat[iter, 1:iter] <- rev(backer_delay[1:iter])
 delay_mat <- drop0(as(delay_mat, "CsparseMatrix")) # make it sparse, not necessary
 delay_mat <- delay_mat / rowSums(delay_mat) # renormalize
 ```
