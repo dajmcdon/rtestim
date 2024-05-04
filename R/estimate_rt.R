@@ -44,8 +44,11 @@
 #' @param nsol Integer. The number of tuning parameters `lambda` at which to
 #'   compute Rt.
 #' @param delay_distn in the case of a non-gamma delay distribution,
-#'   a vector of delay probabilities may be passed here. These will be coerced
-#'   to sum to 1, and padded with 0 in the right tail if necessary.
+#'   a vector or matrix (or `Matrix::Matrix()`) of delay probabilities may be
+#'   passed here. For a vector, these will be coerced
+#'   to sum to 1, and padded with 0 in the right tail if necessary. If a
+#'   time-varying delay matrix, it must be lower-triangular. Each row will be
+#'   silently coerced to sum to 1. See also `vignette("delay-distributions")`.
 #' @param delay_distn_periodicity Controls the relationship between the spacing
 #'   of the computed delay distribution and the spacing of `x`. In the default
 #'   case, `x` would be regular on the sequence `1:length(observed_cases)`,
@@ -106,7 +109,7 @@ estimate_rt <- function(
   arg_is_scalar(korder, nsol, lambda_min_ratio)
   arg_is_scalar(lambdamin, lambdamax, delay_distn_periodicity, allow_null = TRUE)
   arg_is_positive(lambdamin, lambdamax, allow_null = TRUE)
-  arg_is_nonnegative(delay_distn, allow_null = TRUE)
+  # arg_is_nonnegative(delay_distn, allow_null = TRUE)
   arg_is_positive(lambda_min_ratio, dist_gamma)
   arg_is_length(2, dist_gamma)
   n <- length(observed_counts)
