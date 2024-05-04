@@ -57,3 +57,7 @@ compute_gcd <- function(x) {
     .Call(`_rtestim_compute_gcd`, x)
 }
 
+calc_delays <- function(x, y) {
+    .Call(`_rtestim_calc_delays`, x, y)
+}
+

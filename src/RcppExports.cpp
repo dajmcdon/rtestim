@@ -222,6 +222,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// calc_delays
+NumericVector calc_delays(NumericVector x, NumericVector y);
+RcppExport SEXP _rtestim_calc_delays(SEXP xSEXP, SEXP ySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type y(ySEXP);
+    rcpp_result_gen = Rcpp::wrap(calc_delays(x, y));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_rtestim_prox_newton_testing", (DL_FUNC) &_rtestim_prox_newton_testing, 11},
@@ -238,6 +250,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rtestim_gaussianized_data", (DL_FUNC) &_rtestim_gaussianized_data, 3},
     {"_rtestim_line_search", (DL_FUNC) &_rtestim_line_search, 12},
     {"_rtestim_compute_gcd", (DL_FUNC) &_rtestim_compute_gcd, 1},
+    {"_rtestim_calc_delays", (DL_FUNC) &_rtestim_calc_delays, 2},
     {NULL, NULL, 0}
 };
 
