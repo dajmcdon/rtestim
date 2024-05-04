@@ -108,7 +108,7 @@ delay_calculator <- function(
         i = "Otherwise, we will eventually try to calculate 0/0 and produce {.val NaN}. "
       ))
     }
-    delay_distn <- delay_distn / rowSums(delay_distn)
+    delay_distn <- delay_distn / Matrix::rowSums(delay_distn)
     convolved_seq <- drop(delay_distn %*% y)
     return(convolved_seq[allx %in% xout])
   } else {

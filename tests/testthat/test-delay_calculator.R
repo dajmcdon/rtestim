@@ -99,6 +99,7 @@ test_that("delay calculator correctly handles periodicity", {
 })
 
 test_that("delay calculator accommodates alternative delays", {
+  library(Matrix)
   y <- cancovid$incident_cases[1:100]
   wpc <- delay_calculator(y)
 
@@ -131,6 +132,6 @@ test_that("delay calculator accommodates alternative delays", {
   d_mat[1,1] <- 1
   for (i in 2:100) d_mat[i,1:i] <- rev(dist_gamma[1:i])
   d_mat <- drop0(as(d_mat, "CsparseMatrix"))
-  d_mat <- d_mat / rowSums(d_mat)
+  d_mat <- d_mat / Matrix::rowSums(d_mat)
   expect_equal(wpc, delay_calculator(y, delay_distn = d_mat))
 })

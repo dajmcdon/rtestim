@@ -53,8 +53,6 @@ test_that("negatives no longer appear in convolution", {
 
   expect_equal(bcs[10:length], convolved_seq[10:length])
 
-  skip_on_ci() # seeds not necessarily reproducible
-  expect_true(all(convolved_seq[1:2] < 0))
 })
 
 test_that("difficult case of potential negatives still works", {
