@@ -90,6 +90,8 @@ cv_estimate_rt <- function(
   } else {
     middle_fold <- sample.int(nfold, n - 2, replace = TRUE)
   }
+  if (length(unique(middle_fold)) < nfold)
+    cli::cli_warn("Number of random folds is less than `nfold`.")
   foldid <- c(0, middle_fold, 0)
   cvall <- matrix(NA, nfold, length(lambda))
 
@@ -105,7 +107,7 @@ cv_estimate_rt <- function(
     }
   )
 
-  for (f in 1:nfold) {
+  for (f in unique(middle_fold)) {
     train_idx <- if (invert_splits) foldid %in% c(0, f) else foldid != f
     test_idx <- !train_idx
 
@@ -145,13 +147,13 @@ cv_estimate_rt <- function(
     }
   }
   index <- apply(cvall, 2, function(x) any(is.na(x)))
-  cvall <- cvall[, !index]
+  cvall <- cvall[unique(middle_fold), !index]
   lambda <- lambda[!index]
 
 
   ### Calculate CV summary
   cv_scores <- colMeans(cvall)
-  cv_se <- apply(cvall, FUN = stats::sd, MARGIN = 2) / sqrt(nfold)
+  cv_se <- apply(cvall, FUN = stats::sd, MARGIN = 2) / sqrt(nrow(cvall))
   i0 <- which.min(cv_scores)
 
   structure(
