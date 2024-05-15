@@ -4,7 +4,7 @@
 \alias{plot.rt_confidence_band}
 \title{Plot estimated confidence bands for an estimate of Rt}
 \usage{
-\method{plot}{rt_confidence_band}(x, colour = "#3A448F", ...)
+\method{plot}{rt_confidence_band}(x, colour = c("#3A448F", "#FFA500"), ...)
 }
 \arguments{
 \item{x}{An object of class \code{rt_confidence_band} as produced by \code{confband()}.}

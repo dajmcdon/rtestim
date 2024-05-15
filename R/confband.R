@@ -93,15 +93,20 @@ confband.poisson_rt <- function(object, lambda, level = 0.95, ...) {
   #
   D <- get_D(object$korder, object$x)
   kernel <- Matrix::Diagonal(x = 1 / yhat^2) + lambda * Matrix::crossprod(D)
-  covs <- Matrix::diag(Matrix::solve(kernel)) / wt^2
+  cov_ys <- Matrix::diag(Matrix::solve(kernel))
+  covs <- cov_ys / wt^2
 
   a <- (1 - level) / 2
   a <- c(a, rev(1 - a))
   cb <- outer(sqrt(covs), stats::qt(a, n - kn$dof))
   cb <- pmax(Rt + cb, 0)
   colnames(cb) <- fmt_perc(a)
+  cb_y <- outer(sqrt(cov_ys), stats::qt(a, n - kn$dof))
+  cb_y <- pmax(yhat + cb_y, 0)
+  colnames(cb_y) <- fmt_perc(a, type = "(yhat)")
+
   tibble::new_tibble(
-    vctrs::vec_cbind(Rt = Rt, cb),
+    vctrs::vec_cbind(Rt = Rt, cb, yhat = yhat, cb_y),
     lambda = lambda,
     CIs = level,
     dof = kn$dof,
@@ -110,10 +115,11 @@ confband.poisson_rt <- function(object, lambda, level = 0.95, ...) {
   )
 }
 
-fmt_perc <- function(probs, digits = 3) {
+fmt_perc <- function(probs, digits = 3, type = "(Rt)") {
   paste0(
     format(100 * probs, trim = TRUE, scientific = FALSE, digits = digits),
-    "%"
+    "%",
+    type
   )
 }
 
@@ -144,27 +150,43 @@ print.rt_confidence_band <- function(x, ...) {
 #' out <- estimate_rt(y, nsol = 10)
 #' cb <- confband(out, out$lambda[2], level = c(0.95, 0.8, 0.5))
 #' plot(cb)
-plot.rt_confidence_band <- function(x, colour = "#3A448F", ...) {
-  x$xval <- attr(x, "xval")
-  CIs <- names(x)[grep("[0-9]", names(x))]
-  xlab <- ifelse(inherits(attr(x, "xval"), "Date"), "Date", "Time")
+plot.rt_confidence_band <- function(x, colour = c("#3A448F", "#FFA500"), ...) {
+  x_Rt <- x[,-grep("yhat", colnames(x))]
+  colnames(x_Rt)[-1] <- gsub("\\(Rt\\)", "", colnames(x_Rt)[-1])
+  x_Rt$xval <- attr(x_Rt, "xval")
+  CIs <- names(x_Rt)[grep("[0-9]", names(x_Rt))]
+  xlab <- ifelse(inherits(attr(x_Rt, "xval"), "Date"), "Date", "Time")
   ylab <- paste(
     "Estimated Rt with",
-    paste(fmt_perc(rev(attr(x, "CIs"))), collapse = ", "),
+    paste(fmt_perc(rev(attr(x_Rt, "CIs")), type = ""), collapse = ", "),
     "\nconfidence bands"
   )
-  plt <- ggplot2::ggplot(x, ggplot2::aes(x = .data$xval)) +
-    ggplot2::geom_line(ggplot2::aes(y = .data$Rt), colour = colour) +
+  plt_Rt <- ggplot2::ggplot(x_Rt, ggplot2::aes(x = .data$xval)) +
+    ggplot2::geom_line(ggplot2::aes(y = .data$Rt), colour = colour[1]) +
     ggplot2::theme_bw() +
     ggplot2::xlab(xlab) +
     ggplot2::ylab(ylab)
-
-
-  ncis <- length(CIs) / 2
-  v <- ncis:1 / ncis
-  names(v) <- fmt_perc(attr(x, "CIs"))
-  plot_cis(plt, CIs, colour) +
+  plot_Rt <- plot_cis(plt_Rt, CIs, colour[1]) +
     ggplot2::geom_hline(yintercept = 1)
+  print(plot_Rt)
+
+  x_yhat <- x[,grep("yhat", colnames(x))]
+  colnames(x_yhat)[-1] <- gsub("\\(yhat\\)", "", colnames(x_yhat)[-1])
+  x_yhat$xval <- attr(x_yhat, "xval")
+  CIs <- names(x_yhat)[grep("[0-9]", names(x_yhat))]
+  xlab <- ifelse(inherits(attr(x_yhat, "xval"), "Date"), "Date", "Time")
+  ylab <- paste(
+    "Estimated incidence with",
+    paste(fmt_perc(rev(attr(x_yhat, "CIs")), type = ""), collapse = ", "),
+    "\nconfidence bands"
+  )
+  plt_yt <- ggplot2::ggplot(x_yhat, ggplot2::aes(x = .data$xval)) +
+    ggplot2::geom_line(ggplot2::aes(y = .data$yhat), colour = colour[2]) +
+    ggplot2::theme_bw() +
+    ggplot2::xlab(xlab) +
+    ggplot2::ylab(ylab)
+  plot_yt <- plot_cis(plt_yt, CIs, colour[2])
+  print(plot_yt)
 }
 
 plot_cis <- function(plot, CIs, fill = "#3A448F",
