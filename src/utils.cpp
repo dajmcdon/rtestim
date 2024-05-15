@@ -105,7 +105,7 @@ NumericVector gaussianized_data(NumericVector const& y,
     if (w(i) * exp(theta(i)) > 1e-3) {
       out(i) = y(i) * exp(-theta(i)) / w(i) - 1 + theta(i);
     } else if (w(i) < 1e-10) { // deal with overflow using approximation
-      out(i) = y(i) - exp(theta(i)) / (w(i) + 1e-10) + theta(i);
+      out(i) = y(i) - exp(theta(i)) / (1e-10) + theta(i);
     } else { // deal with overflow using approximation
       out(i) = y(i) - exp(theta(i)) / w(i) + theta(i);
     }
