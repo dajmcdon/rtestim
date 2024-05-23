@@ -4,7 +4,7 @@
 \alias{plot.rt_confidence_band}
 \title{Plot estimated confidence bands for an estimate of Rt}
 \usage{
-\method{plot}{rt_confidence_band}(x, colour = c("#3A448F", "#FFA500"), ...)
+\method{plot}{rt_confidence_band}(x, colour = "#3A448F", ...)
 }
 \arguments{
 \item{x}{An object of class \code{rt_confidence_band} as produced by \code{confband()}.}
@@ -24,4 +24,6 @@ y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
 out <- estimate_rt(y, nsol = 10)
 cb <- confband(out, out$lambda[2], level = c(0.95, 0.8, 0.5))
 plot(cb)
+cb_y <- confband(out, out$lambda[2], level = c(0.95, 0.8, 0.5), type = "Yt")
+plot(cb_y)
 }
