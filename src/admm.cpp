@@ -125,8 +125,8 @@ void prox_newton(int M,
       Rcpp::checkUserInterrupt();
     theta_old = theta;
 
-    // define new(Gaussianized) data for least squares problem
-    std_y = gaussianized_data(y, w, theta);
+    // define new(centered) data for least squares problem
+    std_y = centered_data(y, w, theta);
     // solve least squares problem (Gaussian TF)
     admm_gauss(Minner, n, korder, std_y, x, w, theta, z, u, rho, lam_z, DD, tol,
                inner_iter);

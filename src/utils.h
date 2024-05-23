@@ -25,9 +25,9 @@ double pois_obj(int ord,
                 Rcpp::NumericVector& theta,
                 double lambda);
 
-Rcpp::NumericVector gaussianized_data(Rcpp::NumericVector const& y,
-                                      Rcpp::NumericVector const& w,
-                                      Rcpp::NumericVector& theta);
+Rcpp::NumericVector centered_data(Rcpp::NumericVector const& y,
+                                  Rcpp::NumericVector const& w,
+                                  Rcpp::NumericVector& theta);
 
 double line_search(double s,
                    double lambda,
