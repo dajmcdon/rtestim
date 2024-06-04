@@ -300,6 +300,7 @@ boot <- data.frame(
   var = "Ancestral lineage"
 )
 can_pred_class <- bind_rows(boot, can_pred_class)
+saveRDS(can_pred_class, "can_pred_class.rds")
 ```
 
 Using the estimated proportions, we label each date with the dominant variant
