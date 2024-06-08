@@ -45,8 +45,8 @@ pois_obj <- function(ord, y, x, w, theta, lambda) {
     .Call(`_rtestim_pois_obj`, ord, y, x, w, theta, lambda)
 }
 
-gaussianized_data <- function(y, w, theta) {
-    .Call(`_rtestim_gaussianized_data`, y, w, theta)
+centered_data <- function(y, w, theta) {
+    .Call(`_rtestim_centered_data`, y, w, theta)
 }
 
 line_search <- function(s, lambda, alpha, gamma, y, x, w, n, ord, theta, theta_old, M) {
