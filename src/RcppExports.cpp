@@ -176,16 +176,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// gaussianized_data
-NumericVector gaussianized_data(NumericVector const& y, NumericVector const& w, NumericVector& theta);
-RcppExport SEXP _rtestim_gaussianized_data(SEXP ySEXP, SEXP wSEXP, SEXP thetaSEXP) {
+// centered_data
+NumericVector centered_data(NumericVector const& y, NumericVector const& w, NumericVector& theta);
+RcppExport SEXP _rtestim_centered_data(SEXP ySEXP, SEXP wSEXP, SEXP thetaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< NumericVector const& >::type y(ySEXP);
     Rcpp::traits::input_parameter< NumericVector const& >::type w(wSEXP);
     Rcpp::traits::input_parameter< NumericVector& >::type theta(thetaSEXP);
-    rcpp_result_gen = Rcpp::wrap(gaussianized_data(y, w, theta));
+    rcpp_result_gen = Rcpp::wrap(centered_data(y, w, theta));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -247,7 +247,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rtestim_doDtv", (DL_FUNC) &_rtestim_doDtv, 3},
     {"_rtestim_one_norm", (DL_FUNC) &_rtestim_one_norm, 1},
     {"_rtestim_pois_obj", (DL_FUNC) &_rtestim_pois_obj, 6},
-    {"_rtestim_gaussianized_data", (DL_FUNC) &_rtestim_gaussianized_data, 3},
+    {"_rtestim_centered_data", (DL_FUNC) &_rtestim_centered_data, 3},
     {"_rtestim_line_search", (DL_FUNC) &_rtestim_line_search, 12},
     {"_rtestim_compute_gcd", (DL_FUNC) &_rtestim_compute_gcd, 1},
     {"_rtestim_calc_delays", (DL_FUNC) &_rtestim_calc_delays, 2},

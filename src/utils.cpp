@@ -96,7 +96,7 @@ double pois_obj(int ord,
 }
 
 // [[Rcpp::export]]
-NumericVector gaussianized_data(NumericVector const& y,
+NumericVector centered_data(NumericVector const& y,
                                 NumericVector const& w,
                                 NumericVector& theta) {
   int n = y.size();
