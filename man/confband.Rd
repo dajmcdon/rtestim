@@ -2,9 +2,9 @@
 % Please edit documentation in R/confband.R
 \name{confband}
 \alias{confband}
-\title{Add confidence bands to estimated Rt curves}
+\title{Add confidence bands to estimated Rt or incidence curves}
 \usage{
-confband(object, lambda, level = 0.95, ...)
+confband(object, lambda, level = 0.95, type = c("Rt", "Yt"), ...)
 }
 \arguments{
 \item{object}{a \code{poisson_rt} or \code{cv_poisson_rt} object.}
@@ -15,15 +15,18 @@ confband(object, lambda, level = 0.95, ...)
 \item{level}{the desired confidence level(s). These will be sorted if
 necessary.}
 
+\item{type}{the type \code{Rt} or \code{Yt} for confidence intervals of fitted
+Rt or fitted incident cases}
+
 \item{...}{additional arguments for methods. Unused.}
 }
 \value{
-A \code{data.frame} containing the estimated \code{Rt} at the chosen \code{lambda},
-and confidence limits corresponding to \code{level}
+A \code{data.frame} containing the estimates \code{Rt} or \code{Yt} at the chosen
+\code{lambda}, and confidence limits corresponding to \code{level}
 }
 \description{
-Create an approximate confidence band for the Rt estimate. Note that the
-variance computation is approximate.
+Create an approximate confidence band for the Rt or incidence estimate. Note
+that the variance computation is approximate.
 }
 \examples{
 y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
