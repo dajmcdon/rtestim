@@ -256,11 +256,12 @@ they likely don’t have guaranteed coverage.</p>
 <span><span class="va">can_cb</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; An `rt_confidence_band` object.</span></span>
 <span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; * type = Rt </span></span>
 <span><span class="co">#&gt; * lambda = 8986.391 </span></span>
 <span><span class="co">#&gt; * degrees of freedom = 13 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1,253 × 7</span></span></span>
-<span><span class="co">#&gt;       Rt `2.5%` `10.0%` `25.0%` `75.0%` `90.0%` `97.5%`</span></span>
+<span><span class="co">#&gt;      fit `2.5%` `10.0%` `25.0%` `75.0%` `90.0%` `97.5%`</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>  2.04  0.797    1.23    1.61    2.47    2.85    3.29</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>  2.02  0.987    1.35    1.67    2.38    2.70    3.05</span></span>
@@ -275,7 +276,7 @@ they likely don’t have guaranteed coverage.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1,243 more rows</span></span></span></code></pre>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">can_cb</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="rtestim_files/figure-html/unnamed-chunk-11-1.png" width="80%" style="display: block; margin: auto;"></p>
+<p><img src="rtestim_files/figure-html/unnamed-chunk-11-1.png" width="80%" style="display: block; margin: auto;"><img src="rtestim_files/figure-html/unnamed-chunk-11-2.png" width="80%" style="display: block; margin: auto;"><img src="rtestim_files/figure-html/unnamed-chunk-11-3.png" width="80%" style="display: block; margin: auto;"></p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
