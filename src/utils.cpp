@@ -96,16 +96,17 @@ double pois_obj(int ord,
 }
 
 // [[Rcpp::export]]
-NumericVector centered_data(NumericVector const& y,
-                                NumericVector const& w,
-                                NumericVector& theta) {
+NumericVector centered_data(NumericVector const& y, NumericVector const& w,
+                            NumericVector& theta) {
   int n = y.size();
-  NumericVector out(n);
+  NumericVector out = clone(theta);
   for (int i = 0; i < n; i++) {
     if (w(i) * exp(theta(i)) > 1e-3) {
-      out(i) = y(i) * exp(-theta(i)) / w(i) - 1 + theta(i);
-    } else {  // deal with overflow using approximation
-      out(i) = y(i) - exp(theta(i)) / w(i) + theta(i);
+      out(i) += y(i) * exp(-theta(i)) / w(i) - 1;
+    } else if (w(i) < 1e-6) {
+      out(i) += y(i) - exp(theta(i)) / 1e-6;
+    } else { // deal with overflow using approximation
+      out(i) += y(i) - exp(theta(i)) / w(i);
     }
   }
   return out;
