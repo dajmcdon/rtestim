@@ -48,7 +48,7 @@ confband.cv_poisson_rt <- function(
 #' @export
 confband.poisson_rt <- function(object, lambda, level = 0.95, type = c("Rt", "Yt"), ...) {
   rlang::check_dots_empty()
-  assert_numeric(lambda, len = 1L)
+  assert_number(lambda)
   assert_numeric(level, lower = 0, upper = 1)
   level <- sort(level, decreasing = TRUE)
   type <- rlang::arg_match(type)

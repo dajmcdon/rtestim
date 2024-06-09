@@ -1,6 +1,5 @@
 new_period <- function(x) {
-  arg_is_scalar(x)
-  arg_is_chr(x)
+  assert_string(x)
 
   n <- as.integer(strextract("^[0-9]+", x))
   names_in <- tolower(strextract("[a-zA-Z]+$", x))
@@ -41,8 +40,8 @@ gcd <- function(x, na.rm = FALSE) {
   if (anyNA(x)) {
     return(NA)
   }
-  stopifnot(is.numeric(x))
-  if (!rlang::is_integerish(x)) cli_abort("`x` must contain only integers.")
+  assert_integerish(x)
+
   if (length(x) == 1L) {
     return(as.integer(x))
   }

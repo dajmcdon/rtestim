@@ -17,12 +17,14 @@
 #' @examples
 #' discretize_gamma(1:30, shape = 1, scale = 1)
 discretize_gamma <- function(x, shape = 2.5, scale = 2.5, rate = 1 / scale) {
-  arg_is_numeric_scalar(shape, scale, rate)
-  arg_is_nonnegative(x)
+  assert_number(shape, lower = 0, finite = TRUE)
+  assert_number(scale, lower = 0, finite = TRUE)
+  assert_number(rate, lower = 0, finite = TRUE)
+  assert_numeric(x, lower = 0, any.missing = FALSE)
   if (is.unsorted(x, strictly = TRUE)) {
-    cli::cli_abort("`x` must be sorted in increasing order.")
+    cli_abort("`x` must be sorted in increasing order.")
   }
-  pgm <- stats::pgamma(x, shape = shape, scale = scale)
+  pgm <- stats::pgamma(x, shape = shape, scale = scale, rate = rate)
   pgm <- c(0, pgm)
   pgm <- diff(pgm)
   pgm / sum(pgm)

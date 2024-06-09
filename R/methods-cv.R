@@ -227,7 +227,7 @@ predict.cv_poisson_rt <- function(object,
     which_lambda <- match.arg(which_lambda)
     which_lambda <- object[[which_lambda]]
   } else {
-    arg_is_numeric(which_lambda, allow_null = TRUE)
+    assert_numeric(which_lambda, null.ok = TRUE)
   }
   predict(object$full_fit, which_lambda)
 }
@@ -243,7 +243,7 @@ interpolate_rt.cv_poisson_rt <- function(
     which_lambda <- match.arg(which_lambda)
     which_lambda <- object[[which_lambda]]
   } else {
-    arg_is_numeric(which_lambda, allow_null = TRUE)
+    assert_numeric(which_lambda, null.ok = TRUE)
   }
   interpolate_rt(object$full_fit, xout, lambda = which_lambda)
 }

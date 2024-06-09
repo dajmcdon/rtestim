@@ -1,6 +1,6 @@
 fast_convolve <- function(y, delay) {
   n <- length(y)
-  arg_is_length(n, delay)
+  assert_numeric(delay, lower = 0, any.missing = FALSE, len = n)
   if (n < 100) return(calc_delays(y, delay)) # this is exact, normalizes
 
   # Has potential errors due to fft / ifft

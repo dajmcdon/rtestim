@@ -89,7 +89,7 @@ cv_estimate_rt <- function(
     middle_fold <- sample.int(nfold, n - 2, replace = TRUE)
   }
   if (length(unique(middle_fold)) < nfold)
-    cli::cli_warn("Number of random folds is less than `nfold`.")
+    cli_warn("Number of random folds is less than `nfold`.")
   foldid <- c(0, middle_fold, 0)
   cvall <- matrix(NA, nfold, length(lambda))
 

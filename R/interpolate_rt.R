@@ -9,7 +9,7 @@
 #' @export
 interpolate_rt <- function(object, xout, ...) {
   if (inherits(xout, "Date")) xout <- as.numeric(xout)
-  arg_is_numeric(xout)
+  assert_numeric(xout, null.ok = TRUE)
   UseMethod("interpolate_rt")
 }
 
