@@ -173,11 +173,10 @@ plot.rt_confidence_band <- function(x, colour = "#3A448F", ...) {
     ggplot2::xlab(xlab) +
     ggplot2::ylab(ylab)
   ci_plot <- plot_cis(plt, CIs, colour)
-  print(ci_plot)
   if (attr(x, "type") == "Rt") {
-    ci_plot <- ci_plot  + ggplot2::geom_hline(yintercept = 1)
-    print(ci_plot)
+    ci_plot <- ci_plot + ggplot2::geom_hline(yintercept = 1)
   }
+  ci_plot
 }
 
 plot_cis <- function(plot, CIs, fill = "#3A448F",

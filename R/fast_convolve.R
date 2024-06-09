@@ -14,7 +14,7 @@ fast_convolve <- function(y, delay) {
     idd <- as.double(delay > eps)
     id0 <- stats::convolve(idy, rev(idd), type = "open")[seq_along(y)]
     convolved_seq[id0 < 0.5] <- 0
-    convolved_seq <- abs(convolved_seq)
+    convolved_seq[convolved_seq < eps] <- 0
   }
   # normalize
   cw <- cumsum(delay)
