@@ -204,23 +204,66 @@ be the same as that shown above.</p>
 the Canadian data, but combine it with some additional information.</p>
 <p>We use variant circulation information from <a href="https://covarr-net.github.io/duotang/duotang.html" class="external-link">CoVaRR-Net’s
 Duotang notebook</a>.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Run on 19 April 2024</span></span>
+<span><span class="va">duotang</span> <span class="op">&lt;-</span> <span class="fu">read_tsv</span><span class="op">(</span><span class="st">"https://github.com/CoVaRR-NET/duotang/raw/main/data_needed/virusseq.metadata.csv.gz"</span><span class="op">)</span></span>
+<span><span class="va">columnlist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>  <span class="st">"fasta_header_name"</span>, <span class="st">"province"</span>, <span class="st">"host_gender"</span>, <span class="st">"host_age_bin"</span>,</span>
+<span>  <span class="st">"sample_collection_date"</span>, <span class="st">"sample_collected_by"</span>,</span>
+<span>  <span class="st">"purpose_of_sampling"</span>, <span class="st">"purpose_of_sequencing"</span>, <span class="st">"lineage"</span>,</span>
+<span>  <span class="st">"raw_lineage"</span>, <span class="st">"gisaid_accession"</span>, <span class="st">"isolate"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">unknown.str</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>  <span class="st">"Undeclared"</span>, <span class="st">"Not Provided"</span>, <span class="st">"Restricted Access"</span>, <span class="st">"Missing"</span>,</span>
+<span>  <span class="st">"Not Applicable"</span>, <span class="st">""</span>, <span class="st">"NA"</span>, <span class="st">"unknow"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">duotang</span> <span class="op">&lt;-</span> <span class="va">duotang</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>province <span class="op">=</span> <span class="va">geo_loc_name_state_province_territory</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">all_of</a></span><span class="op">(</span><span class="va">columnlist</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">meta</span> <span class="op">&lt;-</span> <span class="va">duotang</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>    week <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cut.html" class="external-link">cut</a></span><span class="op">(</span><span class="va">sample_collection_date</span>, <span class="st">"week"</span><span class="op">)</span>,</span>
+<span>    month <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span><span class="st">"-..$"</span>, <span class="st">""</span>, <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cut.html" class="external-link">cut</a></span><span class="op">(</span><span class="va">sample_collection_date</span>, <span class="st">"month"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="st">"https://github.com/CoVaRR-NET/duotang/raw/main/scripts/scanlineages.R"</span><span class="op">)</span></span>
+<span><span class="va">meta</span> <span class="op">&lt;-</span> <span class="va">meta</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>gisaid_accession <span class="op">=</span> <span class="fu">str_replace</span><span class="op">(</span><span class="va">gisaid_accession</span>, <span class="st">"EPI_ISL_"</span>, <span class="st">""</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>GID <span class="op">=</span> <span class="va">gisaid_accession</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rowwise.html" class="external-link">rowwise</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>raw_lineage <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"^X"</span>, <span class="va">raw_lineage</span><span class="op">)</span>,</span>
+<span>    <span class="fu">str_replace_all</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
+<span>      <span class="fu">realtorawlineage</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/substr.html" class="external-link">substr</a></span><span class="op">(</span></span>
+<span>        <span class="va">raw_lineage</span>, <span class="fl">1</span>, <span class="fu">str_locate</span><span class="op">(</span><span class="va">raw_lineage</span>, <span class="st">"\\."</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span></span>
+<span>      <span class="op">)</span><span class="op">)</span>,</span>
+<span>      <span class="st">"."</span>,</span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/substr.html" class="external-link">substr</a></span><span class="op">(</span><span class="va">raw_lineage</span>, <span class="fu">str_locate</span><span class="op">(</span><span class="va">raw_lineage</span>, <span class="st">"\\."</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/nchar.html" class="external-link">nchar</a></span><span class="op">(</span><span class="va">raw_lineage</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="op">)</span>, <span class="st">"[\r\n]"</span>, <span class="st">""</span><span class="op">)</span>,</span>
+<span>    <span class="va">raw_lineage</span></span>
+<span>  <span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">dico</span> <span class="op">&lt;-</span> <span class="fu">makepangolindico</span><span class="op">(</span><span class="op">)</span> <span class="co"># rebuild the lineage dictionary so the correct names gets assigned for XBB descedants not named XBB</span></span>
+<span></span>
+<span><span class="va">VOCVOI</span> <span class="op">&lt;-</span> <span class="fu">read_csv</span><span class="op">(</span><span class="st">"https://raw.githubusercontent.com/CoVaRR-NET/duotang/main/resources/vocvoi.csv"</span><span class="op">)</span></span>
+<span><span class="va">meta</span><span class="op">$</span><span class="va">pango_group</span> <span class="op">&lt;-</span> <span class="fu">create.pango.group</span><span class="op">(</span><span class="va">VOCVOI</span>, <span class="va">meta</span><span class="op">)</span></span>
+<span><span class="va">meta</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">meta</span>, <span class="va">province</span>, <span class="va">week</span>, <span class="va">pango_group</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>week <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="va">week</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">counts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">meta</span>, <span class="va">province</span>, <span class="va">week</span>, <span class="va">pango_group</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">province</span>, <span class="va">week</span>, <span class="va">pango_group</span><span class="op">)</span></span>
+<span><span class="va">can_counts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">meta</span>, <span class="va">week</span>, <span class="va">pango_group</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">week</span>, <span class="va">pango_group</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>province <span class="op">=</span> <span class="st">"Canada"</span><span class="op">)</span></span>
+<span><span class="va">counts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="va">can_counts</span>, <span class="va">counts</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">counts</span>, <span class="st">"duotang-counts.rds"</span><span class="op">)</span></span></code></pre></div>
 <p>We smooth the raw data using multinomial logistic regression on a
 third order orthogonal polynomial to produce the following estimated
 variant proportions in Canada.</p>
-<pre><code><span><span class="co">#&gt; # weights:  75 (56 variable)</span></span>
-<span><span class="co">#&gt; initial  value 576.814693 </span></span>
-<span><span class="co">#&gt; iter  10 value 351.440027</span></span>
-<span><span class="co">#&gt; iter  20 value 189.605996</span></span>
-<span><span class="co">#&gt; iter  30 value 154.997884</span></span>
-<span><span class="co">#&gt; iter  40 value 140.108374</span></span>
-<span><span class="co">#&gt; iter  50 value 131.785853</span></span>
-<span><span class="co">#&gt; iter  60 value 120.242371</span></span>
-<span><span class="co">#&gt; iter  70 value 114.647448</span></span>
-<span><span class="co">#&gt; iter  80 value 109.763514</span></span>
-<span><span class="co">#&gt; iter  90 value 107.918644</span></span>
-<span><span class="co">#&gt; iter 100 value 104.613062</span></span>
-<span><span class="co">#&gt; final  value 104.613062 </span></span>
-<span><span class="co">#&gt; stopped after 100 iterations</span></span></code></pre>
 <p><img src="delay-distributions_files/figure-html/duotang-counts-1.png" width="80%" style="display: block; margin: auto;"></p>
 <p>Using the estimated proportions, we label each date with the dominant
 variant at the time (and restrict ourselves to the time period of the
@@ -287,14 +330,8 @@ prevalent in Canada.</p>
 <p>Finally, we use these delays during the period they were most
 prevalent to estimate Rt. First, we build the delay matrix.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://Matrix.R-forge.R-project.org" class="external-link">Matrix</a></span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'Matrix'</span></span></code></pre>
-<pre><code><span><span class="co">#&gt; The following objects are masked from 'package:tidyr':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     expand, pack, unpack</span></span></code></pre>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">cancovid</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://Matrix.R-forge.R-project.org" class="external-link">Matrix</a></span><span class="op">)</span></span>
+<span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">cancovid</span><span class="op">)</span></span>
 <span><span class="va">delay_mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">n</span>, <span class="va">n</span><span class="op">)</span></span>
 <span><span class="va">delay_mat</span><span class="op">[</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">iter</span> <span class="kw">in</span> <span class="fl">2</span><span class="op">:</span><span class="va">n</span><span class="op">)</span> <span class="op">{</span></span>
@@ -306,7 +343,7 @@ prevalent to estimate Rt. First, we build the delay matrix.</p>
 <span><span class="va">delay_mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/drop0.html" class="external-link">drop0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/methods/as.html" class="external-link">as</a></span><span class="op">(</span><span class="va">delay_mat</span>, <span class="st">"CsparseMatrix"</span><span class="op">)</span><span class="op">)</span> <span class="co"># make it sparse, not necessary</span></span>
 <span><span class="va">delay_mat</span> <span class="op">&lt;-</span> <span class="va">delay_mat</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/colSums-methods.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="va">delay_mat</span><span class="op">)</span> <span class="co"># renormalize</span></span></code></pre></div>
 <p>Finally, we use this time-varying delay matrix to estimate Rt.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">can_tvar</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/estimate_rt.html">estimate_rt</a></span><span class="op">(</span></span>
 <span>  <span class="va">cancovid</span><span class="op">$</span><span class="va">incident_cases</span>, </span>
 <span>  x <span class="op">=</span> <span class="va">cancovid</span><span class="op">$</span><span class="va">date</span>, </span>
