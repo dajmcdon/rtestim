@@ -58,14 +58,12 @@ cv_estimate_rt <- function(
     regular_splits = FALSE,
     invert_splits = FALSE,
     ...) {
-  arg_is_pos_int(nfold)
   n <- length(observed_counts)
-  arg_is_length(n, x)
+  assert_int(nfold, lower = 2, upper = n - 2L)
   xin <- x
   if (inherits(xin, "Date")) x <- as.numeric(x)
-  arg_is_numeric(x)
+  assert_numeric(x, len = n)
 
-  if (nfold == 1) cli_abort("nfold must be greater than 1")
 
   ## Run program one time to create lambda
   full_fit <- estimate_rt(
