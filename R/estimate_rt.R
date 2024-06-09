@@ -123,6 +123,10 @@ estimate_rt <- function(
   n <- length(observed_counts)
   x <- x[!ymiss]
 
+  if (observed_counts[1] == 0) {
+    cli_abort("`observed_counts` must start with positive count")
+  }
+
   assert_int(korder, lower = 0, upper = n - 2L)
 
   xin <- x

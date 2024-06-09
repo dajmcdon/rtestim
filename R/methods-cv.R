@@ -107,7 +107,7 @@ plot.cv_poisson_rt <- function(
       which_lambda <- x[[which_lambda]]
     }
   } else {
-    arg_is_numeric(which_lambda, allow_null = TRUE)
+    assert_numeric(which_lambda, null.ok = TRUE)
   }
 
   if (plt_scores) {
@@ -177,7 +177,7 @@ fitted.cv_poisson_rt <- function(object,
     which_lambda <- match.arg(which_lambda)
     which_lambda <- object[[which_lambda]]
   } else {
-    arg_is_numeric(which_lambda, allow_null = TRUE)
+    assert_numeric(which_lambda, null.ok = TRUE)
   }
   fitted(object$full_fit, which_lambda)
 }
