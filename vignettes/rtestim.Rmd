@@ -18,7 +18,7 @@ theme_set(theme_bw())
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  dpi = 300,
+  # dpi = 300,
   collapse = FALSE,
   comment = "#>",
   fig.asp = 0.618,
