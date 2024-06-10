@@ -102,13 +102,14 @@ delay_calculator <- function(
         "User specified `delay_distn` must be square and lower triangular."
       )
     }
-    if (delay_distn[1,1] < .Machine$double.eps) {
-      cli::cli_abort(c(
-        "The upper-left most entry of `delay_distn` must be strictly positive.",
-        i = "Otherwise, we will eventually try to calculate 0/0 and produce {.val NaN}. "
-      ))
-    }
+    # if (delay_distn[1,1] < .Machine$double.eps) {
+    #   cli::cli_abort(c(
+    #     "The upper-left most entry of `delay_distn` must be strictly positive.",
+    #     i = "Otherwise, we will eventually try to calculate 0/0 and produce {.val NaN}. "
+    #   ))
+    # }
     delay_distn <- delay_distn / Matrix::rowSums(delay_distn)
+    delay_distn[is.nan(delay_distn)] <- 0
     convolved_seq <- drop(delay_distn %*% y)
     return(convolved_seq[allx %in% xout])
   } else {
@@ -126,12 +127,5 @@ delay_calculator <- function(
   }
 
   convolved_seq <- fast_convolve(y, delay_distn)
-  # (polish up the beginning of the delay calculation)
-  # when delay_distn[1] == 0, we're putting no weight on today.
-  # This is typical and results in division by zero for the first observation
-  # in convolved_seq
-  if (abs(delay_distn[1]) < sqrt(.Machine$double.eps)) {
-    convolved_seq <- c(convolved_seq[2], convolved_seq[-1])
-  }
   convolved_seq[allx %in% xout]
 }
