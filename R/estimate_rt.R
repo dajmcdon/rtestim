@@ -130,17 +130,24 @@ estimate_rt <- function(
   if (any(observed_counts < 0)) {
     cli_abort("`observed_counts` must be non-negative")
   }
-  if (observed_counts[1] == 0 || is.na(observed_counts[1])) {
-    cli_abort("`observed_counts` must start with positive count")
-  }
+
   weighted_past_counts <- delay_calculator(
     observed_counts, x, dist_gamma, delay_distn, delay_distn_periodicity
   )
+  # fixes to handle leading 0 (or internal long strings)
+  zero_likelihood <- observed_counts == 0 & weighted_past_counts == 0
+  has_zero_likelihood <- any(zero_likelihood)
+  if (has_zero_likelihood) {
+    cli_warn(c(
+      "Some values `x` have both `observed_counts` and `weighted_past_counts`",
+      "precisely equal to zero. These estimates will be extrapolated.",
+      i = "You may wish to remove them, however. These happen at `x` = {x[zero_likelihood]}."
+    ))
+  }
 
   if (!inherits(init, "rt_admm_configuration")) {
     cli_abort("`init` must be created with `configure_rt_admm()`.")
   }
-
 
   # checks on lambda, lambdamin, lambdamax
   if (is.null(lambda)) lambda <- double(nsol) # prep for create_lambda
@@ -160,9 +167,9 @@ estimate_rt <- function(
   lambda <- sort(lambda, decreasing = TRUE)
 
   mod <- rtestim_path(
-    observed_counts,
-    x,
-    weighted_past_counts,
+    observed_counts[!zero_likelihood],
+    x[!zero_likelihood],
+    weighted_past_counts[!zero_likelihood],
     korder,
     lambda = lambda,
     lambdamax = lambdamax,
@@ -178,6 +185,12 @@ estimate_rt <- function(
     ls_gamma = init$gamma,
     verbose = init$verbose
   )
+
+  if (has_zero_likelihood) {
+    mod$Rt <- exp(apply(log(mod$Rt), 2, function(r) {
+      dspline::dspline_interp(r, korder, x[!zero_likelihood], x, FALSE)
+    }))
+  }
 
   structure(
     enlist(

@@ -1,10 +1,11 @@
-test_that("Report error if observed_counts start at 0", {
-  y <- c(0, rpois(20, 3))
-  expect_error(estimate_rt(y))
+test_that("Warn if observed_counts start at 0", {
+  set.seed(12345)
+  y <- c(0, 0, rpois(18, 3))
+  expect_warning(o0 <- estimate_rt(y, nsol = 20))
 })
 
 
-test_that("Report error if observed_counts has non-neg values 0", {
+test_that("Error if observed_counts has neg values", {
   y <- c(0, -2, -3, rpois(20, 3))
   expect_error(estimate_rt(observed_counts = y))
 })
