@@ -25,6 +25,12 @@ You can install the development version of rtestim from
 remotes::install_github("dajmcdon/rtestim")
 ```
 
+Or the released version on CRAN
+
+``` r
+install.packages("rtestim")
+```
+
 ## Quick example
 
 Here we create some data that “looks” like a typical wave in an
@@ -56,11 +62,9 @@ plot(mod)
 
 <img src="man/figures/README-full-fit-1.png" width="80%" style="display: block; margin: auto;" />
 
-The additional parameter `nsol = 20` specifies the number of $\lambda$s
-for which $R_t$ is estimated.
-
-A built in function for cross-validation can be used to select the
-tuning parameter.
+The additional parameter `nsol = 20` specifies the number of tuning
+parameters for which $R_t$ is estimated. A built in function for
+cross-validation can be used to select the tuning parameter.
 
 ``` r
 mod_cv <- cv_estimate_rt(dat$incident_cases, nsol = 20)

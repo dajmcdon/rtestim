@@ -20,3 +20,17 @@ A vector or matrix of interpolated Rt estimates.
 \description{
 Interpolate (or extrapolate) Rt estimates to intermediate design points
 }
+\examples{
+y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
+out <- estimate_rt(y)
+
+# originally estimated at
+out$x
+
+# get the Rt at 3 new points (for all estimated lambdas)
+int <- interpolate_rt(out, c(10.5, 11.5, 12.5))
+
+# get the Rt at a single value of lambda
+interpolate_rt(out, c(10.5, 11.5, 12.5), lambda = out$lambda[20])
+
+}

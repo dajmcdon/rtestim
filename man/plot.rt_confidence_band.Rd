@@ -13,6 +13,9 @@
 
 \item{...}{Not used.}
 }
+\value{
+A \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}.
+}
 \description{
 Produces a figure showing a single estimated Rt value along with approximate
 confidence bands. The result is a \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}. Additional user

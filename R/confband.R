@@ -148,6 +148,8 @@ print.rt_confidence_band <- function(x, ...) {
 #' @param colour The colour of the desired plot
 #' @param ... Not used.
 #'
+#' @return A [ggplot2::ggplot()].
+#'
 #'
 #' @exportS3Method plot rt_confidence_band
 #' @examples

@@ -20,4 +20,9 @@ A list containing the segment lengths and the number of segments.
 Produces the lengths of the segments between knots as well as the number
 of knots.
 }
+\examples{
+y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
+out <- estimate_rt(y)
+kn <- find_knots(out, out$lambda[20])
+}
 \keyword{internal}

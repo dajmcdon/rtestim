@@ -1,3 +1,3 @@
-# rtestim 0.0.5
+# rtestim 1.0.0
 
 * Initial CRAN submission.

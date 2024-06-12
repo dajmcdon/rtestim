@@ -11,6 +11,10 @@
 #' @return A list containing the segment lengths and the number of segments.
 #' @export
 #' @keywords internal
+#' @examples
+#' y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
+#' out <- estimate_rt(y)
+#' kn <- find_knots(out, out$lambda[20])
 find_knots <- function(object, lambda, ...) {
   UseMethod("find_knots")
 }
@@ -33,3 +37,5 @@ find_knots.poisson_rt <- function(object, lambda, ...) {
   xpieces <- map2(l, r, function(a, b) object$x[a:b])
   enlist(knots, xpieces, dof, l, r)
 }
+
+

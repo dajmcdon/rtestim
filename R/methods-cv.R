@@ -84,7 +84,7 @@ print.summary.cv_poisson_rt <- function(
 #'
 #' @param ... Not used.
 #'
-#' @return plot of cv scores
+#' @return a [ggplot2::ggplot()] object
 #' @exportS3Method
 #'
 #' @examples
