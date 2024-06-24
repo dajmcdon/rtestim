@@ -2,7 +2,7 @@
 title: "Delay distributions"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{delay-distributions}
+  %\VignetteIndexEntry{Delay-distributions}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

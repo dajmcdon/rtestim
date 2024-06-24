@@ -35,12 +35,12 @@ confband.cv_poisson_rt <- function(
     level = 0.95,
     type = c("Rt", "Yt"), ...) {
   rlang::check_dots_empty()
-  arg_is_probabilities(level)
-  type <- match.arg(type)
+  assert_numeric(level, lower = 0, upper = 1)
+  type <- rlang::arg_match(type)
   if (is.character(lambda)) {
-    lambda <- object[[match.arg(lambda)]]
+    lambda <- object[[rlang::arg_match(lambda)]]
   } else {
-    arg_is_numeric_scalar(lambda)
+    assert_numeric(lambda, len = 1L)
   }
   confband(object$full_fit, lambda = lambda, level = level, type = type)
 }
@@ -48,10 +48,10 @@ confband.cv_poisson_rt <- function(
 #' @export
 confband.poisson_rt <- function(object, lambda, level = 0.95, type = c("Rt", "Yt"), ...) {
   rlang::check_dots_empty()
-  arg_is_numeric_scalar(lambda)
-  arg_is_probabilities(level)
+  assert_number(lambda)
+  assert_numeric(level, lower = 0, upper = 1)
   level <- sort(level, decreasing = TRUE)
-  type <- match.arg(type)
+  type <- rlang::arg_match(type)
 
   nbd <- function(piece, ord) {
     n <- length(piece)

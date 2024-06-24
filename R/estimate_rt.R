@@ -104,42 +104,42 @@ estimate_rt <- function(
     lambda_min_ratio = 1e-4,
     maxiter = 1e5,
     init = configure_rt_admm()) {
-  arg_is_nonneg_int(korder)
-  arg_is_pos_int(nsol, maxiter)
-  arg_is_scalar(korder, nsol, lambda_min_ratio)
-  arg_is_scalar(lambdamin, lambdamax, delay_distn_periodicity, allow_null = TRUE)
-  arg_is_positive(lambdamin, lambdamax, allow_null = TRUE)
-  # arg_is_nonnegative(delay_distn, allow_null = TRUE)
-  arg_is_positive(lambda_min_ratio, dist_gamma)
-  arg_is_length(2, dist_gamma)
-  n <- length(observed_counts)
 
-  if (korder + 1 >= n) {
-    cli_abort("`korder + 1` must be less than observed data length.")
+  assert_int(nsol, lower = 1)
+  assert_int(maxiter, lower = 1)
+  assert_number(lambda_min_ratio, lower = 0, upper = 1)
+  assert_number(lambdamin, lower = 0, null.ok = TRUE)
+  assert_number(lambdamax, lower = 0, null.ok = TRUE)
+  assert_int(delay_distn_periodicity, lower = 1, null.ok = TRUE)
+  assert_numeric(dist_gamma, lower = .Machine$double.eps, finite = TRUE, len = 2)
+  assert_class(init, "rt_admm_configuration")
+  assert_numeric(observed_counts, lower = 0)
+
+  ymiss <- is.na(observed_counts)
+  if (any(ymiss)) {
+    cli_warn("Missing values in `observed_counts` will be ignored.")
   }
+  observed_counts <- observed_counts[!ymiss]
+  n <- length(observed_counts)
+  x <- x[!ymiss]
+
+  if (observed_counts[1] == 0) {
+    cli_abort("`observed_counts` must start with positive count")
+  }
+
+  assert_int(korder, lower = 0, upper = n - 2L)
 
   xin <- x
   if (inherits(x, "Date")) x <- as.numeric(x)
-  arg_is_numeric(x)
-  arg_is_length(n, x)
+  assert_numeric(x, len = n, any.missing = FALSE)
   if (is.unsorted(x, strictly = TRUE)) {
-    cli::cli_abort("`x` must be sorted in increasing order without duplicates.")
+    cli_abort("`x` must be sorted in increasing order without duplicates.")
   }
 
-
-  if (any(observed_counts < 0)) {
-    cli_abort("`observed_counts` must be non-negative")
-  }
-  if (observed_counts[1] == 0 || is.na(observed_counts[1])) {
-    cli_abort("`observed_counts` must start with positive count")
-  }
   weighted_past_counts <- delay_calculator(
     observed_counts, x, dist_gamma, delay_distn, delay_distn_periodicity
   )
 
-  if (!inherits(init, "rt_admm_configuration")) {
-    cli_abort("`init` must be created with `configure_rt_admm()`.")
-  }
 
 
   # checks on lambda, lambdamin, lambdamax
@@ -229,14 +229,14 @@ configure_rt_admm <- function(
     verbose = 0,
     ...) {
   rlang::check_dots_empty()
-  arg_is_scalar(rho, alpha, gamma, tolerance, verbose)
-  arg_is_scalar(maxiter_newton, maxiter_line)
-  arg_is_positive(alpha, gamma, tolerance)
-  arg_is_numeric(rho, tolerance)
-  arg_is_pos_int(maxiter_newton, maxiter_line)
-  arg_is_nonneg_int(verbose)
-  if (alpha >= 1) cli_abort("`alpha` must be in (0, 1).")
-  if (gamma > 1) cli_abort("`gamma` must be in (0, 1].")
+  assert_number(alpha, lower = 0, upper = 1)
+  assert_number(gamma, lower = 0, upper = 1)
+  assert_int(maxiter_newton, lower = 1L)
+  assert_int(maxiter_line, lower = 1L)
+  assert_int(verbose, lower = 0L)
+  assert_number(tolerance, lower = 0)
+  assert_number(rho)
+  if (abs(rho + 1) > sqrt(.Machine$double.eps)) assert_number(rho, lower = 0)
 
   structure(
     enlist(

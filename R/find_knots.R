@@ -18,8 +18,7 @@ find_knots <- function(object, lambda, ...) {
 #' @export
 find_knots.poisson_rt <- function(object, lambda, ...) {
   rlang::check_dots_empty()
-  arg_is_scalar(lambda)
-  arg_is_numeric(lambda)
+  assert_number(lambda, lower = min(object$lambda), upper = max(object$lambda))
 
   n <- length(object$observed_counts)
   lam_list <- interpolate_lambda(object$lambda, lambda)
