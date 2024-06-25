@@ -65,7 +65,7 @@ print.poisson_rt <- function(x, digits = min(3, getOption("digits") - 3), ...) {
 #' out <- estimate_rt(y, lambda = log(c(1.1, 1.3, 1.5)))
 #' plot(out)
 plot.poisson_rt <- function(x, lambda = NULL, ...) {
-  arg_is_positive(lambda, allow_null = TRUE)
+  assert_numeric(lambda, lower = 0, null.ok = TRUE)
 
   n <- length(x$observed_counts)
   if (is.null(lambda)) {
@@ -104,7 +104,7 @@ plot.poisson_rt <- function(x, lambda = NULL, ...) {
 #' @export
 fitted.poisson_rt <- function(object, lambda = NULL, ...) {
   rlang::check_dots_empty()
-  arg_is_positive(lambda, allow_null = TRUE)
+  assert_numeric(lambda, lower = 0, null.ok = TRUE)
 
   if (is.null(lambda)) {
     return(object$Rt)
@@ -154,7 +154,7 @@ interpolate_rt.poisson_rt <- function(object, xout, lambda = NULL, ...) {
   rlang::check_dots_empty()
   xin <- object$x
   if (inherits(xin, "Date")) xin <- as.numeric(xin)
-  arg_is_positive(lambda, allow_null = TRUE)
+  assert_numeric(lambda, lower = 0, null.ok = TRUE)
   if (is.unsorted(xout)) xout <- sort(xout)
 
   logr <- log(fitted(object, lambda = lambda))
