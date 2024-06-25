@@ -4,7 +4,7 @@ pkgdown_sha: ~
 articles:
   delay-distributions: delay-distributions.html
   rtestim: rtestim.html
-last_built: 2024-06-24T19:37Z
+last_built: 2024-06-25T18:39Z
 urls:
   reference: https://dajmcdon.github.io/rtestim/reference
   article: https://dajmcdon.github.io/rtestim/articles

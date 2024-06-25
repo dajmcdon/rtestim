@@ -223,6 +223,8 @@ piece-wise constant curves for example, use the command</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/estimate_rt.html">estimate_rt</a></span><span class="op">(</span>observed_counts <span class="op">=</span> <span class="va">case_counts</span>, korder <span class="op">=</span> <span class="fl">0</span>, nsol <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mod</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; Warning: Removed 2020 rows containing missing values or values outside the scale range</span></span>
+<span><span class="co">#&gt; (`geom_line()`).</span></span></code></pre>
 <p><img src="rtestim_files/figure-html/unnamed-chunk-9-1.png" width="80%" style="display: block; margin: auto;"></p>
 </div>
 </div>
@@ -233,7 +235,7 @@ piece-wise constant curves for example, use the command</p>
 data is available from <a href="https://opencovid.ca" class="external-link">opencovid.ca</a>
 and the version downloaded on 4 July 2023 is included in the package. We
 use this data to estimate <span class="math inline">\(R_t\)</span>.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">can</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/estimate_rt.html">estimate_rt</a></span><span class="op">(</span></span>
 <span>  observed_counts <span class="op">=</span> <span class="va">cancovid</span><span class="op">$</span><span class="va">incident_cases</span>,</span>
 <span>  x <span class="op">=</span> <span class="va">cancovid</span><span class="op">$</span><span class="va">date</span>,</span>
@@ -251,30 +253,30 @@ use this data to estimate <span class="math inline">\(R_t\)</span>.</p>
 bands for Rt based on normal approximations and the delta method. These
 are intended to be fast and to provide some idea of uncertainty, but
 they likely don’t have guaranteed coverage.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">can_cb</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/confband.html">confband</a></span><span class="op">(</span><span class="va">can</span>, lambda <span class="op">=</span> <span class="va">can</span><span class="op">$</span><span class="va">lambda</span><span class="op">[</span><span class="fl">10</span><span class="op">]</span>, level <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">.5</span>, <span class="fl">.8</span>, <span class="fl">.95</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">can_cb</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; An `rt_confidence_band` object.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; * type = Rt </span></span>
-<span><span class="co">#&gt; * lambda = 8986.391 </span></span>
-<span><span class="co">#&gt; * degrees of freedom = 13 </span></span>
+<span><span class="co">#&gt; * lambda = 8985.99 </span></span>
+<span><span class="co">#&gt; * degrees of freedom = 14 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1,253 × 7</span></span></span>
-<span><span class="co">#&gt;      fit `2.5%` `10.0%` `25.0%` `75.0%` `90.0%` `97.5%`</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>  2.04  0.797    1.23    1.61    2.47    2.85    3.29</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>  2.02  0.987    1.35    1.67    2.38    2.70    3.05</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>  2.00  1.04     1.37    1.67    2.33    2.63    2.96</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>  1.98  1.01     1.34    1.65    2.32    2.62    2.96</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>  1.96  0.926    1.29    1.61    2.32    2.64    3.00</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>  1.94  0.844    1.23    1.57    2.32    2.66    3.04</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>  1.93  0.772    1.17    1.53    2.32    2.68    3.08</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>  1.91  0.710    1.13    1.50    2.32    2.69    3.10</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>  1.89  0.657    1.08    1.47    2.31    2.69    3.12</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>  1.87  0.607    1.05    1.44    2.31    2.70    3.14</span></span>
+<span><span class="co">#&gt;      fit  `2.5%` `10.0%` `25.0%` `75.0%` `90.0%` `97.5%`</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>  2.06 <span style="color: #BB0000;">NaN</span>      <span style="color: #BB0000;">NaN</span>     <span style="color: #BB0000;">NaN</span>     <span style="color: #BB0000;">NaN</span>     <span style="color: #BB0000;">NaN</span>     <span style="color: #BB0000;">NaN</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>  2.04   1.96     1.98    2.01    2.06    2.09    2.11</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>  2.02   1.86     1.91    1.96    2.07    2.12    2.17</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>  2.00   1.75     1.83    1.91    2.08    2.16    2.24</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>  1.98   1.61     1.74    1.85    2.10    2.21    2.34</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>  1.96   1.45     1.63    1.78    2.13    2.29    2.46</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>  1.94   1.28     1.51    1.71    2.17    2.37    2.60</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>  1.92   1.10     1.38    1.64    2.20    2.46    2.74</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>  1.90   0.924    1.26    1.57    2.24    2.54    2.88</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>  1.88   0.761    1.15    1.50    2.27    2.62    3.01</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1,243 more rows</span></span></span></code></pre>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">can_cb</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="rtestim_files/figure-html/unnamed-chunk-11-1.png" width="80%" style="display: block; margin: auto;"></p>
 </div>
