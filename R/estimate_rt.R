@@ -126,6 +126,8 @@ estimate_rt <- function(
 
   assert_int(korder, lower = 0, upper = n - 2L)
 
+  assert_int(korder, lower = 0, upper = n - 2L)
+
   xin <- x
   if (inherits(x, "Date")) x <- as.numeric(x)
   assert_numeric(x, len = n, any.missing = FALSE)
@@ -136,6 +138,7 @@ estimate_rt <- function(
   weighted_past_counts <- delay_calculator(
     observed_counts, x, dist_gamma, delay_distn, delay_distn_periodicity
   )
+
   # fixes to handle leading 0 (or internal long strings)
   zero_likelihood <- observed_counts == 0 & weighted_past_counts == 0
   has_zero_likelihood <- any(zero_likelihood)
@@ -146,6 +149,7 @@ estimate_rt <- function(
       i = "You may wish to remove them, however. These happen at `x` = {x[zero_likelihood]}."
     ))
   }
+
 
 
   # checks on lambda, lambdamin, lambdamax
