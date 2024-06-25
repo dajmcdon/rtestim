@@ -109,7 +109,7 @@ The Effective Reproduction Number \eqn{R_t} of an infectious
 disease can be estimated by solving the smoothness penalized Poisson
 regression (trend filtering) of the form:
 
-\deqn{\hat{\theta} = \argmin_{\theta} \frac{1}{n} \sum_{i=1}^n (w_i e^{\theta_i} -
+\deqn{\hat{\theta} = \arg\min_{\theta} \frac{1}{n} \sum_{i=1}^n (w_i e^{\theta_i} -
   y_i\theta_i) + \lambda\Vert D^{(k+1)}\theta\Vert_1, }
 
 where \eqn{R_t = e^{\theta}}, \eqn{y_i} is the observed case count at day

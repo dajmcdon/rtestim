@@ -22,7 +22,7 @@ Rossi, T., Simmons, A. E., Van Camp, M., Xie, X., Tuite, A. R., Greer, A. L.,
 Fisman, D. N., & Soucy, J.-P. R. (2021). A sub-national real-time
 epidemiological and vaccination database for the COVID-19 pandemic in
 Canada. Scientific Data, 8(1).
-doi: \href{https://doi.org/10.1038/s41597-021-00955-2}{10.1038/s41597-021-00955-2}
+\doi{10.1038/s41597-021-00955-2}
 }
 \usage{
 cancovid
