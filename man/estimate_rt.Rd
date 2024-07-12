@@ -10,7 +10,7 @@ estimate_rt(
   dist_gamma = c(2.5, 2.5),
   x = 1:n,
   lambda = NULL,
-  nsol = 100L,
+  nsol = 50L,
   delay_distn = NULL,
   delay_distn_periodicity = NULL,
   lambdamin = NULL,
@@ -122,6 +122,6 @@ y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
 out <- estimate_rt(y)
 plot(out)
 
-out0 <- estimate_rt(y, korder = 0L, nsol = 10)
+out0 <- estimate_rt(y, korder = 0L, nsol = 40)
 plot(out0)
 }

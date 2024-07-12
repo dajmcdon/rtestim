@@ -88,7 +88,7 @@
 #' out <- estimate_rt(y)
 #' plot(out)
 #'
-#' out0 <- estimate_rt(y, korder = 0L, nsol = 10)
+#' out0 <- estimate_rt(y, korder = 0L, nsol = 40)
 #' plot(out0)
 estimate_rt <- function(
     observed_counts,
@@ -96,7 +96,7 @@ estimate_rt <- function(
     dist_gamma = c(2.5, 2.5),
     x = 1:n,
     lambda = NULL,
-    nsol = 100L,
+    nsol = 50L,
     delay_distn = NULL,
     delay_distn_periodicity = NULL,
     lambdamin = NULL,
@@ -140,17 +140,16 @@ estimate_rt <- function(
   )
 
   # fixes to handle leading 0 (or internal long strings)
-  zero_likelihood <- observed_counts == 0 & weighted_past_counts == 0
-  has_zero_likelihood <- any(zero_likelihood)
-  if (has_zero_likelihood) {
+  inf_likelihood <- weighted_past_counts < .Machine$double.eps
+  if (any(inf_likelihood[-1])) { # the first is always 0
+    locs <- which(inf_likelihood)
+    locs <- locs[locs != 1L]
     cli_warn(c(
-      "Some values `x` have both `observed_counts` and `weighted_past_counts`",
+      "Some values `x` have `weighted_past_counts`",
       "precisely equal to zero. These estimates will be extrapolated.",
-      i = "You may wish to remove them, however. These happen at `x` = {x[zero_likelihood]}."
+      i = "You may wish to remove them, however. These happen at `x` = {x[locs]}."
     ))
   }
-
-
 
   # checks on lambda, lambdamin, lambdamax
   if (is.null(lambda)) lambda <- double(nsol) # prep for create_lambda
@@ -170,9 +169,9 @@ estimate_rt <- function(
   lambda <- sort(lambda, decreasing = TRUE)
 
   mod <- rtestim_path(
-    observed_counts[!zero_likelihood],
-    x[!zero_likelihood],
-    weighted_past_counts[!zero_likelihood],
+    observed_counts[!inf_likelihood],
+    x[!inf_likelihood],
+    weighted_past_counts[!inf_likelihood],
     korder,
     lambda = lambda,
     lambdamax = lambdamax,
@@ -189,9 +188,9 @@ estimate_rt <- function(
     verbose = init$verbose
   )
 
-  if (has_zero_likelihood) {
+  if (any(inf_likelihood)) {
     mod$Rt <- exp(apply(log(mod$Rt), 2, function(r) {
-      dspline::dspline_interp(r, korder, x[!zero_likelihood], x, FALSE)
+      dspline::dspline_interp(r, korder, x[!inf_likelihood], x, FALSE)
     }))
   }
 
