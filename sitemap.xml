@@ -1,78 +1,28 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://dajmcdon.github.io/rtestim/404.html</loc>
-  </url>
-  <url>
-    <loc>https://dajmcdon.github.io/rtestim/LICENSE-text.html</loc>
-  </url>
-  <url>
-    <loc>https://dajmcdon.github.io/rtestim/LICENSE.html</loc>
-  </url>
-  <url>
-    <loc>https://dajmcdon.github.io/rtestim/articles/delay-distributions.html</loc>
-  </url>
-  <url>
-    <loc>https://dajmcdon.github.io/rtestim/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>https://dajmcdon.github.io/rtestim/articles/rtestim.html</loc>
-  </url>
-  <url>
-    <loc>https://dajmcdon.github.io/rtestim/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://dajmcdon.github.io/rtestim/index.html</loc>
-  </url>
-  <url>
-    <loc>https://dajmcdon.github.io/rtestim/reference/cancovid.html</loc>
-  </url>
-  <url>
-    <loc>https://dajmcdon.github.io/rtestim/reference/confband.html</loc>
-  </url>
-  <url>
-    <loc>https://dajmcdon.github.io/rtestim/reference/configure_rt_admm.html</loc>
-  </url>
-  <url>
-    <loc>https://dajmcdon.github.io/rtestim/reference/cv_estimate_rt.html</loc>
-  </url>
-  <url>
-    <loc>https://dajmcdon.github.io/rtestim/reference/delay_calculator.html</loc>
-  </url>
-  <url>
-    <loc>https://dajmcdon.github.io/rtestim/reference/discretize_gamma.html</loc>
-  </url>
-  <url>
-    <loc>https://dajmcdon.github.io/rtestim/reference/estimate_rt.html</loc>
-  </url>
-  <url>
-    <loc>https://dajmcdon.github.io/rtestim/reference/find_knots.html</loc>
-  </url>
-  <url>
-    <loc>https://dajmcdon.github.io/rtestim/reference/fitted.cv_poisson_rt.html</loc>
-  </url>
-  <url>
-    <loc>https://dajmcdon.github.io/rtestim/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://dajmcdon.github.io/rtestim/reference/interpolate_rt.html</loc>
-  </url>
-  <url>
-    <loc>https://dajmcdon.github.io/rtestim/reference/pipe.html</loc>
-  </url>
-  <url>
-    <loc>https://dajmcdon.github.io/rtestim/reference/plot.cv_poisson_rt.html</loc>
-  </url>
-  <url>
-    <loc>https://dajmcdon.github.io/rtestim/reference/plot.poisson_rt.html</loc>
-  </url>
-  <url>
-    <loc>https://dajmcdon.github.io/rtestim/reference/plot.rt_confidence_band.html</loc>
-  </url>
-  <url>
-    <loc>https://dajmcdon.github.io/rtestim/reference/predict.cv_poisson_rt.html</loc>
-  </url>
-  <url>
-    <loc>https://dajmcdon.github.io/rtestim/reference/predict.poisson_rt.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://dajmcdon.github.io/rtestim/404.html</loc></url>
+<url><loc>https://dajmcdon.github.io/rtestim/LICENSE-text.html</loc></url>
+<url><loc>https://dajmcdon.github.io/rtestim/LICENSE.html</loc></url>
+<url><loc>https://dajmcdon.github.io/rtestim/articles/delay-distributions.html</loc></url>
+<url><loc>https://dajmcdon.github.io/rtestim/articles/index.html</loc></url>
+<url><loc>https://dajmcdon.github.io/rtestim/articles/rtestim.html</loc></url>
+<url><loc>https://dajmcdon.github.io/rtestim/authors.html</loc></url>
+<url><loc>https://dajmcdon.github.io/rtestim/index.html</loc></url>
+<url><loc>https://dajmcdon.github.io/rtestim/reference/cancovid.html</loc></url>
+<url><loc>https://dajmcdon.github.io/rtestim/reference/confband.html</loc></url>
+<url><loc>https://dajmcdon.github.io/rtestim/reference/configure_rt_admm.html</loc></url>
+<url><loc>https://dajmcdon.github.io/rtestim/reference/cv_estimate_rt.html</loc></url>
+<url><loc>https://dajmcdon.github.io/rtestim/reference/delay_calculator.html</loc></url>
+<url><loc>https://dajmcdon.github.io/rtestim/reference/discretize_gamma.html</loc></url>
+<url><loc>https://dajmcdon.github.io/rtestim/reference/estimate_rt.html</loc></url>
+<url><loc>https://dajmcdon.github.io/rtestim/reference/find_knots.html</loc></url>
+<url><loc>https://dajmcdon.github.io/rtestim/reference/fitted.cv_poisson_rt.html</loc></url>
+<url><loc>https://dajmcdon.github.io/rtestim/reference/index.html</loc></url>
+<url><loc>https://dajmcdon.github.io/rtestim/reference/interpolate_rt.html</loc></url>
+<url><loc>https://dajmcdon.github.io/rtestim/reference/pipe.html</loc></url>
+<url><loc>https://dajmcdon.github.io/rtestim/reference/plot.cv_poisson_rt.html</loc></url>
+<url><loc>https://dajmcdon.github.io/rtestim/reference/plot.poisson_rt.html</loc></url>
+<url><loc>https://dajmcdon.github.io/rtestim/reference/plot.rt_confidence_band.html</loc></url>
+<url><loc>https://dajmcdon.github.io/rtestim/reference/predict.cv_poisson_rt.html</loc></url>
+<url><loc>https://dajmcdon.github.io/rtestim/reference/predict.poisson_rt.html</loc></url>
 </urlset>
+
