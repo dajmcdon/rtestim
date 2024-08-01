@@ -83,7 +83,7 @@ growing while those less than 1 indicate decline.</p>
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>R</mi><mi>t</mi></msub><annotation encoding="application/x-tex">R_t</annotation></semantics></math>.
 <a href="https://github.com/dajmcdon/rtestim" class="external-link">rtestim</a> finds a sequence of
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>R</mi><mi>t</mi></msub><annotation encoding="application/x-tex">R_t</annotation></semantics></math>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>{</mo><annotation encoding="application/x-tex">\mathop{\{R_t\}_{t=1}^n}</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><msub><mi>R</mi><mi>t</mi></msub><msubsup><mo stretchy="false" form="postfix">}</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></msubsup></mrow><annotation encoding="application/x-tex">\{R_t\}_{t=1}^n</annotation></semantics></math>
 of an infectious disease by solving the following penalized Poisson
 regression
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>θ</mi><mo accent="true">̂</mo></mover><mo>=</mo><msub><mo>argmin</mo><mi>θ</mi></msub><mfrac><mn>1</mn><mi>n</mi></mfrac><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><mrow><mo stretchy="true" form="prefix">(</mo><msup><mi>e</mi><msub><mi>θ</mi><mi>t</mi></msub></msup><msub><mi>x</mi><mi>t</mi></msub><mo>−</mo><msub><mi>y</mi><mi>t</mi></msub><msub><mi>θ</mi><mi>t</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>λ</mi><mo stretchy="false" form="postfix">‖</mo><msup><mi>D</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>k</mi><mo>+</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></msup><mi>θ</mi><msub><mo stretchy="false" form="postfix">‖</mo><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">\begin{equation} \label{eq:objective_fn}
@@ -125,7 +125,7 @@ of length
 This delay distribution encapsulates the duration of time that a
 previous infection is likely to lead to future infection.</p>
 <p>To compute
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>{</mo><annotation encoding="application/x-tex">\mathop{\{R_t\}_{t=1}^n}</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><msub><mi>R</mi><mi>t</mi></msub><msubsup><mo stretchy="false" form="postfix">}</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></msubsup></mrow><annotation encoding="application/x-tex">\{R_t\}_{t=1}^n</annotation></semantics></math>
 with <a href="https://github.com/dajmcdon/rtestim" class="external-link">rtestim</a>, the minimal information needed is the new
 case counts at days up until
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>
@@ -154,24 +154,24 @@ where the new daily case counts are generated from a Poisson
 distribution with mean parameter that roughly follows a wave. Note that
 the first observation must be strictly larger than 0.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">12345</span><span class="op">)</span></span>
 <span><span class="va">case_counts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">rpois</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">dnorm</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">100</span>, <span class="fl">50</span>, <span class="fl">15</span><span class="op">)</span> <span class="op">*</span> <span class="fl">500</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">101</span>, <span class="va">case_counts</span><span class="op">)</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">case_counts</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"cornflowerblue"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Time"</span>, y <span class="op">=</span> <span class="st">"Case Counts"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="rtestim_files/figure-html/unnamed-chunk-2-1.png" width="80%" style="display: block; margin: auto;"></p>
 <p>Next, we fit the model and visualize the resulting
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>{</mo><annotation encoding="application/x-tex">\mathop{\{R_t\}_{t=1}^n}</annotation></semantics></math>:</p>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><msub><mi>R</mi><mi>t</mi></msub><msubsup><mo stretchy="false" form="postfix">}</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></msubsup></mrow><annotation encoding="application/x-tex">\{R_t\}_{t=1}^n</annotation></semantics></math>:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/estimate_rt.html">estimate_rt</a></span><span class="op">(</span>observed_counts <span class="op">=</span> <span class="va">case_counts</span>, nsol <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mod</span><span class="op">)</span></span></code></pre></div>
 <p><img src="rtestim_files/figure-html/unnamed-chunk-3-1.png" width="80%" style="display: block; margin: auto;"></p>
 <p><a href="https://github.com/dajmcdon/rtestim" class="external-link">rtestim</a> estimates a spectrum of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>{</mo><annotation encoding="application/x-tex">\mathop{\{R_t\}_{t=1}^n}</annotation></semantics></math>s
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><msub><mi>R</mi><mi>t</mi></msub><msubsup><mo stretchy="false" form="postfix">}</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></msubsup></mrow><annotation encoding="application/x-tex">\{R_t\}_{t=1}^n</annotation></semantics></math>s
 for a range of
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
 values, where each
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>{</mo><annotation encoding="application/x-tex">\mathop{\{R_t\}_{t=1}^n}</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><msub><mi>R</mi><mi>t</mi></msub><msubsup><mo stretchy="false" form="postfix">}</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></msubsup></mrow><annotation encoding="application/x-tex">\{R_t\}_{t=1}^n</annotation></semantics></math>
 corresponds to a specific
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
 value. If no
@@ -183,7 +183,7 @@ values. The additional parameter <code>nsol = 20</code> specifies the
 number of
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>s
 for which the
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>{</mo><annotation encoding="application/x-tex">\mathop{\{R_t\}_{t=1}^n}</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><msub><mi>R</mi><mi>t</mi></msub><msubsup><mo stretchy="false" form="postfix">}</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></msubsup></mrow><annotation encoding="application/x-tex">\{R_t\}_{t=1}^n</annotation></semantics></math>
 is calculated</p>
 </div>
 <div class="section level3">
@@ -224,7 +224,7 @@ that gives minimum mean cross-validated error, called
 regularized model such that the cross-validated error is within one
 standard error of the minimum, called <code>lambda.1se</code>.</p>
 <p>Users may wish to visualize the particular
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>{</mo><annotation encoding="application/x-tex">\mathop{\{R_t\}_{t=1}^n}</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><msub><mi>R</mi><mi>t</mi></msub><msubsup><mo stretchy="false" form="postfix">}</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></msubsup></mrow><annotation encoding="application/x-tex">\{R_t\}_{t=1}^n</annotation></semantics></math>
 which minimizes the cross-validation error while prioritizing
 smoothness.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
@@ -240,14 +240,14 @@ accommodates scenarios in which cases are reported with uneven
 intervals. To demonstrate this, we generate a sequence of integers
 representing the days at which we observe the case counts.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">observation_incr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">rpois</a></span><span class="op">(</span><span class="fl">101</span>, lambda <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">observation_incr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">rpois</a></span><span class="op">(</span><span class="fl">101</span>, lambda <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="va">observation_incr</span><span class="op">[</span><span class="va">observation_incr</span> <span class="op">==</span> <span class="fl">0</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
 <span><span class="va">observation_time</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cumsum.html" class="external-link">cumsum</a></span><span class="op">(</span><span class="va">observation_incr</span><span class="op">)</span></span></code></pre></div>
 <p>We can then fit the model by passing the observation time point as
 <code>x</code>.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/estimate_rt.html">estimate_rt</a></span><span class="op">(</span>observed_counts <span class="op">=</span> <span class="va">case_counts</span>, x <span class="op">=</span> <span class="va">observation_time</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mod</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mod</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="rtestim_files/figure-html/unnamed-chunk-8-1.png" width="80%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
@@ -257,9 +257,9 @@ representing the days at which we observe the case counts.</p>
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
 defaults to 3 for the algorithm, which corresponds to a piece-wise cubic
 estimate
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>{</mo><annotation encoding="application/x-tex">\mathop{\{R_t\}_{t=1}^n}</annotation></semantics></math>.
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><msub><mi>R</mi><mi>t</mi></msub><msubsup><mo stretchy="false" form="postfix">}</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></msubsup></mrow><annotation encoding="application/x-tex">\{R_t\}_{t=1}^n</annotation></semantics></math>.
 To estimate
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>{</mo><annotation encoding="application/x-tex">\mathop{\{R_t\}_{t=1}^n}</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><msub><mi>R</mi><mi>t</mi></msub><msubsup><mo stretchy="false" form="postfix">}</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></msubsup></mrow><annotation encoding="application/x-tex">\{R_t\}_{t=1}^n</annotation></semantics></math>
 with piece-wise constant curves for example, use the command</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/estimate_rt.html">estimate_rt</a></span><span class="op">(</span>observed_counts <span class="op">=</span> <span class="va">case_counts</span>, korder <span class="op">=</span> <span class="fl">0</span>, nsol <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span>
