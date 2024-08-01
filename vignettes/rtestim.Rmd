@@ -13,8 +13,8 @@ library(ggplot2)
 theme_set(theme_bw())
 ```
 
-\newcommand{\argmin}{\mathop{\mathrm{argmin}}}
-\newcommand{\Rtseq}{\mathop{\{R_t\}_{t=1}^n}}
+\DeclareMathOperator{\argmin}{argmin}
+\newcommand{\Rtseq}{\{R_t\}_{t=1}^n}
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
@@ -81,7 +81,7 @@ parameter that roughly follows a wave. Note that the first observation must
 be strictly larger than 0.
 
 ```{r, fig.align='center'}
-set.seed(1234)
+set.seed(12345)
 case_counts <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
 ggplot(data.frame(x = 1:101, case_counts), aes(x, case_counts)) +
   geom_point(colour = "cornflowerblue") +
@@ -148,7 +148,7 @@ with uneven intervals. To demonstrate this, we generate a sequence of integers
 representing the days at which we observe the case counts.
 
 ```{r}
-observation_incr <- rpois(101, lambda = 1)
+observation_incr <- rpois(101, lambda = 2)
 observation_incr[observation_incr == 0] <- 1
 observation_time <- cumsum(observation_incr)
 ```
@@ -157,7 +157,7 @@ We can then fit the model by passing the observation time point as `x`.
 
 ```{r, fig.align='center'}
 mod <- estimate_rt(observed_counts = case_counts, x = observation_time)
-plot(mod)
+plot(mod) + coord_cartesian(ylim = c(0, 5))
 ```
 
 

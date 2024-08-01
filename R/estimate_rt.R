@@ -126,11 +126,9 @@ estimate_rt <- function(
 
   assert_int(korder, lower = 0, upper = n - 2L)
 
-  assert_int(korder, lower = 0, upper = n - 2L)
-
   xin <- x
   if (inherits(x, "Date")) x <- as.numeric(x)
-  assert_numeric(x, len = n, any.missing = FALSE)
+  assert_integerish(x, len = n, any.missing = FALSE)
   if (is.unsorted(x, strictly = TRUE)) {
     cli_abort("`x` must be sorted in increasing order without duplicates.")
   }
