@@ -1,10 +1,10 @@
 pandoc: 3.1.11
-pkgdown: 2.1.0
+pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   delay-distributions: delay-distributions.html
   rtestim: rtestim.html
-last_built: 2024-08-01T21:14Z
+last_built: 2024-09-25T17:33Z
 urls:
   reference: https://dajmcdon.github.io/rtestim/reference
   article: https://dajmcdon.github.io/rtestim/articles
