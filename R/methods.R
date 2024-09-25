@@ -158,8 +158,9 @@ interpolate_rt.poisson_rt <- function(object, xout, lambda = NULL, ...) {
   if (is.unsorted(xout)) xout <- sort(xout)
 
   logr <- log(fitted(object, lambda = lambda))
+  if (!is.matrix(logr)) logr <- matrix(logr)
   interp <- apply(logr, 2, function(r) {
     dspline::dspline_interp(r, object$korder, xin, xout)
   })
-  exp(interp)
+  drop(exp(interp))
 }

@@ -15,3 +15,9 @@ test_that("estimate_rt works with uneven spacing", {
   x <- c(1, 2, 4, 6, 7, 9, 10, 15, 18, 20)
   expect_no_error(estimate_rt(observed_counts = y, x = x, korder = 2, lambda = 1))
 })
+
+test_that("interpolate_rt handles single lambda value", {
+  y <- rpois(100, 10)
+  rt <- estimate_rt(y, lambda = 10)
+  expect_silent(interpolate_rt(rt, xout = 101:110))
+})
