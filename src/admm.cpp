@@ -44,6 +44,7 @@ void admm_gauss(int M,
                 double lam_z,
                 Eigen::SparseMatrix<double> const& DD,
                 double tol,
+                int linear_solver, 
                 int& iter) {
   double r_norm = 0.0;
   double s_norm = 0.0;
@@ -64,14 +65,16 @@ void admm_gauss(int M,
     if (iter % 1000 == 0)
       Rcpp::checkUserInterrupt();
     // solve for primal variable - theta:
-    kftf(nvec_to_evec(y), korder, eW, nvec_to_evec(x), nvec_to_evec(z - u), n * rho, tmp_theta);
-    // alternatively, matrix inverse: 
-    // tmp_n = doDtv(z - u, korder, x) * n * rho;
-    // tmp_n += W * y;
-    // tmp_theta = nvec_to_evec(tmp_n);
-    // tmp_theta = qradmm.solve(tmp_theta);
+    if (linear_solver == 1)
+      kftf(nvec_to_evec(y), korder, eW, nvec_to_evec(x), nvec_to_evec(z - u), n * rho, tmp_theta);
+    else {
+      // alternatively, matrix inverse: 
+      tmp_n = doDtv(z - u, korder, x) * n * rho;
+      tmp_n += W * y;
+      tmp_theta = nvec_to_evec(tmp_n);
+      tmp_theta = qradmm.solve(tmp_theta);
+    }
     theta = evec_to_nvec(tmp_theta);
-    // Rcpp::Rcout << theta << std::endl;
     
     // solve for alternating variable - z:
     Dth = doDv(theta, korder, x);
@@ -111,6 +114,7 @@ void prox_newton(int M,
                  double gamma,
                  Eigen::SparseMatrix<double> const& DD,
                  double tol,
+                 int linear_solver, 
                  int& total_iter) {
   double s;                       // step size
   NumericVector obj_list(M + 1);  // objective list for each iterate
@@ -133,7 +137,7 @@ void prox_newton(int M,
     // define new(centered) data for least squares problem
     std_y = centered_data(y, w, theta);
     // solve least squares problem (Gaussian TF)
-    admm_gauss(Minner, n, korder, std_y, x, w, theta, z, u, rho, lam_z, DD, tol,
+    admm_gauss(Minner, n, korder, std_y, x, w, theta, z, u, rho, lam_z, DD, tol, linear_solver, 
                inner_iter);
     total_iter += inner_iter;
     //  line search for step size
@@ -190,7 +194,7 @@ Rcpp::List prox_newton_testing(int M,
   double rho = lambda;
   int iter = 0;
   prox_newton(M, Minner, Mline, n, korder, y, x, w, beta, z, u, lambda, rho,
-              ls_alpha, ls_gamma, DkDk, tol, iter);
+              ls_alpha, ls_gamma, DkDk, tol, 1, iter);
   List out = List::create(Named("lambda") = lambda, Named("theta") = exp(beta),
                           Named("niter") = iter);
   return out;

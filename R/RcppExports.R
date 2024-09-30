@@ -17,8 +17,8 @@ kftf_test <- function(y, k, weights, x, c, lambda) {
     .Call(`_rtestim_kftf_test`, y, k, weights, x, c, lambda)
 }
 
-rtestim_path <- function(y, x, w, korder, lambda, lambdamax = -1, lambdamin = -1, nsol = 100L, rho = -1, maxiter = 1e5L, maxiter_newton = 50L, maxiter_line = 5L, tolerance = 1e-3, lambda_min_ratio = 1e-4, ls_alpha = 0.5, ls_gamma = 0.9, verbose = 0L) {
-    .Call(`_rtestim_rtestim_path`, y, x, w, korder, lambda, lambdamax, lambdamin, nsol, rho, maxiter, maxiter_newton, maxiter_line, tolerance, lambda_min_ratio, ls_alpha, ls_gamma, verbose)
+rtestim_path <- function(y, x, w, korder, lambda, lambdamax = -1, lambdamin = -1, nsol = 100L, rho = -1, maxiter = 1e5L, maxiter_newton = 50L, maxiter_line = 5L, tolerance = 1e-3, lambda_min_ratio = 1e-4, ls_alpha = 0.5, ls_gamma = 0.9, linear_solver = 1L, verbose = 0L) {
+    .Call(`_rtestim_rtestim_path`, y, x, w, korder, lambda, lambdamax, lambdamin, nsol, rho, maxiter, maxiter_newton, maxiter_line, tolerance, lambda_min_ratio, ls_alpha, ls_gamma, linear_solver, verbose)
 }
 
 get_Dtil <- function(k, xd) {

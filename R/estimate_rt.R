@@ -67,6 +67,8 @@
 #'   `lambda` sequence, where `lambdamin = lambda_min_ratio * lambdamax`.
 #'   A very small value will lead to the solution `Rt = log(observed_counts)`.
 #'   This argument has no effect if there is a user-defined `lambda` sequence.
+#' @param linear_solver The linear system solver for theta step in ADMM.
+#'   1: Kalman filter solver; 2: QR decomposition.
 #'
 #' @return An object with S3 class `poisson_rt`. Among the list components:
 #' * `observed_counts` the observed daily infection counts.
@@ -103,7 +105,8 @@ estimate_rt <- function(
     lambdamax = NULL,
     lambda_min_ratio = 1e-4,
     maxiter = 1e5,
-    init = configure_rt_admm()) {
+    init = configure_rt_admm(),
+    linear_solver = 1) {
 
   assert_int(nsol, lower = 1)
   assert_int(maxiter, lower = 1)
@@ -183,6 +186,7 @@ estimate_rt <- function(
     lambda_min_ratio = lambda_min_ratio,
     ls_alpha = init$alpha,
     ls_gamma = init$gamma,
+    linear_solver = linear_solver,
     verbose = init$verbose
   )
 

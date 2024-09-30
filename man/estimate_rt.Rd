@@ -17,7 +17,8 @@ estimate_rt(
   lambdamax = NULL,
   lambda_min_ratio = 1e-04,
   maxiter = 1e+05,
-  init = configure_rt_admm()
+  init = configure_rt_admm(),
+  linear_solver = 1
 )
 }
 \arguments{
@@ -87,6 +88,9 @@ algorithm.}
 
 \item{init}{a list of internal configuration parameters of class
 \code{rt_admm_configuration}.}
+
+\item{linear_solver}{The linear system solver for theta step in ADMM.
+1: Kalman filter solver; 2: QR decomposition.}
 }
 \value{
 An object with S3 class \code{poisson_rt}. Among the list components:

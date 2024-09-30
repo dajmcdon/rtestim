@@ -74,8 +74,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // rtestim_path
-List rtestim_path(NumericVector y, NumericVector x, NumericVector w, int korder, NumericVector lambda, double lambdamax, double lambdamin, int nsol, double rho, int maxiter, int maxiter_newton, int maxiter_line, double tolerance, double lambda_min_ratio, double ls_alpha, double ls_gamma, int verbose);
-RcppExport SEXP _rtestim_rtestim_path(SEXP ySEXP, SEXP xSEXP, SEXP wSEXP, SEXP korderSEXP, SEXP lambdaSEXP, SEXP lambdamaxSEXP, SEXP lambdaminSEXP, SEXP nsolSEXP, SEXP rhoSEXP, SEXP maxiterSEXP, SEXP maxiter_newtonSEXP, SEXP maxiter_lineSEXP, SEXP toleranceSEXP, SEXP lambda_min_ratioSEXP, SEXP ls_alphaSEXP, SEXP ls_gammaSEXP, SEXP verboseSEXP) {
+List rtestim_path(NumericVector y, NumericVector x, NumericVector w, int korder, NumericVector lambda, double lambdamax, double lambdamin, int nsol, double rho, int maxiter, int maxiter_newton, int maxiter_line, double tolerance, double lambda_min_ratio, double ls_alpha, double ls_gamma, int linear_solver, int verbose);
+RcppExport SEXP _rtestim_rtestim_path(SEXP ySEXP, SEXP xSEXP, SEXP wSEXP, SEXP korderSEXP, SEXP lambdaSEXP, SEXP lambdamaxSEXP, SEXP lambdaminSEXP, SEXP nsolSEXP, SEXP rhoSEXP, SEXP maxiterSEXP, SEXP maxiter_newtonSEXP, SEXP maxiter_lineSEXP, SEXP toleranceSEXP, SEXP lambda_min_ratioSEXP, SEXP ls_alphaSEXP, SEXP ls_gammaSEXP, SEXP linear_solverSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -95,8 +95,9 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type lambda_min_ratio(lambda_min_ratioSEXP);
     Rcpp::traits::input_parameter< double >::type ls_alpha(ls_alphaSEXP);
     Rcpp::traits::input_parameter< double >::type ls_gamma(ls_gammaSEXP);
+    Rcpp::traits::input_parameter< int >::type linear_solver(linear_solverSEXP);
     Rcpp::traits::input_parameter< int >::type verbose(verboseSEXP);
-    rcpp_result_gen = Rcpp::wrap(rtestim_path(y, x, w, korder, lambda, lambdamax, lambdamin, nsol, rho, maxiter, maxiter_newton, maxiter_line, tolerance, lambda_min_ratio, ls_alpha, ls_gamma, verbose));
+    rcpp_result_gen = Rcpp::wrap(rtestim_path(y, x, w, korder, lambda, lambdamax, lambdamin, nsol, rho, maxiter, maxiter_newton, maxiter_line, tolerance, lambda_min_ratio, ls_alpha, ls_gamma, linear_solver, verbose));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -269,7 +270,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rtestim_dptf", (DL_FUNC) &_rtestim_dptf, 2},
     {"_rtestim_weight_dptf", (DL_FUNC) &_rtestim_weight_dptf, 3},
     {"_rtestim_kftf_test", (DL_FUNC) &_rtestim_kftf_test, 6},
-    {"_rtestim_rtestim_path", (DL_FUNC) &_rtestim_rtestim_path, 17},
+    {"_rtestim_rtestim_path", (DL_FUNC) &_rtestim_rtestim_path, 18},
     {"_rtestim_get_Dtil", (DL_FUNC) &_rtestim_get_Dtil, 2},
     {"_rtestim_get_D", (DL_FUNC) &_rtestim_get_D, 2},
     {"_rtestim_create_lambda_test", (DL_FUNC) &_rtestim_create_lambda_test, 5},
