@@ -90,7 +90,7 @@ algorithm.}
 \code{rt_admm_configuration}.}
 
 \item{linear_solver}{The linear system solver for theta step in ADMM.
-1: Kalman filter solver; 2: QR decomposition.}
+\code{linear_solver = 1}: Kalman filter solver; \code{linear_solver = 2}: QR decomposition.}
 }
 \value{
 An object with S3 class \code{poisson_rt}. Among the list components:

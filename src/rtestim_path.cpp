@@ -46,12 +46,11 @@ List rtestim_path(NumericVector y,
   D = get_D(korder, x);
   qr.compute(D.transpose());
   int m = n;
-  if (korder > 0) {
+  if (linear_solver != 1 && korder > 0) {
     Dk = get_Dtil(korder, x);
     DkDk = Dk.transpose() * Dk;
-    m = Dk.rows();
   }
-
+  m = n - korder; //Dk.rows();
   NumericMatrix alp(m - 1, nsol);
 
   // Generate lambda sequence if necessary

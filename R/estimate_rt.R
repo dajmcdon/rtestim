@@ -68,7 +68,7 @@
 #'   A very small value will lead to the solution `Rt = log(observed_counts)`.
 #'   This argument has no effect if there is a user-defined `lambda` sequence.
 #' @param linear_solver The linear system solver for theta step in ADMM.
-#'   1: Kalman filter solver; 2: QR decomposition.
+#'   `linear_solver = 1`: Kalman filter solver; `linear_solver = 2`: QR decomposition.
 #'
 #' @return An object with S3 class `poisson_rt`. Among the list components:
 #' * `observed_counts` the observed daily infection counts.
@@ -168,6 +168,8 @@ estimate_rt <- function(
   }
   if (length(lambda) != nsol) nsol <- length(lambda)
   lambda <- sort(lambda, decreasing = TRUE)
+  if (linear_solver != 1 && linear_solver != 2)
+    cli_warn("`linear_solver` must be either 1 or 2. QR decomposition is used.")
 
   mod <- rtestim_path(
     observed_counts[!inf_likelihood],

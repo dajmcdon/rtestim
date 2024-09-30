@@ -53,13 +53,15 @@ void admm_gauss(int M,
   NumericVector tmp_m(z.size());
   NumericVector Dth(z.size());
   VectorXd tmp_theta(n);
-  SparseMatrix<double> cDD = DD * n * rho;  // a copy that doesn't change
+  SparseMatrix<double> cDD;
   NumericVector W = exp(theta) * w;         // update the weights
   VectorXd eW = nvec_to_evec(W);
-  for (int i = 0; i < n; i++) {
-    cDD.diagonal()(i) += eW(i);
+  if (linear_solver != 1) {
+    cDD = DD * n * rho;  // a copy that doesn't change
+    for (int i = 0; i < n; i++) 
+      cDD.diagonal()(i) += eW(i);
+    qradmm.compute(cDD);
   }
-  qradmm.compute(cDD);
 
   for (iter = 0; iter < M; iter++) {
     if (iter % 1000 == 0)
