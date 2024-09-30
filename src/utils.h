@@ -42,4 +42,7 @@ double line_search(double s,
                    Rcpp::NumericVector& theta_old,
                    int M);
 
+Eigen::MatrixXd computePtemp(Eigen::MatrixXd A, Eigen::MatrixXd P);
+Eigen::MatrixXd smat_to_mat(const Eigen::SparseMatrix<double>& sparseMat, int k, bool equal_spaced);
+
 #endif

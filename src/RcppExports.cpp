@@ -57,6 +57,22 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// kftf_test
+Eigen::VectorXd kftf_test(Eigen::VectorXd y, int k, Eigen::VectorXd weights, Eigen::VectorXd x, Eigen::VectorXd c, double lambda);
+RcppExport SEXP _rtestim_kftf_test(SEXP ySEXP, SEXP kSEXP, SEXP weightsSEXP, SEXP xSEXP, SEXP cSEXP, SEXP lambdaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Eigen::VectorXd >::type y(ySEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXd >::type weights(weightsSEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXd >::type x(xSEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXd >::type c(cSEXP);
+    Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
+    rcpp_result_gen = Rcpp::wrap(kftf_test(y, k, weights, x, c, lambda));
+    return rcpp_result_gen;
+END_RCPP
+}
 // rtestim_path
 List rtestim_path(NumericVector y, NumericVector x, NumericVector w, int korder, NumericVector lambda, double lambdamax, double lambdamin, int nsol, double rho, int maxiter, int maxiter_newton, int maxiter_line, double tolerance, double lambda_min_ratio, double ls_alpha, double ls_gamma, int verbose);
 RcppExport SEXP _rtestim_rtestim_path(SEXP ySEXP, SEXP xSEXP, SEXP wSEXP, SEXP korderSEXP, SEXP lambdaSEXP, SEXP lambdamaxSEXP, SEXP lambdaminSEXP, SEXP nsolSEXP, SEXP rhoSEXP, SEXP maxiterSEXP, SEXP maxiter_newtonSEXP, SEXP maxiter_lineSEXP, SEXP toleranceSEXP, SEXP lambda_min_ratioSEXP, SEXP ls_alphaSEXP, SEXP ls_gammaSEXP, SEXP verboseSEXP) {
@@ -234,11 +250,25 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// smat_to_mat
+Eigen::MatrixXd smat_to_mat(const Eigen::SparseMatrix<double>& sparseMat, int k, bool equal_spaced);
+RcppExport SEXP _rtestim_smat_to_mat(SEXP sparseMatSEXP, SEXP kSEXP, SEXP equal_spacedSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::SparseMatrix<double>& >::type sparseMat(sparseMatSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< bool >::type equal_spaced(equal_spacedSEXP);
+    rcpp_result_gen = Rcpp::wrap(smat_to_mat(sparseMat, k, equal_spaced));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_rtestim_prox_newton_testing", (DL_FUNC) &_rtestim_prox_newton_testing, 11},
     {"_rtestim_dptf", (DL_FUNC) &_rtestim_dptf, 2},
     {"_rtestim_weight_dptf", (DL_FUNC) &_rtestim_weight_dptf, 3},
+    {"_rtestim_kftf_test", (DL_FUNC) &_rtestim_kftf_test, 6},
     {"_rtestim_rtestim_path", (DL_FUNC) &_rtestim_rtestim_path, 17},
     {"_rtestim_get_Dtil", (DL_FUNC) &_rtestim_get_Dtil, 2},
     {"_rtestim_get_D", (DL_FUNC) &_rtestim_get_D, 2},
@@ -251,6 +281,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rtestim_line_search", (DL_FUNC) &_rtestim_line_search, 12},
     {"_rtestim_compute_gcd", (DL_FUNC) &_rtestim_compute_gcd, 1},
     {"_rtestim_calc_delays", (DL_FUNC) &_rtestim_calc_delays, 2},
+    {"_rtestim_smat_to_mat", (DL_FUNC) &_rtestim_smat_to_mat, 3},
     {NULL, NULL, 0}
 };
 

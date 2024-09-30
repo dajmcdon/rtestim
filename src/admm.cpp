@@ -2,6 +2,7 @@
 #include <Eigen/Sparse>
 #include "utils.h"
 #include "dptf.h"
+#include "kftf.h"
 #include "admm.h"
 
 typedef Eigen::COLAMDOrdering<int> Ord;
@@ -63,11 +64,15 @@ void admm_gauss(int M,
     if (iter % 1000 == 0)
       Rcpp::checkUserInterrupt();
     // solve for primal variable - theta:
-    tmp_n = doDtv(z - u, korder, x) * n * rho;
-    tmp_n += W * y;
-    tmp_theta = nvec_to_evec(tmp_n);
-    tmp_theta = qradmm.solve(tmp_theta);
+    kftf(nvec_to_evec(y), korder, eW, nvec_to_evec(x), nvec_to_evec(z - u), n * rho, tmp_theta);
+    // alternatively, matrix inverse: 
+    // tmp_n = doDtv(z - u, korder, x) * n * rho;
+    // tmp_n += W * y;
+    // tmp_theta = nvec_to_evec(tmp_n);
+    // tmp_theta = qradmm.solve(tmp_theta);
     theta = evec_to_nvec(tmp_theta);
+    // Rcpp::Rcout << theta << std::endl;
+    
     // solve for alternating variable - z:
     Dth = doDv(theta, korder, x);
     tmp_m = Dth + u;

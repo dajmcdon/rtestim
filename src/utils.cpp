@@ -5,6 +5,7 @@
 
 using namespace Rcpp;
 using Eigen::VectorXd;
+using Eigen::MatrixXd;
 
 NumericVector evec_to_nvec(VectorXd evec) {
   NumericVector nvec(wrap(evec));
@@ -206,4 +207,45 @@ NumericVector calc_delays(NumericVector x, NumericVector y) {
     if (s > 1e-16) out[i] /= s;
   }
   return out;
+}
+
+
+// in-place computation of Ptemp given P and A
+Eigen::MatrixXd computePtemp(Eigen::MatrixXd A, Eigen::MatrixXd P) {
+  int k = P.rows();
+  Eigen::MatrixXd temp = A.row(0) * P;
+  Eigen::MatrixXd var = A.row(0) * temp.transpose();
+
+  // in-place block replacement starting from the last component:
+  P.block(1, 1, k - 1, k - 1).reverse() = P.block(0, 0, k - 1, k - 1).reverse();
+  P(0, 0) = var(0, 0);
+  temp.conservativeResize(1, k - 1);  // drop the last component
+  P.block(0, 1, 1, k - 1) = temp;
+  P.block(1, 0, k - 1, 1) = temp.transpose();
+  return P;
+}
+
+// [[Rcpp::export]]
+Eigen::MatrixXd smat_to_mat(const Eigen::SparseMatrix<double>& sparseMat, int k, bool equal_spaced) {
+  int rows = sparseMat.rows(); // n-k
+  Eigen::MatrixXd denseMat(rows, k + 1);
+  std::vector<double> rowNonzeros;
+  // Iterate over nonzero coefficients in each row of the sparse matrix
+  for (int i = 0; i < sparseMat.outerSize(); ++i) {
+    std::vector<double> rowNonzeros;
+    for (Eigen::SparseMatrix<double>::InnerIterator it(sparseMat, i); it; ++it) 
+      rowNonzeros.push_back(it.value());
+    int m = rowNonzeros.size();
+    for (int j = 0; j < m; j++) {
+      if (i < rows) 
+        denseMat(i - j, j) = rowNonzeros[m - 1 - j];
+      else  
+        denseMat(rows - 1 - j, j + i - rows + 1) = rowNonzeros[m - 1 - j];
+    }
+    if (equal_spaced && i == k) {
+      denseMat.conservativeResize(1, k + 1);
+      return denseMat;
+    } 
+  }
+  return denseMat;
 }
