@@ -12,11 +12,11 @@ summary.cv_poisson_rt <- function(object, ...) {
   ))
   n <- nrow(tab)
   if (n > 5) {
-    l1 <- which(abs(object$lambda - object$lambda.min) < 1e-10)
-    l2 <- which(abs(object$lambda - object$lambda.1se) < 1e-10)
+    l1 <- which(abs(object$lambda - object$lambda.1se) < 1e-10)
+    l2 <- which(abs(object$lambda - object$lambda.min) < 1e-10)
     idx <- c(1, l1, l2, n)
     tab <- tab[idx, ]
-    rownames(tab) <- c("Max Lambda", "CV Minimizer", "1se Lambda", "Min Lambda")
+    rownames(tab) <- c("Max Lambda", "1se Lambda", "CV Minimizer", "Min Lambda")
   }
 
   out <- structure(
@@ -42,9 +42,12 @@ print.summary.cv_poisson_rt <- function(
   rlang::check_dots_empty()
 
   lambda_warning <- NULL
-  if (x$table$index[2] == 1) lambda_warning <- "smallest"
-  if (nrow(x$table) > 3 & x$table$index[2] == x$table$index[4]) {
+  if (nrow(x$table) == 1) {
     lambda_warning <- "largest"
+  }
+  if (nrow(x$table) > 3) {
+    if (x$table$index[3] == x$table$index[4]) lambda_warning <- "smallest"
+    if (x$table$index[3] == 1) lambda_warning <- "largest"
   }
 
   cat("\nCall:", deparse(x$call), fill = TRUE)
