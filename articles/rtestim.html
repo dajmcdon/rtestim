@@ -6,7 +6,18 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>rtestim Package Vignette • rtestim</title>
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
+<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="icon" sizes="any" href="../favicon.ico">
+<link rel="manifest" href="../site.webmanifest">
+<!-- mathjax math --><script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script><script>
+  window.MathJax = {
+    chtml: {
+      fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
+    }
+  };
+</script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
@@ -73,75 +84,45 @@
 </h2>
 <p>This package uses Poisson likelihood with trend filtering penalty (a
 type of regularized nonparametric regression) to estimate the effective
-reproductive number,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>R</mi><mi>t</mi></msub><annotation encoding="application/x-tex">R_t</annotation></semantics></math>.
-This value roughly says “how many new infections will result from each
-new infection today”. Values larger than 1 indicate that an epidemic is
+reproductive number, <span class="math inline">\(R_t\)</span>. This
+value roughly says “how many new infections will result from each new
+infection today”. Values larger than 1 indicate that an epidemic is
 growing while those less than 1 indicate decline.</p>
 <p>This vignette provides a few examples to demonstrate the usage of
 <a href="https://github.com/dajmcdon/rtestim" class="external-link">rtestim</a> to estimate the effective reproduction number,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>R</mi><mi>t</mi></msub><annotation encoding="application/x-tex">R_t</annotation></semantics></math>.
-<a href="https://github.com/dajmcdon/rtestim" class="external-link">rtestim</a> finds a sequence of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>R</mi><mi>t</mi></msub><annotation encoding="application/x-tex">R_t</annotation></semantics></math>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><msub><mi>R</mi><mi>t</mi></msub><msubsup><mo stretchy="false" form="postfix">}</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></msubsup></mrow><annotation encoding="application/x-tex">\{R_t\}_{t=1}^n</annotation></semantics></math>
-of an infectious disease by solving the following penalized Poisson
-regression
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>θ</mi><mo accent="true">̂</mo></mover><mo>=</mo><msub><mo>argmin</mo><mi>θ</mi></msub><mfrac><mn>1</mn><mi>n</mi></mfrac><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><mrow><mo stretchy="true" form="prefix">(</mo><msup><mi>e</mi><msub><mi>θ</mi><mi>t</mi></msub></msup><msub><mi>x</mi><mi>t</mi></msub><mo>−</mo><msub><mi>y</mi><mi>t</mi></msub><msub><mi>θ</mi><mi>t</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>λ</mi><mo stretchy="false" form="postfix">‖</mo><msup><mi>D</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>k</mi><mo>+</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></msup><mi>θ</mi><msub><mo stretchy="false" form="postfix">‖</mo><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">\begin{equation} \label{eq:objective_fn}
-    \hat{\theta} = \mathop{\mathrm{argmin}}_{\theta} \frac{1}{n} \sum_{t=1}^n \left(e^{\theta_{t}}x_t - y_t\theta_{t}\right) + \lambda \Vert D^{(k+1)} \theta \Vert_1
-\end{equation}</annotation></semantics></math> where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>y</mi><mi>t</mi></msub><annotation encoding="application/x-tex">y_t</annotation></semantics></math>
+<span class="math inline">\(R_t\)</span>. <a href="https://github.com/dajmcdon/rtestim" class="external-link">rtestim</a> finds a
+sequence of <span class="math inline">\(R_t\)</span>, <span class="math inline">\(\{R_t\}_{t=1}^n\)</span> of an infectious disease
+by solving the following penalized Poisson regression <span class="math display">\[\begin{equation} \label{eq:objective_fn}
+    \hat{\theta} = \mathop{\mathrm{argmin}}_{\theta} \frac{1}{n}
+\sum_{t=1}^n \left(e^{\theta_{t}}x_t - y_t\theta_{t}\right) + \lambda
+\Vert D^{(k+1)} \theta \Vert_1
+\end{equation}\]</span> where <span class="math inline">\(y_t\)</span>
 is the an epidemic signal, ideally, incident infections, but most
-frequently, incident cases, on day
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>θ</mi><mi>t</mi></msub><mo>=</mo><mo>log</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>R</mi><mi>t</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\theta_{t} = \log(R_t)</annotation></semantics></math>
-is the natural logarithm of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>R</mi><mi>t</mi></msub><annotation encoding="application/x-tex">R_t</annotation></semantics></math>
-at time
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>D</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>k</mi><mo stretchy="true" form="postfix">)</mo></mrow></msup><annotation encoding="application/x-tex">D^{(k)}</annotation></semantics></math>
-is the
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>-th
-order divided difference operator
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo>≥</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">k \geq 0</annotation></semantics></math>).
-The penalty
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="postfix">‖</mo><msup><mi>D</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>k</mi><mo>+</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></msup><mi>θ</mi><msub><mo stretchy="false" form="postfix">‖</mo><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">\Vert D^{(k+1)} \theta \Vert_1</annotation></semantics></math>
-imposes smoothness on the solution and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
-controls the level of this smoothness, with larger
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
+frequently, incident cases, on day <span class="math inline">\(t\)</span>, <span class="math inline">\(\theta_{t}
+= \log(R_t)\)</span> is the natural logarithm of <span class="math inline">\(R_t\)</span> at time <span class="math inline">\(t\)</span>, <span class="math inline">\(D^{(k)}\)</span> is the <span class="math inline">\(k\)</span>-th order divided difference operator
+(<span class="math inline">\(k \geq 0\)</span>). The penalty <span class="math inline">\(\Vert D^{(k+1)} \theta \Vert_1\)</span> imposes
+smoothness on the solution and <span class="math inline">\(\lambda\)</span> controls the level of this
+smoothness, with larger <span class="math inline">\(\lambda\)</span>
 resulting in smoother estimates.</p>
-<p>In particular
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mi>t</mi></msub><mo>=</mo><munderover><mo>∑</mo><mrow><mi>a</mi><mo>=</mo><mn>1</mn></mrow><mi>m</mi></munderover><msub><mi>y</mi><mrow><mi>t</mi><mo>−</mo><mi>a</mi></mrow></msub><msub><mi>w</mi><mi>a</mi></msub></mrow><annotation encoding="application/x-tex">\begin{equation}
+<p>In particular <span class="math display">\[\begin{equation}
 x_t = \sum_{a = 1}^m y_{t-a} w_a
-\end{equation}</annotation></semantics></math> is the weighted sum of
-previous incidence at
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>,
-calculated by convolving the preceding
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>m</mi><annotation encoding="application/x-tex">m</annotation></semantics></math>
-days of new infections with the discretized serial interval distribution
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>w</mi><annotation encoding="application/x-tex">w</annotation></semantics></math>
-of length
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>m</mi><annotation encoding="application/x-tex">m</annotation></semantics></math>.
-This delay distribution encapsulates the duration of time that a
-previous infection is likely to lead to future infection.</p>
-<p>To compute
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><msub><mi>R</mi><mi>t</mi></msub><msubsup><mo stretchy="false" form="postfix">}</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></msubsup></mrow><annotation encoding="application/x-tex">\{R_t\}_{t=1}^n</annotation></semantics></math>
-with <a href="https://github.com/dajmcdon/rtestim" class="external-link">rtestim</a>, the minimal information needed is the new
-case counts at days up until
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>
-and a parametric form for the serial interval distribution (a Gamma
-density). By default,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2.5</mn><annotation encoding="application/x-tex">2.5</annotation></semantics></math>
-is used for both the scale and shape parameters, based on the literature
-on contract tracing, representing the typical delay between case onsets.
-This is discretized to be supported on the integers. The order of the
-difference operator, the degree of smoothness, defaults to
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>3</mn><annotation encoding="application/x-tex">3</annotation></semantics></math>.
-The sequence of smoothness penalty
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>,
-if no
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
-is provided, is calculated internally by the algorithm.</p>
+\end{equation}\]</span> is the weighted sum of previous incidence at
+<span class="math inline">\(t\)</span>, calculated by convolving the
+preceding <span class="math inline">\(m\)</span> days of new infections
+with the discretized serial interval distribution <span class="math inline">\(w\)</span> of length <span class="math inline">\(m\)</span>. This delay distribution encapsulates
+the duration of time that a previous infection is likely to lead to
+future infection.</p>
+<p>To compute <span class="math inline">\(\{R_t\}_{t=1}^n\)</span> with
+<a href="https://github.com/dajmcdon/rtestim" class="external-link">rtestim</a>, the minimal information needed is the new case
+counts at days up until <span class="math inline">\(t\)</span> and a
+parametric form for the serial interval distribution (a Gamma density).
+By default, <span class="math inline">\(2.5\)</span> is used for both
+the scale and shape parameters, based on the literature on contract
+tracing, representing the typical delay between case onsets. This is
+discretized to be supported on the integers. The order of the difference
+operator, the degree of smoothness, defaults to <span class="math inline">\(3\)</span>. The sequence of smoothness penalty
+<span class="math inline">\(\lambda\)</span>, if no <span class="math inline">\(\lambda\)</span> is provided, is calculated
+internally by the algorithm.</p>
 </div>
 <div class="section level2">
 <h2 id="example---synthetic-dataset">Example - synthetic dataset<a class="anchor" aria-label="anchor" href="#example---synthetic-dataset"></a>
@@ -160,31 +141,15 @@ the first observation must be strictly larger than 0.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"cornflowerblue"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Time"</span>, y <span class="op">=</span> <span class="st">"Case Counts"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="rtestim_files/figure-html/unnamed-chunk-2-1.png" width="80%" style="display: block; margin: auto;"></p>
-<p>Next, we fit the model and visualize the resulting
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><msub><mi>R</mi><mi>t</mi></msub><msubsup><mo stretchy="false" form="postfix">}</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></msubsup></mrow><annotation encoding="application/x-tex">\{R_t\}_{t=1}^n</annotation></semantics></math>:</p>
+<p>Next, we fit the model and visualize the resulting <span class="math inline">\(\{R_t\}_{t=1}^n\)</span>:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/estimate_rt.html">estimate_rt</a></span><span class="op">(</span>observed_counts <span class="op">=</span> <span class="va">case_counts</span>, nsol <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mod</span><span class="op">)</span></span></code></pre></div>
 <p><img src="rtestim_files/figure-html/unnamed-chunk-3-1.png" width="80%" style="display: block; margin: auto;"></p>
-<p><a href="https://github.com/dajmcdon/rtestim" class="external-link">rtestim</a> estimates a spectrum of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><msub><mi>R</mi><mi>t</mi></msub><msubsup><mo stretchy="false" form="postfix">}</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></msubsup></mrow><annotation encoding="application/x-tex">\{R_t\}_{t=1}^n</annotation></semantics></math>s
-for a range of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
-values, where each
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><msub><mi>R</mi><mi>t</mi></msub><msubsup><mo stretchy="false" form="postfix">}</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></msubsup></mrow><annotation encoding="application/x-tex">\{R_t\}_{t=1}^n</annotation></semantics></math>
-corresponds to a specific
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
-value. If no
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
-value is supplied by the user, <a href="https://github.com/dajmcdon/rtestim" class="external-link">rtestim</a> will automatically
-calculate a sequence of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
-values. The additional parameter <code>nsol = 20</code> specifies the
-number of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>s
-for which the
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><msub><mi>R</mi><mi>t</mi></msub><msubsup><mo stretchy="false" form="postfix">}</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></msubsup></mrow><annotation encoding="application/x-tex">\{R_t\}_{t=1}^n</annotation></semantics></math>
-is calculated</p>
+<p><a href="https://github.com/dajmcdon/rtestim" class="external-link">rtestim</a> estimates a spectrum of <span class="math inline">\(\{R_t\}_{t=1}^n\)</span>s for a range of <span class="math inline">\(\lambda\)</span> values, where each <span class="math inline">\(\{R_t\}_{t=1}^n\)</span> corresponds to a specific
+<span class="math inline">\(\lambda\)</span> value. If no <span class="math inline">\(\lambda\)</span> value is supplied by the user,
+<a href="https://github.com/dajmcdon/rtestim" class="external-link">rtestim</a> will automatically calculate a sequence of <span class="math inline">\(\lambda\)</span> values. The additional parameter
+<code>nsol = 20</code> specifies the number of <span class="math inline">\(\lambda\)</span>s for which the <span class="math inline">\(\{R_t\}_{t=1}^n\)</span> is calculated</p>
 </div>
 <div class="section level3">
 <h3 id="cross-validation">Cross Validation<a class="anchor" aria-label="anchor" href="#cross-validation"></a>
@@ -194,39 +159,29 @@ selecting the amount of smoothness to be used in the final estimate
 (leave-every-k-th-out cross validation). Minimizing this metric, in
 principle, balances prediction error and smoothness
 (<code>lambda.min</code>) though if smoother estimates are desired, one
-can instead use <code>lambda.1se</code>, the largest value of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
-within one standard error of the minimum.</p>
+can instead use <code>lambda.1se</code>, the largest value of <span class="math inline">\(\lambda\)</span> within one standard error of the
+minimum.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod_cv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv_estimate_rt.html">cv_estimate_rt</a></span><span class="op">(</span>observed_counts <span class="op">=</span> <span class="va">case_counts</span><span class="op">)</span></span></code></pre></div>
 <p>The following command plots the cross validation errors for each
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
-in ascending order.</p>
+<span class="math inline">\(\lambda\)</span> in ascending order.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mod_cv</span><span class="op">)</span></span></code></pre></div>
 <p><img src="rtestim_files/figure-html/unnamed-chunk-5-1.png" width="80%" style="display: block; margin: auto;"></p>
 <p>The plot above displays vertical lines that correspond to the
-cross-validation scores for specific values of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>.
-The blue point at the center of each line represents the mean score for
-that value of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
-across all cross-validation folds. The top and bottom caps of each line
-indicate one cross-validation standard error above and below the mean
-score for the given value of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
-across all cross-validation folds. Two special values of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>’s
-are highlighted with dashed lines. The one on the left represents the
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
-that gives minimum mean cross-validated error, called
-<code>lambda.min</code>, and the one on the right gives the most
-regularized model such that the cross-validated error is within one
-standard error of the minimum, called <code>lambda.1se</code>.</p>
-<p>Users may wish to visualize the particular
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><msub><mi>R</mi><mi>t</mi></msub><msubsup><mo stretchy="false" form="postfix">}</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></msubsup></mrow><annotation encoding="application/x-tex">\{R_t\}_{t=1}^n</annotation></semantics></math>
-which minimizes the cross-validation error while prioritizing
-smoothness.</p>
+cross-validation scores for specific values of <span class="math inline">\(\lambda\)</span>. The blue point at the center of
+each line represents the mean score for that value of <span class="math inline">\(\lambda\)</span> across all cross-validation
+folds. The top and bottom caps of each line indicate one
+cross-validation standard error above and below the mean score for the
+given value of <span class="math inline">\(\lambda\)</span> across all
+cross-validation folds. Two special values of <span class="math inline">\(\lambda\)</span>’s are highlighted with dashed
+lines. The one on the left represents the <span class="math inline">\(\lambda\)</span> that gives minimum mean
+cross-validated error, called <code>lambda.min</code>, and the one on
+the right gives the most regularized model such that the cross-validated
+error is within one standard error of the minimum, called
+<code>lambda.1se</code>.</p>
+<p>Users may wish to visualize the particular <span class="math inline">\(\{R_t\}_{t=1}^n\)</span> which minimizes the
+cross-validation error while prioritizing smoothness.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mod_cv</span>, which_lambda <span class="op">=</span> <span class="st">"lambda.1se"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="rtestim_files/figure-html/unnamed-chunk-6-1.png" width="80%" style="display: block; margin: auto;"></p>
@@ -254,13 +209,9 @@ representing the days at which we observe the case counts.</p>
 <h3 id="changing-degree-of-difference-operator">Changing degree of difference operator<a class="anchor" aria-label="anchor" href="#changing-degree-of-difference-operator"></a>
 </h3>
 <p>The degree of the estimated penalized Poisson regression function
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
-defaults to 3 for the algorithm, which corresponds to a piece-wise cubic
-estimate
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><msub><mi>R</mi><mi>t</mi></msub><msubsup><mo stretchy="false" form="postfix">}</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></msubsup></mrow><annotation encoding="application/x-tex">\{R_t\}_{t=1}^n</annotation></semantics></math>.
-To estimate
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><msub><mi>R</mi><mi>t</mi></msub><msubsup><mo stretchy="false" form="postfix">}</mo><mrow><mi>t</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></msubsup></mrow><annotation encoding="application/x-tex">\{R_t\}_{t=1}^n</annotation></semantics></math>
-with piece-wise constant curves for example, use the command</p>
+<span class="math inline">\(k\)</span> defaults to 3 for the algorithm,
+which corresponds to a piece-wise cubic estimate <span class="math inline">\(\{R_t\}_{t=1}^n\)</span>. To estimate <span class="math inline">\(\{R_t\}_{t=1}^n\)</span> with piece-wise constant
+curves for example, use the command</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/estimate_rt.html">estimate_rt</a></span><span class="op">(</span>observed_counts <span class="op">=</span> <span class="va">case_counts</span>, korder <span class="op">=</span> <span class="fl">0</span>, nsol <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mod</span><span class="op">)</span></span></code></pre></div>
@@ -273,8 +224,7 @@ with piece-wise constant curves for example, use the command</p>
 <p>Finally, we use a long history of real case counts in Canada. The
 data is available from <a href="https://opencovid.ca" class="external-link">opencovid.ca</a>
 and the version downloaded on 4 July 2023 is included in the package. We
-use this data to estimate
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>R</mi><mi>t</mi></msub><annotation encoding="application/x-tex">R_t</annotation></semantics></math>.</p>
+use this data to estimate <span class="math inline">\(R_t\)</span>.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">can</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/estimate_rt.html">estimate_rt</a></span><span class="op">(</span></span>
 <span>  observed_counts <span class="op">=</span> <span class="va">cancovid</span><span class="op">$</span><span class="va">incident_cases</span>,</span>
@@ -332,7 +282,7 @@ they likely don’t have guaranteed coverage.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
 </div>
 
     </footer>

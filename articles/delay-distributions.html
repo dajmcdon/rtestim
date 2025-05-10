@@ -6,7 +6,18 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Delay distributions • rtestim</title>
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
+<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="icon" sizes="any" href="../favicon.ico">
+<link rel="manifest" href="../site.webmanifest">
+<!-- mathjax math --><script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script><script>
+  window.MathJax = {
+    chtml: {
+      fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
+    }
+  };
+</script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
@@ -75,84 +86,52 @@
 <p>This package accommodates 3 different ways of specifying a delay
 distribution in the renewal equation, and this vignette illustrates
 these in turn. The renewal equation specifies that the expected
-incidence at time
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>
-is a weighted sum of previous incidence, multiplied by
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>R</mi><mi>t</mi></msub><annotation encoding="application/x-tex">R_t</annotation></semantics></math>:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝔼</mi><mrow><mo stretchy="true" form="prefix">[</mo><msub><mi>I</mi><mi>t</mi></msub><mo>∣</mo><msub><mi>I</mi><mn>1</mn></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>I</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo stretchy="true" form="postfix">]</mo></mrow><mo>=</mo><msub><mi>R</mi><mi>t</mi></msub><munderover><mo>∑</mo><mrow><mi>a</mi><mo>=</mo><mn>1</mn></mrow><mi>t</mi></munderover><msub><mi>w</mi><mi>a</mi></msub><msub><mi>I</mi><mrow><mi>t</mi><mo>−</mo><mi>a</mi></mrow></msub><mo>,</mo></mrow><annotation encoding="application/x-tex">\begin{equation}
+incidence at time <span class="math inline">\(t\)</span> is a weighted
+sum of previous incidence, multiplied by <span class="math inline">\(R_t\)</span>: <span class="math display">\[\begin{equation}
 \mathbb{E}[I_t \mid I_1,\ldots,I_{t-1}] = R_t \sum_{a=1}^t w_a I_{t-a},
-\end{equation}</annotation></semantics></math> calculated by convolving
-the preceding
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>a</mi><annotation encoding="application/x-tex">a</annotation></semantics></math>
-days of new infections with the discretized generation (or serial)
-interval distribution
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>w</mi><annotation encoding="application/x-tex">w</annotation></semantics></math>
-of length
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>.
-It is the allowable distributions
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><mi>w</mi><msubsup><mo stretchy="false" form="postfix">}</mo><mrow><mi>a</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></msubsup></mrow><annotation encoding="application/x-tex">\{w\}_{a=1}^n</annotation></semantics></math>
-that are the focus.</p>
+\end{equation}\]</span> calculated by convolving the preceding <span class="math inline">\(a\)</span> days of new infections with the
+discretized generation (or serial) interval distribution <span class="math inline">\(w\)</span> of length <span class="math inline">\(t\)</span>. It is the allowable distributions
+<span class="math inline">\(\{w\}_{a=1}^n\)</span> that are the
+focus.</p>
 <div class="section level2">
 <h2 id="discretization">Discretization<a class="anchor" aria-label="anchor" href="#discretization"></a>
 </h2>
-<p>First, it is important to recognize that the sequence
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><mi>w</mi><msubsup><mo stretchy="false" form="postfix">}</mo><mrow><mi>a</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></msubsup></mrow><annotation encoding="application/x-tex">\{w\}_{a=1}^n</annotation></semantics></math>
-is usually a discretization of a probability density function, most
-frequently gamma or Weibull. This is because observed incidence happens
-at discrete time points like days or weeks, while time is continuous.
-Using the default (parametric) delay distributions requires calculating
-a discrete approximation.</p>
+<p>First, it is important to recognize that the sequence <span class="math inline">\(\{w\}_{a=1}^n\)</span> is usually a discretization
+of a probability density function, most frequently gamma or Weibull.
+This is because observed incidence happens at discrete time points like
+days or weeks, while time is continuous. Using the default (parametric)
+delay distributions requires calculating a discrete approximation.</p>
 </div>
 <div class="section level2">
 <h2 id="default-parametric-delay-distribution">Default (parametric) delay distribution<a class="anchor" aria-label="anchor" href="#default-parametric-delay-distribution"></a>
 </h2>
 <p>By default, <code><a href="../reference/estimate_rt.html">estimate_rt()</a></code> uses a gamma distribution
-parameterized by the shape
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
-and scale
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>θ</mi><annotation encoding="application/x-tex">\theta</annotation></semantics></math>.
-This density has pdf
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>W</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>w</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mfrac><mn>1</mn><mrow><mi>Γ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>k</mi><mo stretchy="true" form="postfix">)</mo></mrow><msup><mi>θ</mi><mi>k</mi></msup></mrow></mfrac><msup><mi>w</mi><mrow><mi>k</mi><mo>−</mo><mn>1</mn></mrow></msup><msup><mi>e</mi><mrow><mo>−</mo><mi>w</mi><mi>/</mi><mi>θ</mi></mrow></msup><mi>I</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>w</mi><mo>&gt;</mo><mn>0</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">
+parameterized by the shape <span class="math inline">\(k\)</span> and
+scale <span class="math inline">\(\theta\)</span>. This density has pdf
+<span class="math display">\[
 f_W(w) = \frac{1}{\Gamma(k)\theta^k} w^{k-1} e^{-w/\theta} I(w &gt; 0),
-</annotation></semantics></math> where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>I</mi><annotation encoding="application/x-tex">I</annotation></semantics></math>
-is the indicator function. The mean of this distribution is
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mi>θ</mi></mrow><annotation encoding="application/x-tex">k\theta</annotation></semantics></math>,
-and the variance is
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><msup><mi>θ</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">k\theta^2</annotation></semantics></math>.
-Both
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>θ</mi><annotation encoding="application/x-tex">\theta</annotation></semantics></math>
-must be greater than 0. The figure below shows a few examples densities
-from this family.</p>
+\]</span> where <span class="math inline">\(I\)</span> is the indicator
+function. The mean of this distribution is <span class="math inline">\(k\theta\)</span>, and the variance is <span class="math inline">\(k\theta^2\)</span>. Both <span class="math inline">\(k\)</span> and <span class="math inline">\(\theta\)</span> must be greater than 0. The figure
+below shows a few examples densities from this family.</p>
 <p><img src="delay-distributions_files/figure-html/gamma-pdf-1.png" width="80%" style="display: block; margin: auto;"></p>
 <p>The default is the orange curve shown above. Given an incidence
-sequence of length
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>,
-internally, <code><a href="../reference/delay_calculator.html">delay_calculator()</a></code> creates
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><mi>w</mi><msubsup><mo stretchy="false" form="postfix">}</mo><mrow><mi>a</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></msubsup></mrow><annotation encoding="application/x-tex">\{w\}_{a=1}^n</annotation></semantics></math>
-by
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>w</mi><mi>a</mi></msub><mo>=</mo><mi>F</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>a</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><mi>F</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>a</mi><mo>−</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">
+sequence of length <span class="math inline">\(n\)</span>, internally,
+<code><a href="../reference/delay_calculator.html">delay_calculator()</a></code> creates <span class="math inline">\(\{w\}_{a=1}^n\)</span> by <span class="math display">\[
 w_a = F(a) - F(a - 1),
-</annotation></semantics></math> and then renormalizing with
-<code>w / sum(w)</code> to ensure that it sums to 1. Here,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>F</mi><annotation encoding="application/x-tex">F</annotation></semantics></math>
-is the cumulative distribution function for Gamma (though similar works
-for any continuous distribution). Note that this formula assumes that
-the probability of a 0 delay is 0 and that the probability of a delay of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>a</mi><annotation encoding="application/x-tex">a</annotation></semantics></math>
-is really
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mrow><mi>a</mi><mo>−</mo><mn>1</mn></mrow><mi>a</mi></msubsup><msub><mi>f</mi><mi>W</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>w</mi><mo stretchy="true" form="postfix">)</mo></mrow><mspace width="0.167em"></mspace><mi>d</mi><mi>w</mi><mo>=</mo><mi>F</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>a</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><mi>F</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>a</mi><mo>−</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mi>.</mi></mrow><annotation encoding="application/x-tex">
+\]</span> and then renormalizing with <code>w / sum(w)</code> to ensure
+that it sums to 1. Here, <span class="math inline">\(F\)</span> is the
+cumulative distribution function for Gamma (though similar works for any
+continuous distribution). Note that this formula assumes that the
+probability of a 0 delay is 0 and that the probability of a delay of
+<span class="math inline">\(a\)</span> is really <span class="math display">\[
 \int_{a-1}^a f_W(w) \, dw = F(a) - F(a-1).
-</annotation></semantics></math></p>
+\]</span></p>
 <p>When using this default, the delay distribution is necessarily
-assumed to be the same for all
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>,
+assumed to be the same for all <span class="math inline">\(t\)</span>,
 and we compute the convolution of <code>w</code> and <code>I</code> with
 the Fast Fourier Transform. Finally, an adjustment is made to handle the
-first observation. We define
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>I</mi><mn>0</mn></msub><mo>=</mo><msub><mi>I</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">I_0 = I_1</annotation></semantics></math>.</p>
+first observation. We define <span class="math inline">\(I_0 =
+I_1\)</span>.</p>
 <p>Just to illustrate this behaviour, we show the results for the
 default setting on the included <code>cancovid</code> data.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
@@ -295,10 +274,8 @@ Kummer, A.G. et al.</a>. The raw data for their analysis is available on
 We use a simple version of their procedure, taking the median
 calculations across studies to find the mean and standard deviation of
 the delay for each variant separately. Then we convert these to the
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>θ</mi><annotation encoding="application/x-tex">\theta</annotation></semantics></math>
-parameters for the gamma distribution.</p>
+<span class="math inline">\(k\)</span> and <span class="math inline">\(\theta\)</span> parameters for the gamma
+distribution.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data_raw</span> <span class="op">&lt;-</span> <span class="fu">readxl</span><span class="fu">::</span><span class="fu">read_excel</span><span class="op">(</span><span class="st">"xu-etal-DATA_RAW.xlsx"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">type</span>, <span class="va">para</span>, n <span class="op">=</span> <span class="va">Sample_size</span>, <span class="va">mean</span>, <span class="va">sd</span>, <span class="va">se</span>, <span class="va">median</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -381,7 +358,7 @@ prevalent to estimate Rt. First, we build the delay matrix.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
 </div>
 
     </footer>
