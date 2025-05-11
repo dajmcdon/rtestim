@@ -9,14 +9,9 @@
 #'   based on interpolating linearly between the available values.
 #'
 #' @return A list containing the segment lengths and the number of segments.
-#' @export
 #' @keywords internal
+#' @noRd
 find_knots <- function(object, lambda, ...) {
-  UseMethod("find_knots")
-}
-
-#' @export
-find_knots.poisson_rt <- function(object, lambda, ...) {
   rlang::check_dots_empty()
   assert_number(lambda, lower = min(object$lambda), upper = max(object$lambda))
 
@@ -30,5 +25,5 @@ find_knots.poisson_rt <- function(object, lambda, ...) {
   r <- c(knots + object$korder, n)
   l <- c(1, knots + object$korder + 1)
   xpieces <- map2(l, r, function(a, b) object$x[a:b])
-  enlist(knots, xpieces, dof, l, r)
+  structure(enlist(knots, xpieces, dof, l, r), class = "rtestim_knots")
 }
