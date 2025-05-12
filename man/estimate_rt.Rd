@@ -120,8 +120,10 @@ difference matrix.
 \examples{
 y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
 out <- estimate_rt(y)
+out
 plot(out)
 
 out0 <- estimate_rt(y, korder = 0L, nsol = 40)
+out0
 plot(out0)
 }

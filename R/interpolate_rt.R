@@ -12,10 +12,3 @@ interpolate_rt <- function(object, xout, ...) {
   assert_numeric(xout, null.ok = TRUE)
   UseMethod("interpolate_rt")
 }
-
-#' @export
-interpolate_rt.default <- function(object, xout, ...) {
-  cli_abort(
-    "No interpolation methods exist for objects of class {.cls {class(object)}}."
-  )
-}

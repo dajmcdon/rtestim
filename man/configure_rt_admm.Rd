@@ -43,3 +43,7 @@ a list of model parameters with class \code{rt_admm_configuration}
 \description{
 Rt estimation algorithm configuration
 }
+\examples{
+configure_rt_admm()
+configure_rt_admm(tolerance = 1e-6, verbose = 1L)
+}

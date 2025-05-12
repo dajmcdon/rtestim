@@ -150,6 +150,11 @@ predict.poisson_rt <- function(object, lambda = NULL, ...) {
 }
 
 #' @export
+#' @rdname interpolate_rt
+#' @examples
+#' y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
+#' out <- estimate_rt(y, nsol = 10)
+#' interpolate_rt(out, xout = c(1.5, 2.5))
 interpolate_rt.poisson_rt <- function(object, xout, lambda = NULL, ...) {
   rlang::check_dots_empty()
   xin <- object$x
