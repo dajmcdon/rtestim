@@ -29,7 +29,7 @@ minimal cross validation score.
 \item{...}{Not used.}
 }
 \value{
-a \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} object
+a \link[ggplot2:ggplot]{ggplot2::ggplot}
 }
 \description{
 Plot cv_poisson_rt

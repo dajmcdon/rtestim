@@ -29,33 +29,33 @@ delay_calculator <- function(
     delay_distn = NULL,
     delay_distn_periodicity = NULL,
     xout = x) {
-  arg_is_length(2, dist_gamma)
-  arg_is_positive(dist_gamma)
+  assert_numeric(dist_gamma, lower = 0, len = 2)
   if (inherits(delay_distn, "Matrix")) {
-    arg_is_nonnegative(delay_distn@x)
+    assert_numeric(delay_distn@x, lower = 0)
   } else {
-    arg_is_nonnegative(delay_distn, allow_null = TRUE)
+    assert_numeric(delay_distn, lower = 0, null.ok = TRUE)
   }
+
   n <- length(observed_counts)
-  arg_is_length(n, x, allow_null = TRUE)
   if (is.null(x)) {
     x <- 1:n
   } else {
-    if (any(is.na(x))) cli_abort("`x` may not contain missing values.")
+    if (inherits(x, "Date")) x <- as.numeric(x)
+    assert_numeric(x, len = n, any.missing = FALSE)
     if (is.unsorted(x, strictly = TRUE)) {
       cli_abort("`x` must be strictly sorted and contain no duplicates.")
     }
   }
 
-  if (inherits(x, "Date")) x <- as.numeric(x)
-  arg_is_numeric(x)
-
-  if (any(is.na(xout))) cli_abort("`xout` may not contain missing values.")
-  if (is.unsorted(xout, strictly = TRUE)) {
-    cli_abort("`xout` must be sorted and contain no duplicates.")
+  if (is.null(xout)) {
+    xout <- x
+  } else {
+    if (inherits(xout, "Date")) xout <- as.numeric(xout)
+    assert_numeric(xout, any.missing = FALSE)
+    if (is.unsorted(xout, strictly = TRUE)) {
+      cli_abort("`xout` must be strictly sorted and contain no duplicates.")
+    }
   }
-  if (inherits(xout, "Date")) xout <- as.numeric(xout)
-  arg_is_numeric(xout)
   if (min(xout) < min(x)) cli_abort("`min(xout)` may not be less than `min(x)`.")
   if (max(xout) > max(x)) cli_abort("`max(xout)` may not exceed `max(x)`.")
 
@@ -68,10 +68,10 @@ delay_calculator <- function(
   } else if (is.numeric(delay_distn_periodicity)) {
     ddp <- delay_distn_periodicity
   } else {
-    cli::cli_abort("`delay_distn_periodicity` must be a scalar, character or numeric.")
+    cli_abort("`delay_distn_periodicity` must be a scalar, character or numeric.")
   }
   if (ddx %% ddp != 0) {
-    cli::cli_abort(c(
+    cli_abort(c(
       "`delay_distn_periodicity` may be at most the minimum spacing in `x`,",
       "!" = "and must divide the minimum spacing evenly.",
       i = "`delay_distn_periodicity` = {.val {ddp}} compared to {.val {ddx}} for `x`."
@@ -80,7 +80,7 @@ delay_calculator <- function(
   allx <- seq(from = min(x), to = max(x), by = ddp)
   ddxout <- gcd(unique(diff(xout)))
   if (ddxout < ddp) {
-    cli::cli_abort(c(
+    cli_abort(c(
       "The minimum spacing in `xout` must be at least `delay_distn_periodicity`.",
       i = "`delay_distn_periodicity` = {.val {ddp}} compared to {.val {ddxout}} for `xout`."
     ))
@@ -92,28 +92,23 @@ delay_calculator <- function(
     delay_distn <- discretize_gamma(allx - min(x), dist_gamma[1], dist_gamma[2])
   } else if (is.matrix(delay_distn) || inherits(delay_distn, "Matrix")) {
     if (!all(dim(delay_distn) == length(allx))) {
-      cli::cli_abort(c(
+      cli_abort(c(
         "User specified `delay_distn` has dimensions {.val {dim(delay_distn)}},",
         "!" = "but it must have both dimensions {.val {length(allx)}}."
       ))
     }
     if (!Matrix::isTriangular(delay_distn, upper = FALSE)) {
-      cli::cli_abort(
+      cli_abort(
         "User specified `delay_distn` must be square and lower triangular."
       )
     }
-    if (delay_distn[1,1] < .Machine$double.eps) {
-      cli::cli_abort(c(
-        "The upper-left most entry of `delay_distn` must be strictly positive.",
-        i = "Otherwise, we will eventually try to calculate 0/0 and produce {.val NaN}. "
-      ))
-    }
     delay_distn <- delay_distn / Matrix::rowSums(delay_distn)
+    delay_distn[is.nan(delay_distn)] <- 0
     convolved_seq <- drop(delay_distn %*% y)
     return(convolved_seq[allx %in% xout])
   } else {
     if (length(delay_distn) > length(allx)) {
-      cli::cli_warn(c(
+      cli_warn(c(
         "User specified `delay_distn` has {.val {length(delay_distn)}} when",
         "only {.val {length(allx)}} are necessary.",
         i = "Truncating to match."
@@ -126,12 +121,5 @@ delay_calculator <- function(
   }
 
   convolved_seq <- fast_convolve(y, delay_distn)
-  # (polish up the beginning of the delay calculation)
-  # when delay_distn[1] == 0, we're putting no weight on today.
-  # This is typical and results in division by zero for the first observation
-  # in convolved_seq
-  if (abs(delay_distn[1]) < sqrt(.Machine$double.eps)) {
-    convolved_seq <- c(convolved_seq[2], convolved_seq[-1])
-  }
   convolved_seq[allx %in% xout]
 }

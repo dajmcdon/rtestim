@@ -17,12 +17,21 @@
 #' @examples
 #' discretize_gamma(1:30, shape = 1, scale = 1)
 discretize_gamma <- function(x, shape = 2.5, scale = 2.5, rate = 1 / scale) {
-  arg_is_numeric_scalar(shape, scale, rate)
-  arg_is_nonnegative(x)
-  if (is.unsorted(x, strictly = TRUE)) {
-    cli::cli_abort("`x` must be sorted in increasing order.")
+  assert_number(shape, lower = 0, finite = TRUE)
+  assert_number(scale, lower = 0, finite = TRUE)
+  assert_number(rate, lower = 0, finite = TRUE)
+  if (!missing(scale) && !missing(rate)) {
+    if (abs(rate * scale - 1) < 1e-15) {
+      cli_warn("specify `rate` or `scale` but not both")
+    } else {
+      cli_abort("specify `rate' or `scale` but not both")
+    }
   }
-  pgm <- stats::pgamma(x, shape = shape, scale = scale)
+  assert_numeric(x, lower = 0, any.missing = FALSE)
+  if (is.unsorted(x, strictly = TRUE)) {
+    cli_abort("`x` must be sorted in increasing order.")
+  }
+  pgm <- stats::pgamma(x, shape = shape, rate = rate)
   pgm <- c(0, pgm)
   pgm <- diff(pgm)
   pgm / sum(pgm)

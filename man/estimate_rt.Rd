@@ -10,7 +10,7 @@ estimate_rt(
   dist_gamma = c(2.5, 2.5),
   x = 1:n,
   lambda = NULL,
-  nsol = 100L,
+  nsol = 50L,
   delay_distn = NULL,
   delay_distn_periodicity = NULL,
   lambdamin = NULL,
@@ -109,7 +109,7 @@ The Effective Reproduction Number \eqn{R_t} of an infectious
 disease can be estimated by solving the smoothness penalized Poisson
 regression (trend filtering) of the form:
 
-\deqn{\hat{\theta} = \argmin_{\theta} \frac{1}{n} \sum_{i=1}^n (w_i e^{\theta_i} -
+\deqn{\hat{\theta} = \arg\min_{\theta} \frac{1}{n} \sum_{i=1}^n (w_i e^{\theta_i} -
   y_i\theta_i) + \lambda\Vert D^{(k+1)}\theta\Vert_1, }
 
 where \eqn{R_t = e^{\theta}}, \eqn{y_i} is the observed case count at day
@@ -120,8 +120,10 @@ difference matrix.
 \examples{
 y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
 out <- estimate_rt(y)
+out
 plot(out)
 
-out0 <- estimate_rt(y, korder = 0L, nsol = 10)
+out0 <- estimate_rt(y, korder = 0L, nsol = 40)
+out0
 plot(out0)
 }

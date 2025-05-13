@@ -58,14 +58,12 @@ cv_estimate_rt <- function(
     regular_splits = FALSE,
     invert_splits = FALSE,
     ...) {
-  arg_is_pos_int(nfold)
   n <- length(observed_counts)
-  arg_is_length(n, x)
+  assert_int(nfold, lower = 2, upper = n - 2L)
   xin <- x
   if (inherits(xin, "Date")) x <- as.numeric(x)
-  arg_is_numeric(x)
+  assert_numeric(x, len = n)
 
-  if (nfold == 1) cli_abort("nfold must be greater than 1")
 
   ## Run program one time to create lambda
   full_fit <- estimate_rt(
@@ -91,7 +89,7 @@ cv_estimate_rt <- function(
     middle_fold <- sample.int(nfold, n - 2, replace = TRUE)
   }
   if (length(unique(middle_fold)) < nfold)
-    cli::cli_warn("Number of random folds is less than `nfold`.")
+    cli_warn("Number of random folds is less than `nfold`.")
   foldid <- c(0, middle_fold, 0)
   cvall <- matrix(NA, nfold, length(lambda))
 

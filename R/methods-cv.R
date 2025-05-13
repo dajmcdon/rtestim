@@ -12,11 +12,11 @@ summary.cv_poisson_rt <- function(object, ...) {
   ))
   n <- nrow(tab)
   if (n > 5) {
-    l1 <- which(abs(object$lambda - object$lambda.min) < 1e-10)
-    l2 <- which(abs(object$lambda - object$lambda.1se) < 1e-10)
+    l1 <- which(abs(object$lambda - object$lambda.1se) < 1e-10)
+    l2 <- which(abs(object$lambda - object$lambda.min) < 1e-10)
     idx <- c(1, l1, l2, n)
     tab <- tab[idx, ]
-    rownames(tab) <- c("Max Lambda", "CV Minimizer", "1se Lambda", "Min Lambda")
+    rownames(tab) <- c("Max Lambda", "1se Lambda", "CV Minimizer", "Min Lambda")
   }
 
   out <- structure(
@@ -42,9 +42,12 @@ print.summary.cv_poisson_rt <- function(
   rlang::check_dots_empty()
 
   lambda_warning <- NULL
-  if (x$table$index[2] == 1) lambda_warning <- "smallest"
-  if (nrow(x$table) > 3 & x$table$index[2] == x$table$index[4]) {
+  if (nrow(x$table) == 1) {
     lambda_warning <- "largest"
+  }
+  if (nrow(x$table) > 3) {
+    if (x$table$index[3] == x$table$index[4]) lambda_warning <- "smallest"
+    if (x$table$index[3] == 1) lambda_warning <- "largest"
   }
 
   cat("\nCall:", deparse(x$call), fill = TRUE)
@@ -84,7 +87,7 @@ print.summary.cv_poisson_rt <- function(
 #'
 #' @param ... Not used.
 #'
-#' @return a [ggplot2::ggplot()] object
+#' @return a [ggplot2::ggplot]
 #' @exportS3Method
 #'
 #' @examples
@@ -107,7 +110,7 @@ plot.cv_poisson_rt <- function(
       which_lambda <- x[[which_lambda]]
     }
   } else {
-    arg_is_numeric(which_lambda, allow_null = TRUE)
+    assert_numeric(which_lambda, null.ok = TRUE)
   }
 
   if (plt_scores) {
@@ -177,7 +180,7 @@ fitted.cv_poisson_rt <- function(object,
     which_lambda <- match.arg(which_lambda)
     which_lambda <- object[[which_lambda]]
   } else {
-    arg_is_numeric(which_lambda, allow_null = TRUE)
+    assert_numeric(which_lambda, null.ok = TRUE)
   }
   fitted(object$full_fit, which_lambda)
 }
@@ -227,11 +230,13 @@ predict.cv_poisson_rt <- function(object,
     which_lambda <- match.arg(which_lambda)
     which_lambda <- object[[which_lambda]]
   } else {
-    arg_is_numeric(which_lambda, allow_null = TRUE)
+    assert_numeric(which_lambda, null.ok = TRUE)
   }
   predict(object$full_fit, which_lambda)
 }
 
+#' @inheritParams predict.cv_poisson_rt
+#' @rdname interpolate_rt
 #' @export
 interpolate_rt.cv_poisson_rt <- function(
     object,
@@ -243,7 +248,7 @@ interpolate_rt.cv_poisson_rt <- function(
     which_lambda <- match.arg(which_lambda)
     which_lambda <- object[[which_lambda]]
   } else {
-    arg_is_numeric(which_lambda, allow_null = TRUE)
+    assert_numeric(which_lambda, null.ok = TRUE)
   }
   interpolate_rt(object$full_fit, xout, lambda = which_lambda)
 }

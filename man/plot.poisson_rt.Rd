@@ -14,6 +14,9 @@ all Rt's are plotted.}
 
 \item{...}{Not used.}
 }
+\value{
+a \link[ggplot2:ggplot]{ggplot2::ggplot}
+}
 \description{
 Produces a figure showing some or all estimated Rt values for different
 values of the penalty. The result is a \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}. Additional user

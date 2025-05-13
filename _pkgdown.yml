@@ -3,6 +3,7 @@ url: https://dajmcdon.github.io/rtestim/
 template:
   bootstrap: 5
   bootswatch: cosmo
+  math-rendering: mathjax
   bslib:
     pkgdown-nav-height: 100px
     primary: "#041E42"

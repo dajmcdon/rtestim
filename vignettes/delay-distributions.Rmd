@@ -2,7 +2,7 @@
 title: "Delay distributions"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{delay-distributions}
+  %\VignetteIndexEntry{Delay-distributions}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -110,8 +110,8 @@ distribution.
 
 ```{r cancov-nonpar}
 # Data from Backer et al.
-delay <- read.csv("backer.csv") %>%
-  filter(delay > 0) %>%
+delay <- read.csv("backer.csv") |>
+  filter(delay > 0) |>
   select(-delay)
 delay <- rowSums(delay)
 delay <- delay / sum(delay)
@@ -197,20 +197,20 @@ unknown.str <- c(
   "Undeclared", "Not Provided", "Restricted Access", "Missing",
   "Not Applicable", "", "NA", "unknow"
 )
-duotang <- duotang %>%
-  rename(province = geo_loc_name_state_province_territory) %>%
+duotang <- duotang |>
+  rename(province = geo_loc_name_state_province_territory) |>
   select(all_of(columnlist))
 
-meta <- duotang %>%
+meta <- duotang |>
   mutate(
     week = cut(sample_collection_date, "week"),
     month = gsub("-..$", "", as.character(cut(sample_collection_date, "month")))
   )
 source("https://github.com/CoVaRR-NET/duotang/raw/main/scripts/scanlineages.R")
-meta <- meta %>%
-  mutate(gisaid_accession = str_replace(gisaid_accession, "EPI_ISL_", "")) %>%
-  rename(GID = gisaid_accession) %>%
-  rowwise() %>%
+meta <- meta |>
+  mutate(gisaid_accession = str_replace(gisaid_accession, "EPI_ISL_", "")) |>
+  rename(GID = gisaid_accession) |>
+  rowwise() |>
   mutate(raw_lineage = ifelse(
     grepl("^X", raw_lineage),
     str_replace_all(paste0(
@@ -221,23 +221,23 @@ meta <- meta %>%
       substr(raw_lineage, str_locate(raw_lineage, "\\.") + 1, nchar(raw_lineage))
     ), "[\r\n]", ""),
     raw_lineage
-  )) %>%
+  )) |>
   ungroup()
 dico <- makepangolindico() # rebuild the lineage dictionary so the correct names gets assigned for XBB descedants not named XBB
 
 VOCVOI <- read_csv("https://raw.githubusercontent.com/CoVaRR-NET/duotang/main/resources/vocvoi.csv")
 meta$pango_group <- create.pango.group(VOCVOI, meta)
-meta <- select(meta, province, week, pango_group) %>%
+meta <- select(meta, province, week, pango_group) |>
   mutate(week = as.Date(week))
 
-counts <- group_by(meta, province, week, pango_group) %>%
-  count() %>%
-  ungroup() %>%
+counts <- group_by(meta, province, week, pango_group) |>
+  count() |>
+  ungroup() |>
   arrange(province, week, pango_group)
-can_counts <- group_by(meta, week, pango_group) %>%
-  count() %>%
-  ungroup() %>%
-  arrange(week, pango_group) %>%
+can_counts <- group_by(meta, week, pango_group) |>
+  count() |>
+  ungroup() |>
+  arrange(week, pango_group) |>
   mutate(province = "Canada")
 counts <- bind_rows(can_counts, counts)
 saveRDS(counts, "duotang-counts.rds")
@@ -249,8 +249,8 @@ in Canada.
 ```{r duotang-counts, echo=FALSE, message=FALSE}
 props <- readRDS("duotang-counts.rds") |>
   pivot_wider(names_from = pango_group, values_from = n, values_fill = 0) |>
-  mutate(total = rowSums(across(-c(week, province)))) %>%
-  mutate(across(-c(week, province, total), ~ .x / total)) %>%
+  mutate(total = rowSums(across(-c(week, province)))) |>
+  mutate(across(-c(week, province, total), ~ .x / total)) |>
   select(-total)
 
 smooth_it <- function(props_group) {
@@ -264,14 +264,14 @@ smooth_it <- function(props_group) {
   fits <- multinom(form, z, trace = FALSE)
   rng <- range(props_group$week)
   alltime <- as.numeric(seq(rng[1], rng[2], by = 1))
-  z <- as_tibble(predict(fits, data.frame(time = alltime), type = "probs")) %>%
+  z <- as_tibble(predict(fits, data.frame(time = alltime), type = "probs")) |>
     mutate(Date = as.Date(alltime))
   z
 }
 
-can_props_smoothed <- smooth_it(props %>% filter(province == "Canada"))
+can_props_smoothed <- smooth_it(props |> filter(province == "Canada"))
 
-can_props_smoothed %>%
+can_props_smoothed |>
   pivot_longer(-Date) |>
   ggplot(aes(Date, y = value, fill = name)) +
   geom_area(position = "stack") +

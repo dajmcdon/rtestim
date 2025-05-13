@@ -6,7 +6,7 @@ test_that("delay calculator with even spacing works", {
   w <- discretize_gamma(0:(n - 1))
   cw <- cumsum(w)
   for (j in 1:n) manual_output[j] <- sum(w[1:j] * counts[j:1] / cw[j])
-  manual_output[1] <- manual_output[2] # first value is 0 / 0
+  manual_output[1] <- 0 # first value is 0 / 0
   expect_equal(manual_output, delay_calculator_output)
 
   w <- c(1, 2, 3, 2, 1, 1)
@@ -117,11 +117,10 @@ test_that("delay calculator accommodates alternative delays", {
   expect_error(delay_calculator(y, delay_distn = d_mat))
 
   d_mat[upper.tri(d_mat, diag = TRUE)] <- 0
-  expect_error(delay_calculator(y, delay_distn = d_mat))
+  #expect_error(delay_calculator(y, delay_distn = d_mat))
 
-  d_mat[1,1] <- 1
-  roll_avg <- cumsum(y) / seq_along(y)
-  roll_avg <- c(roll_avg[1], roll_avg[-100])
+  roll_avg <- c(0, cumsum(y[-100])) / (seq_along(y) - 1)
+  roll_avg[1] <- 0
   expect_equal(roll_avg, delay_calculator(y, delay_distn = d_mat))
   expect_equal(
     roll_avg,
@@ -129,9 +128,8 @@ test_that("delay calculator accommodates alternative delays", {
   )
 
   d_mat <- matrix(0, 100, 100)
-  d_mat[1,1] <- 1
   for (i in 2:100) d_mat[i,1:i] <- rev(dist_gamma[1:i])
   d_mat <- drop0(as(d_mat, "CsparseMatrix"))
-  d_mat <- d_mat / Matrix::rowSums(d_mat)
+  d_mat[-1, ] <- d_mat[-1, ] / Matrix::rowSums(d_mat[-1, ])
   expect_equal(wpc, delay_calculator(y, delay_distn = d_mat))
 })

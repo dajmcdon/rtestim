@@ -12,7 +12,7 @@ Description: Use Poisson likelihood with trend filtering
     the effective reproductive number, Rt. This value roughly says how
     many new infections will result from each new infection today.
     Values larger than 1 indicate that an epidemic is growing while those
-    less than 1 indicate decline.
+    less than 1 indicate decline <doi:10.1371/journal.pcbi.1012324>.
 License: MIT + file LICENSE
 URL: https://github.com/dajmcdon/rtestim,
     https://dajmcdon.github.io/rtestim/
@@ -20,10 +20,10 @@ BugReports: https://github.com/dajmcdon/rtestim/issues
 Depends: 
     R (>= 3.6.2)
 Imports: 
+    checkmate,
     cli,
     dspline,
     ggplot2,
-    magrittr,
     Matrix,
     methods,
     Rcpp,
@@ -53,4 +53,4 @@ Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2

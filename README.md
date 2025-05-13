@@ -1,14 +1,14 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# rtestim
+# rtestim <a href="https://dajmcdon.github.io/rtestim/"><img src="man/figures/logo.png" align="right" height="139" alt="rtestim website" /></a>
 
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/dajmcdon/rtestim/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/dajmcdon/rtestim/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-This package uses Poisson likelihood with trend filtering penalty (a
+This package uses Poisson likelihood with a trend filtering penalty (a
 type of regularized nonparametric regression) to estimate the effective
 reproductive number, Rt. This value roughly says “how many new
 infections will result from each new infection today”. Values larger
