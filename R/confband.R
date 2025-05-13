@@ -96,7 +96,6 @@ confband.poisson_rt <- function(object, lambda, level = 0.95, type = c("Rt", "Yt
   #   Matrix::Diagonal(n, 1 / yhat^2) + lambda * Matrix::crossprod(Ds)
   # )) / wt^2
   #
-  browser()
   D <- get_D(object$korder, object$x)
   kernel <- Matrix::Diagonal(x = 1 / yhat^2) + lambda * Matrix::crossprod(D)
   covs <- Matrix::diag(Matrix::solve(kernel))
