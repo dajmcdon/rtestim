@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rtestim</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.6</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -38,7 +38,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Interpolate (or extrapolate) Rt estimates to intermediate design points</h1>
-      <small class="dont-index">Source: <a href="https://github.com/dajmcdon/rtestim/blob/main/R/interpolate_rt.R" class="external-link"><code>R/interpolate_rt.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/dajmcdon/rtestim/blob/main/R/interpolate_rt.R" class="external-link"><code>R/interpolate_rt.R</code></a>, <a href="https://github.com/dajmcdon/rtestim/blob/main/R/methods-cv.R" class="external-link"><code>R/methods-cv.R</code></a>, <a href="https://github.com/dajmcdon/rtestim/blob/main/R/methods.R" class="external-link"><code>R/methods.R</code></a></small>
       <div class="d-none name"><code>interpolate_rt.Rd</code></div>
     </div>
 
@@ -48,7 +48,13 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">interpolate_rt</span><span class="op">(</span><span class="va">object</span>, <span class="va">xout</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">interpolate_rt</span><span class="op">(</span><span class="va">object</span>, <span class="va">xout</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'cv_poisson_rt'</span></span>
+<span><span class="fu">interpolate_rt</span><span class="op">(</span><span class="va">object</span>, <span class="va">xout</span>, which_lambda <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lambda.min"</span>, <span class="st">"lambda.1se"</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'poisson_rt'</span></span>
+<span><span class="fu">interpolate_rt</span><span class="op">(</span><span class="va">object</span>, <span class="va">xout</span>, lambda <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -67,12 +73,50 @@ but where counts may not have been observed.</p></dd>
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>additional arguments passed to methods.</p></dd>
 
+
+<dt id="arg-which-lambda">which_lambda<a class="anchor" aria-label="anchor" href="#arg-which-lambda"></a></dt>
+<dd><p>Select which lambdas from the object to use. If not
+provided, all Rt's are returned. Note that new lambdas not originally
+used in the estimation procedure may be provided, but the results will be
+calculated by linearly interpolating the estimated Rt's.</p>
+<p>The strings <code>lambda.min</code> or <code>lambda.1se</code> are allowed to choose either
+the lambda that minimizes the cross validation score or the largest lambda
+whose corresponding cross validation score is within 1 standard error of
+the minimal cross validation score.</p></dd>
+
+
+<dt id="arg-lambda">lambda<a class="anchor" aria-label="anchor" href="#arg-lambda"></a></dt>
+<dd><p>Vector. A user supplied sequence of tuning parameters which
+determines the balance between data fidelity and
+smoothness of the estimated Rt; larger <code>lambda</code> results in a smoother
+estimate. The default, <code>NULL</code>
+results in an automatic computation based on <code>nlambda</code>, the largest value
+of <code>lambda</code> that would result in a maximally smooth estimate, and <code>lambda_min_ratio</code>.
+Supplying a value of <code>lambda</code> overrides
+this behaviour. It is likely better to supply a
+decreasing sequence of <code>lambda</code> values than a single (small) value. If
+supplied, the user-defined <code>lambda</code> sequence is automatically sorted in
+decreasing order.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A vector or matrix of interpolated Rt estimates.</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">rpois</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">dnorm</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">100</span>, <span class="fl">50</span>, <span class="fl">15</span><span class="op">)</span> <span class="op">*</span> <span class="fl">500</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="estimate_rt.html">estimate_rt</a></span><span class="op">(</span><span class="va">y</span>, nsol <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">interpolate_rt</span><span class="op">(</span><span class="va">out</span>, xout <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.5</span>, <span class="fl">2.5</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           [,1]      [,2]     [,3]     [,4]     [,5]     [,6]     [,7]      [,8]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 0.9410539 0.9850314 1.017199 1.041474 1.068285 1.098084 1.116102 0.9812915</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 0.9672588 1.0134091 1.043204 1.065007 1.087493 1.112833 1.128222 1.0634079</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           [,9]     [,10]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 0.6648585 0.2188586</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 0.9362237 0.7614771</span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

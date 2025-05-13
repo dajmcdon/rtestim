@@ -29,7 +29,7 @@ difference matrix."><meta property="og:image" content="https://dajmcdon.github.i
 
     <a class="navbar-brand me-2" href="../index.html">rtestim</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.6</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -205,10 +205,38 @@ than the maximum number of iterations for the estimation algorithm.</p></li>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">rpois</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">dnorm</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">100</span>, <span class="fl">50</span>, <span class="fl">15</span><span class="op">)</span> <span class="op">*</span> <span class="fl">500</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu">estimate_rt</span><span class="op">(</span><span class="va">y</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">out</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Call:  estimate_rt(observed_counts = y)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Degree of the estimated piecewise polynomial curve: 3 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Summary of the 50 estimated models:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           lambda index approx_dof niterations</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Min.    317.3015     1          4          15</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1st Qu.  33.2568    13          4         150</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Median    2.8884    26          6         567</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3rd Qu.   0.3027    38         14        1715</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Max.      0.0317    50         26        2937</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">out</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="estimate_rt-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">out0</span> <span class="op">&lt;-</span> <span class="fu">estimate_rt</span><span class="op">(</span><span class="va">y</span>, korder <span class="op">=</span> <span class="fl">0L</span>, nsol <span class="op">=</span> <span class="fl">40</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">out0</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Call:  estimate_rt(observed_counts = y, korder = 0L, nsol = 40)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Degree of the estimated piecewise polynomial curve: 0 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Summary of the 40 estimated models:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           lambda index approx_dof niterations</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Min.    0.819961     1          4           0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1st Qu. 0.077295    11          8           0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Median  0.009227    20         51           0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3rd Qu. 0.000870    30         92           0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Max.    0.000082    40         99           0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">out0</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="estimate_rt-2.png" alt="" width="700" height="433"></span>
 </code></pre></div>

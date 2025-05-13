@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rtestim</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.6</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -106,6 +106,32 @@ algorithm in the proximal Newton method.</p></dd>
     <p>a list of model parameters with class <code>rt_admm_configuration</code></p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">configure_rt_admm</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">An ADMM configuration</span> ──</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #87AFFF;">rho</span>: -1</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #87AFFF;">alpha</span>: 0.5</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #87AFFF;">gamma</span>: 0.9</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #87AFFF;">tolerance</span>: 1e-04</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #87AFFF;">maxiter_newton</span>: 50</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #87AFFF;">maxiter_line</span>: 20</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #87AFFF;">verbose</span>: 0</span>
+<span class="r-in"><span><span class="fu">configure_rt_admm</span><span class="op">(</span>tolerance <span class="op">=</span> <span class="fl">1e-6</span>, verbose <span class="op">=</span> <span class="fl">1L</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">An ADMM configuration</span> ──</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #87AFFF;">rho</span>: -1</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #87AFFF;">alpha</span>: 0.5</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #87AFFF;">gamma</span>: 0.9</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #87AFFF;">tolerance</span>: 1e-06</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #87AFFF;">maxiter_newton</span>: 50</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #87AFFF;">maxiter_line</span>: 20</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #87AFFF;">verbose</span>: 1</span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 
