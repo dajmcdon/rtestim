@@ -150,6 +150,7 @@ predict.poisson_rt <- function(object, lambda = NULL, ...) {
 }
 
 #' @export
+#' @inheritParams estimate_rt
 #' @rdname interpolate_rt
 #' @examples
 #' y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))

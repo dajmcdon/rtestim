@@ -235,6 +235,8 @@ predict.cv_poisson_rt <- function(object,
   predict(object$full_fit, which_lambda)
 }
 
+#' @inheritParams predict.cv_poisson_rt
+#' @rdname interpolate_rt
 #' @export
 interpolate_rt.cv_poisson_rt <- function(
     object,
