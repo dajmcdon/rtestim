@@ -86,9 +86,11 @@
 #' @examples
 #' y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
 #' out <- estimate_rt(y)
+#' out
 #' plot(out)
 #'
 #' out0 <- estimate_rt(y, korder = 0L, nsol = 40)
+#' out0
 #' plot(out0)
 estimate_rt <- function(
     observed_counts,
@@ -232,6 +234,9 @@ estimate_rt <- function(
 #' @return a list of model parameters with class `rt_admm_configuration`
 #'
 #' @export
+#' @examples
+#' configure_rt_admm()
+#' configure_rt_admm(tolerance = 1e-6, verbose = 1L)
 configure_rt_admm <- function(
     rho = -1,
     alpha = 0.5,
@@ -263,4 +268,13 @@ configure_rt_admm <- function(
     ),
     class = "rt_admm_configuration"
   )
+}
+
+#' @export
+print.rt_admm_configuration <- function(x, prefix = "An", ...) {
+  rlang::check_dots_empty()
+  cli::cli_h2(paste(prefix, "ADMM configuration"))
+  d <- cli::cli_div(theme = list(span.dt = list(color = "cornflowerblue")))
+  cli::cli_dl(x)
+  cli::cli_end(d)
 }

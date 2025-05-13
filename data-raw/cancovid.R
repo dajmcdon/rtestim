@@ -10,7 +10,7 @@ if (first_case > 1) {
   cancovid <- cancovid[-seq(first_case - 1L), ]
 }
 library(dplyr)
-cancovid <- cancovid %>%
+cancovid <- cancovid |>
   select(date, incident_cases = value_daily)
 
 usethis::use_data(cancovid, overwrite = TRUE)

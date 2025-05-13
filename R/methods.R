@@ -56,6 +56,7 @@ print.poisson_rt <- function(x, digits = min(3, getOption("digits") - 3), ...) {
 #' @param lambda select which Rt's to plot. If not provided,
 #'   all Rt's are plotted.
 #' @param ... Not used.
+#' @return a [ggplot2::ggplot]
 #'
 #' @export
 #'
@@ -150,6 +151,12 @@ predict.poisson_rt <- function(object, lambda = NULL, ...) {
 }
 
 #' @export
+#' @inheritParams estimate_rt
+#' @rdname interpolate_rt
+#' @examples
+#' y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
+#' out <- estimate_rt(y, nsol = 10)
+#' interpolate_rt(out, xout = c(1.5, 2.5))
 interpolate_rt.poisson_rt <- function(object, xout, lambda = NULL, ...) {
   rlang::check_dots_empty()
   xin <- object$x
