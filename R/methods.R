@@ -56,6 +56,7 @@ print.poisson_rt <- function(x, digits = min(3, getOption("digits") - 3), ...) {
 #' @param lambda select which Rt's to plot. If not provided,
 #'   all Rt's are plotted.
 #' @param ... Not used.
+#' @return a [ggplot2::ggplot]
 #'
 #' @export
 #'
