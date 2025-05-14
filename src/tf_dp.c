@@ -44,7 +44,7 @@
  * @return  void
  * @see tf_dp_weight
  */
-void tf_dp(int n, double* y, double lam, double* beta) {
+void tf_dp(unsigned int n, double* y, double lam, double* beta) {
   int i;
   int k;
   int l;
@@ -185,7 +185,7 @@ void tf_dp(int n, double* y, double lam, double* beta) {
  * @return  void
  * @see tf_dp
  */
-void tf_dp_weight(int n, double* y, double* w, double lam, double* beta) {
+void tf_dp_weight(unsigned int n, double* y, double* w, double lam, double* beta) {
   int i;
   int k;
   int l;
@@ -329,7 +329,7 @@ void tf_dp_weight(int n, double* y, double* w, double lam, double* beta) {
  * @return  void
  * @see tf_dp
  */
-void tf_dp_past(int n, double* y, double* past, double lam, double* beta) {
+void tf_dp_past(unsigned int n, double* y, double* past, double lam, double* beta) {
   int i;
   int k;
   int l;
@@ -484,7 +484,7 @@ void tf_dp_past(int n, double* y, double* past, double lam, double* beta) {
  * @return  void
  * @see tf_dp_weight
  */
-void tf_dp_past_weight(int n,
+void tf_dp_past_weight(unsigned int n,
                        double* y,
                        double* past,
                        double* w,
