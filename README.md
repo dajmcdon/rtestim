@@ -6,6 +6,8 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/dajmcdon/rtestim/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/dajmcdon/rtestim/actions/workflows/R-CMD-check.yaml)
+[![CRAN
+status](https://www.r-pkg.org/badges/version/rtestim)](https://CRAN.R-project.org/package=rtestim)
 <!-- badges: end -->
 
 This package uses Poisson likelihood with a trend filtering penalty (a
