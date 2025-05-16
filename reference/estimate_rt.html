@@ -29,7 +29,7 @@ difference matrix."><meta property="og:image" content="https://dajmcdon.github.i
 
     <a class="navbar-brand me-2" href="../index.html">rtestim</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -43,6 +43,7 @@ difference matrix."><meta property="og:image" content="https://dajmcdon.github.i
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/delay-distributions.html">Delay distributions</a></li>
   </ul></li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/dajmcdon/rtestim/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
@@ -212,12 +213,13 @@ than the maximum number of iterations for the estimation algorithm.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Degree of the estimated piecewise polynomial curve: 3 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Summary of the 50 estimated models:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           lambda index approx_dof niterations</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Min.    317.3015     1          4          15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1st Qu.  33.2568    13          4         150</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Max.    317.3015     1          4          15</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3rd Qu.  33.2568    13          4         150</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Median    2.8884    26          6         567</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3rd Qu.   0.3027    38         14        1715</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Max.      0.0317    50         26        2937</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1st Qu.   0.3027    38         14        1715</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Min.      0.0317    50         26        2937</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">out</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="estimate_rt-1.png" alt="" width="700" height="433"></span>
@@ -230,12 +232,13 @@ than the maximum number of iterations for the estimation algorithm.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Degree of the estimated piecewise polynomial curve: 0 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Summary of the 40 estimated models:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           lambda index approx_dof niterations</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Min.    0.819961     1          4           0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1st Qu. 0.077295    11          8           0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Max.    0.819961     1          4           0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3rd Qu. 0.077295    11          8           0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Median  0.009227    20         51           0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3rd Qu. 0.000870    30         92           0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Max.    0.000082    40         99           0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1st Qu. 0.000870    30         92           0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Min.    0.000082    40         99           0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">out0</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="estimate_rt-2.png" alt="" width="700" height="433"></span>
@@ -246,7 +249,7 @@ than the maximum number of iterations for the estimation algorithm.</p></li>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Daniel J. McDonald, Jiaping Liu, Zhenglun Cai.</p>
+  <p>Developed by Daniel J. McDonald, Jiaping Liu.</p>
 </div>
 
 <div class="pkgdown-footer-right">
