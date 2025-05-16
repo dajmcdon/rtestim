@@ -6,6 +6,8 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/dajmcdon/rtestim/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/dajmcdon/rtestim/actions/workflows/R-CMD-check.yaml)
+[![CRAN
+status](https://www.r-pkg.org/badges/version/rtestim)](https://CRAN.R-project.org/package=rtestim)
 <!-- badges: end -->
 
 This package uses Poisson likelihood with a trend filtering penalty (a
@@ -23,6 +25,12 @@ You can install the development version of rtestim from
 ``` r
 # install.packages("remotes")
 remotes::install_github("dajmcdon/rtestim")
+```
+
+Or the released version on CRAN
+
+``` r
+install.packages("rtestim")
 ```
 
 ## Quick example
@@ -56,11 +64,9 @@ plot(mod)
 
 <img src="man/figures/README-full-fit-1.png" width="80%" style="display: block; margin: auto;" />
 
-The additional parameter `nsol = 20` specifies the number of $\lambda$s
-for which $R_t$ is estimated.
-
-A built in function for cross-validation can be used to select the
-tuning parameter.
+The additional parameter `nsol = 20` specifies the number of tuning
+parameters for which $R_t$ is estimated. A built in function for
+cross-validation can be used to select the tuning parameter.
 
 ``` r
 mod_cv <- cv_estimate_rt(dat$incident_cases, nsol = 20)

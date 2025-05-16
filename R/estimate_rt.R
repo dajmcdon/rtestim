@@ -270,10 +270,11 @@ configure_rt_admm <- function(
   )
 }
 
+#' @method print rt_admm_configuration
 #' @export
-print.rt_admm_configuration <- function(x, prefix = "An", ...) {
+print.rt_admm_configuration <- function(x, ...) {
   rlang::check_dots_empty()
-  cli::cli_h2(paste(prefix, "ADMM configuration"))
+  cli::cli_h2("An Rt ADMM configuration")
   d <- cli::cli_div(theme = list(span.dt = list(color = "cornflowerblue")))
   cli::cli_dl(x)
   cli::cli_end(d)

@@ -21,6 +21,7 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/dajmcdon/rtestim/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/dajmcdon/rtestim/actions/workflows/R-CMD-check.yaml)
+[![CRAN status](https://www.r-pkg.org/badges/version/rtestim)](https://CRAN.R-project.org/package=rtestim)
 <!-- badges: end -->
 
 This package uses Poisson likelihood with a trend filtering penalty (a type of 
@@ -32,11 +33,18 @@ epidemic is growing while those less than 1 indicate decline.
 
 ## Installation
 
-You can install the development version of rtestim from [GitHub](https://github.com/) with:
+You can install the development version of rtestim from 
+[GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("remotes")
 remotes::install_github("dajmcdon/rtestim")
+```
+
+Or the released version on CRAN
+
+``` r
+install.packages("rtestim")
 ```
 
 ## Quick example
@@ -66,10 +74,8 @@ plot(mod)
 ```
 
 The additional parameter `nsol = 20` specifies the number of 
-$\lambda$s for which $R_t$ is estimated.
-
-A built in function for cross-validation can be used to select the
-tuning parameter.
+tuning parameters for which $R_t$ is estimated. A built in function for 
+cross-validation can be used to select the tuning parameter.
 
 ```{r cv-estimate, fig.align='center'}
 mod_cv <- cv_estimate_rt(dat$incident_cases, nsol = 20)

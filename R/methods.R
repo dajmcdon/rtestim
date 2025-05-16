@@ -5,7 +5,7 @@ summary.poisson_rt <- function(object, ...) {
   ns <- length(object$lambda)
   if (ns > 5) {
     xlam <- round(stats::quantile(1:ns))
-    names(xlam) <- rev(c("Max.", "3rd Qu.", "Median", "1st Qu.", "Min."))
+    names(xlam) <- c("Max.", "3rd Qu.", "Median", "1st Qu.", "Min.")
   } else {
     xlam <- seq_len(ns)
     names(xlam) <- paste0("s", seq_len(ns))
@@ -33,7 +33,7 @@ print.summary.poisson_rt <- function(x,
   rlang::check_dots_empty()
   cat("\nCall: ", deparse(x$call), fill = TRUE)
   cat("\nDegree of the estimated piecewise polynomial curve:", x$korder, "\n")
-  cat("\nSummary of the", x$nlam, "estimated models:\n")
+  cat("\nSummary of the", x$nlam, "estimated models:\n\n")
   print(x$tab, digits = digits)
   cat("\n")
 }

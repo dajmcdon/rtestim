@@ -10,6 +10,10 @@
 #'
 #' @return A list containing the segment lengths and the number of segments.
 #' @keywords internal
+#' @examples
+#' y <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
+#' out <- estimate_rt(y)
+#' kn <- find_knots(out, out$lambda[20])
 #' @noRd
 find_knots <- function(object, lambda, ...) {
   rlang::check_dots_empty()
@@ -27,3 +31,5 @@ find_knots <- function(object, lambda, ...) {
   xpieces <- map2(l, r, function(a, b) object$x[a:b])
   structure(enlist(knots, xpieces, dof, l, r), class = "rtestim_knots")
 }
+
+
