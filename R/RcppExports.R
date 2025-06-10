@@ -5,16 +5,12 @@ prox_newton_testing <- function(M, Minner, Mline, korder, y, x, w, lambda, ls_al
     .Call(`_rtestim_prox_newton_testing`, M, Minner, Mline, korder, y, x, w, lambda, ls_alpha, ls_gamma, tol)
 }
 
-dptf <- function(y, lam) {
-    .Call(`_rtestim_dptf`, y, lam)
-}
-
-weight_dptf <- function(y, lam, w) {
-    .Call(`_rtestim_weight_dptf`, y, lam, w)
-}
-
 rtestim_path <- function(y, x, w, korder, lambda, lambdamax = -1, lambdamin = -1, nsol = 100L, rho = -1, maxiter = 1e5L, maxiter_newton = 50L, maxiter_line = 5L, tolerance = 1e-3, lambda_min_ratio = 1e-4, ls_alpha = 0.5, ls_gamma = 0.9, verbose = 0L) {
     .Call(`_rtestim_rtestim_path`, y, x, w, korder, lambda, lambdamax, lambdamin, nsol, rho, maxiter, maxiter_newton, maxiter_line, tolerance, lambda_min_ratio, ls_alpha, ls_gamma, verbose)
+}
+
+rcpp_tvdz <- function(y, z, lambda) {
+    .Call(`_rtestim_rcpp_tvdz`, y, z, lambda)
 }
 
 get_Dtil <- function(k, xd) {
@@ -61,3 +57,11 @@ calc_delays <- function(x, y) {
     .Call(`_rtestim_calc_delays`, x, y)
 }
 
+rcpp_wtvdz <- function(y, z, lambda, weights) {
+    .Call(`_rtestim_rcpp_wtvdz`, y, z, lambda, weights)
+}
+
+# Register entry points for exported C++ functions
+methods::setLoadAction(function(ns) {
+    .Call(`_rtestim_RcppExport_registerCCallable`)
+})
