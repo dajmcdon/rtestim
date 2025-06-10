@@ -397,7 +397,7 @@ delay_dstns_can |>
 ```
 
 
-Finally, we use these delays during the period they were most prevalent to 
+We use these delays during the period they were most prevalent to 
 estimate Rt. First, we build the delay matrix.
 
 ```{r tvar-matrix, message=FALSE}
