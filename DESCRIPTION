@@ -49,6 +49,7 @@ LinkingTo:
     tvdenoising
 VignetteBuilder: 
     knitr
+Remotes: glmgen/tvdenoising
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
