@@ -124,17 +124,17 @@ decreasing order.</p></dd>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># get the Rt at a single value of lambda</span></span></span>
 <span class="r-in"><span><span class="fu">interpolate_rt</span><span class="op">(</span><span class="va">out</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10.5</span>, <span class="fl">11.5</span>, <span class="fl">12.5</span><span class="op">)</span>, lambda <span class="op">=</span> <span class="va">out</span><span class="op">$</span><span class="va">lambda</span><span class="op">[</span><span class="fl">20</span><span class="op">]</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1.273321 1.299229 1.325050</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1.271699 1.330518 1.388280</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">rpois</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">dnorm</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">100</span>, <span class="fl">50</span>, <span class="fl">15</span><span class="op">)</span> <span class="op">*</span> <span class="fl">500</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="estimate_rt.html">estimate_rt</a></span><span class="op">(</span><span class="va">y</span>, nsol <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">interpolate_rt</span><span class="op">(</span><span class="va">out</span>, xout <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.5</span>, <span class="fl">2.5</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           [,1]      [,2]      [,3]      [,4]      [,5]      [,6]      [,7]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 0.9261949 0.8748347 0.8485153 0.7749767 0.5931002 0.3464485 0.1629525</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 0.9666290 0.9327794 0.9142258 0.8523650 0.7041141 0.4954903 0.3060661</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            [,8]        [,9]       [,10]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 0.05642733 0.006992139 0.008935814</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 0.15632458 0.037238210 0.037764047</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           [,1]      [,2]      [,3]      [,4]     [,5]     [,6]     [,7]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 0.9400601 0.9450540 0.9482746 0.9499832 1.021779 1.147269 1.525102</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 0.9603300 0.9694403 0.9749279 0.9778787 1.035098 1.121487 1.324955</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          [,8]     [,9]    [,10]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 1.981008 2.785992 1.941565</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 1.520084 1.782627 1.811711</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
@@ -146,7 +146,7 @@ decreasing order.</p></dd>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer></div>

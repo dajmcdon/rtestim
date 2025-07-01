@@ -199,8 +199,9 @@ be the same as that shown above.</p>
 <p>For a more illustrative version of the previous example, we revisit
 the Canadian data, but combine it with some additional information.</p>
 <p>We use variant circulation information from <a href="https://covarr-net.github.io/duotang/duotang.html" class="external-link">CoVaRR-Net’s
-Duotang notebook</a>.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+Duotang notebook</a>. For simplicity, the code for this processing is
+hidden in the fold.</p>
+<details><div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Run on 19 April 2024</span></span>
 <span><span class="va">duotang</span> <span class="op">&lt;-</span> <span class="fu">read_tsv</span><span class="op">(</span><span class="st">"https://github.com/CoVaRR-NET/duotang/raw/main/data_needed/virusseq.metadata.csv.gz"</span><span class="op">)</span></span>
 <span><span class="va">columnlist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
@@ -257,7 +258,7 @@ Duotang notebook</a>.</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>province <span class="op">=</span> <span class="st">"Canada"</span><span class="op">)</span></span>
 <span><span class="va">counts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="va">can_counts</span>, <span class="va">counts</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">counts</span>, <span class="st">"duotang-counts.rds"</span><span class="op">)</span></span></code></pre></div>
-<p>We smooth the raw data using multinomial logistic regression on a
+</details><p>We smooth the raw data using multinomial logistic regression on a
 third order orthogonal polynomial to produce the following estimated
 variant proportions in Canada.</p>
 <p><img src="delay-distributions_files/figure-html/duotang-counts-1.png" width="80%" style="display: block; margin: auto;"></p>
@@ -276,8 +277,8 @@ We use a simple version of their procedure, taking the median
 calculations across studies to find the mean and standard deviation of
 the delay for each variant separately. Then we convert these to the
 <span class="math inline">\(k\)</span> and <span class="math inline">\(\theta\)</span> parameters for the gamma
-distribution.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+distribution. This analysis is hidden below the fold.</p>
+<details><div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data_raw</span> <span class="op">&lt;-</span> <span class="fu">readxl</span><span class="fu">::</span><span class="fu">read_excel</span><span class="op">(</span><span class="st">"xu-etal-DATA_RAW.xlsx"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">type</span>, <span class="va">para</span>, n <span class="op">=</span> <span class="va">Sample_size</span>, <span class="va">mean</span>, <span class="va">sd</span>, <span class="va">se</span>, <span class="va">median</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">type</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -309,7 +310,9 @@ distribution.</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">type</span> <span class="op">==</span> <span class="st">"Alpha"</span>, <span class="va">para</span> <span class="op">==</span> <span class="st">"IP"</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">sd</span><span class="op">)</span></span>
 <span><span class="va">Beta</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span></span>
 <span>  <span class="va">Beta_IP</span>,</span>
-<span>  <span class="va">bonehead_meta</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">type</span> <span class="op">==</span> <span class="st">"Alpha"</span>, <span class="va">para</span> <span class="op">!=</span> <span class="st">"IP"</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>type <span class="op">=</span> <span class="st">"Beta"</span><span class="op">)</span></span>
+<span>  <span class="va">bonehead_meta</span> <span class="op">|&gt;</span> </span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">type</span> <span class="op">==</span> <span class="st">"Alpha"</span>, <span class="va">para</span> <span class="op">!=</span> <span class="st">"IP"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>type <span class="op">=</span> <span class="st">"Beta"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">delay_dstns_byvar</span> <span class="op">&lt;-</span> <span class="va">bonehead_meta</span> <span class="op">|&gt;</span></span>
@@ -318,13 +321,13 @@ distribution.</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">type</span>, <span class="va">para</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="va">mean</span><span class="op">^</span><span class="fl">2</span> <span class="op">/</span> <span class="va">sd</span><span class="op">^</span><span class="fl">2</span>, scale <span class="op">=</span> <span class="va">mean</span> <span class="op">/</span> <span class="va">shape</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">delay_dstns_byvar</span>, <span class="st">"delay-distns-byvar.rds"</span><span class="op">)</span></span></code></pre></div>
-<p>We’ll use just the Serial Intervals (SI), though the incubation
+</details><p>We’ll use just the Serial Intervals (SI), though the incubation
 periods (IP), and generation times (GT) are also available. Below, we
 visualize the estimated delays for the 4 variants that were most
 prevalent in Canada.</p>
 <p><img src="delay-distributions_files/figure-html/variant-si-plot-1.png" width="80%" style="display: block; margin: auto;"></p>
-<p>Finally, we use these delays during the period they were most
-prevalent to estimate Rt. First, we build the delay matrix.</p>
+<p>We use these delays during the period they were most prevalent to
+estimate Rt. First, we build the delay matrix.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://Matrix.R-forge.R-project.org" class="external-link">Matrix</a></span><span class="op">)</span></span>
 <span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">cancovid</span><span class="op">)</span></span>
@@ -359,7 +362,7 @@ prevalent to estimate Rt. First, we build the delay matrix.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer>
