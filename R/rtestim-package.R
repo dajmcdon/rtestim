@@ -1,4 +1,5 @@
 #' @importFrom Rcpp sourceCpp
+#' @importFrom tvdenoising tvdenoising
 #' @importFrom rlang .data %||% := as_function global_env set_names inject !!!
 #' @importFrom rlang is_logical is_true
 #' @importFrom methods is

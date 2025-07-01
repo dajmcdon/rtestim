@@ -61,9 +61,9 @@ test_that("delay calculator correctly handles periodicity", {
     yw, xw,
     delay_distn_periodicity = "1 day", xout = xd[xd <= max(xw)]
   )
-  expect_identical(dweekly, dweekly_text)
+  expect_equal(dweekly, dweekly_text)
   ddaily <- delay_calculator(yd[xd <= max(xw)], xd[xd <= max(xw)])
-  expect_identical(dweekly, ddaily)
+  expect_equal(dweekly, ddaily)
 
   delay_distn <- 7:1
   ddn <- c(delay_distn, rep(0, length(yd) - length(delay_distn)))

@@ -1,7 +1,8 @@
 ## Response to revisions requested by CRAN team
+
 * The DESCRIPTION now lists Author(s), (YYYY) before the <doi> link.
-* Code creators Arnold, Tibshirani, and Sadhanala have been added as contributors
-  and their original copyright added in inst/COPYRIGHTS
+* Included copyrighted code by Arnold, Tibshirani, and Sadhanala has been removed in 
+  favour of linking to the CRAN package `tvdenoising` (written by Tibshirani)
 
 
 ## R CMD check results

@@ -5,16 +5,13 @@ Version: 1.0.0
 Authors@R: c(
     person("Daniel J.", "McDonald", , "daniel@stat.ubc.ca", role = c("aut", "cre", "cph")),
     person("Jiaping", "Liu", , "jiaping.liu@stat.ubc.ca", role = "aut"),
-    person("Zhenglun", "Cai", , "zhenglun.cai@stat.ubc.ca", role = "ctb"),
-    person("Ryan J.", "Tibshirani", role = "ctb"),
-    person("Taylor", "Arnold", role = "ctb"),
-    person("Veeranjaneyulu", "Sadhanala", role = "ctb")
+    person("Zhenglun", "Cai", , "zhenglun.cai@stat.ubc.ca", role = "ctb")
   )
 Description: Use trend filtering, a type of regularized nonparametric
     regression, to estimate the instantaneous reproduction number, also
     called Rt. This value roughly says how many new infections will result
     from each new infection today.  Values larger than 1 indicate that an
-    epidemic is growing while those less than 1 indicate decline. For a more 
+    epidemic is growing while those less than 1 indicate decline. For more 
     details about this methodology, see Liu, Cai, Gustafson, and McDonald (2024)
     <doi:10.1371/journal.pcbi.1012324>.
 License: MIT + file LICENSE
@@ -33,6 +30,7 @@ Imports:
     Rcpp,
     rlang,
     tibble,
+    tvdenoising,
     vctrs
 Suggests:
     dplyr,
@@ -48,7 +46,8 @@ LinkingTo:
     dspline,
     Rcpp,
     RcppEigen,
-    testthat
+    testthat,
+    tvdenoising
 VignetteBuilder: 
     knitr
 Config/testthat/edition: 3
