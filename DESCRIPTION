@@ -30,6 +30,7 @@ Imports:
     Rcpp,
     rlang,
     tibble,
+    tvdenoising,
     vctrs
 Suggests:
     dplyr,
