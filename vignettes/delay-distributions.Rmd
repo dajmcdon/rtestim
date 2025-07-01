@@ -182,8 +182,10 @@ For a more illustrative version of the previous example, we revisit the Canadian
 data, but combine it with some additional information. 
 
 We use variant
-circulation information from [CoVaRR-Net's Duotang notebook](https://covarr-net.github.io/duotang/duotang.html). 
+circulation information from [CoVaRR-Net's Duotang notebook](https://covarr-net.github.io/duotang/duotang.html).
+For simplicity, the code for this processing is hidden in the fold.
 
+<details>
 ```{r duotang-processing, eval=FALSE, echo=TRUE}
 # Run on 19 April 2024
 duotang <- read_tsv("https://github.com/CoVaRR-NET/duotang/raw/main/data_needed/virusseq.metadata.csv.gz")
@@ -242,6 +244,7 @@ can_counts <- group_by(meta, week, pango_group) |>
 counts <- bind_rows(can_counts, counts)
 saveRDS(counts, "duotang-counts.rds")
 ```
+</details>
 
 We smooth the raw data using multinomial logistic regression on a third order orthogonal polynomial to produce the following estimated variant proportions 
 in Canada.
@@ -321,8 +324,10 @@ We use the delay distribution data from the meta analysis in
 The raw data for their analysis is available on [GitHub](https://github.com/xxyy0574/COVID-19-transmission-parameters). We use
 a simple version of their procedure, taking the median calculations across 
 studies to find the mean and standard deviation of the delay for each variant 
-separately. Then we convert these to the $k$ and $\theta$ parameters for the gamma distribution. 
+separately. Then we convert these to the $k$ and $\theta$ parameters for the gamma distribution.
+This analysis is hidden below the fold.
 
+<details>
 ```{r meta-analysis, eval=FALSE}
 data_raw <- readxl::read_excel("xu-etal-DATA_RAW.xlsx") |>
   select(type, para, n = Sample_size, mean, sd, se, median) |>
@@ -355,7 +360,9 @@ Beta_IP$sd = bonehead_meta |>
   filter(type == "Alpha", para == "IP") |> pull(sd)
 Beta <- bind_rows(
   Beta_IP,
-  bonehead_meta |> filter(type == "Alpha", para != "IP") |> mutate(type = "Beta")
+  bonehead_meta |> 
+    filter(type == "Alpha", para != "IP") |>
+    mutate(type = "Beta")
 )
 
 delay_dstns_byvar <- bonehead_meta |>
@@ -365,6 +372,7 @@ delay_dstns_byvar <- bonehead_meta |>
   mutate(shape = mean^2 / sd^2, scale = mean / shape)
 saveRDS(delay_dstns_byvar, "delay-distns-byvar.rds")
 ```
+</details>
 
 We'll use just the Serial Intervals (SI), though the incubation periods (IP),
 and generation times (GT) are also available. Below, we visualize the estimated
@@ -389,7 +397,7 @@ delay_dstns_can |>
 ```
 
 
-Finally, we use these delays during the period they were most prevalent to 
+We use these delays during the period they were most prevalent to 
 estimate Rt. First, we build the delay matrix.
 
 ```{r tvar-matrix, message=FALSE}

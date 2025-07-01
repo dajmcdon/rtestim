@@ -1,5 +1,6 @@
 #include <Eigen/Sparse>
 #include <RcppEigen.h>
+#include <tvdenoising.h>
 #include "admm.h"
 #include "utils.h"
 #include "dptf.h"
@@ -79,7 +80,7 @@ List rtestim_path(NumericVector y,
     Rcpp::checkUserInterrupt();
 
     if (korder == 0) {
-      beta = weight_dptf(y, lambda[i], w);
+      beta = tvdenoising::rcpp_wtvd(y, lambda[i], w);
       niter[i] = 0;
     } else {
       _rho = (rho < 0) ? lambda[i] : rho;

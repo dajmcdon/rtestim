@@ -11,7 +11,8 @@ Description: Use trend filtering, a type of regularized nonparametric
     regression, to estimate the instantaneous reproduction number, also
     called Rt. This value roughly says how many new infections will result
     from each new infection today.  Values larger than 1 indicate that an
-    epidemic is growing while those less than 1 indicate decline
+    epidemic is growing while those less than 1 indicate decline. For more 
+    details about this methodology, see Liu, Cai, Gustafson, and McDonald (2024)
     <doi:10.1371/journal.pcbi.1012324>.
 License: MIT + file LICENSE
 URL: https://github.com/dajmcdon/rtestim,
@@ -29,6 +30,7 @@ Imports:
     Rcpp,
     rlang,
     tibble,
+    tvdenoising,
     vctrs
 Suggests:
     dplyr,
@@ -44,7 +46,8 @@ LinkingTo:
     dspline,
     Rcpp,
     RcppEigen,
-    testthat
+    testthat,
+    tvdenoising
 VignetteBuilder: 
     knitr
 Config/testthat/edition: 3

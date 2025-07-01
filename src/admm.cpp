@@ -1,5 +1,6 @@
 #include <RcppEigen.h>
 #include <Eigen/Sparse>
+#include <tvdenoising.h>
 #include "utils.h"
 #include "dptf.h"
 #include "admm.h"
@@ -71,7 +72,7 @@ void admm_gauss(int M,
     // solve for alternating variable - z:
     Dth = doDv(theta, korder, x);
     tmp_m = Dth + u;
-    z = dptf(tmp_m, lam_z);
+    z = tvdenoising::rcpp_tvd(tmp_m, lam_z);
     // update dual variable - u:
     u += Dth - z;
 
