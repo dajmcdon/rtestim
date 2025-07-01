@@ -183,7 +183,7 @@ data, but combine it with some additional information.
 
 We use variant
 circulation information from [CoVaRR-Net's Duotang notebook](https://covarr-net.github.io/duotang/duotang.html).
-For simplicity, the code fore this processing is hidden in the fold.
+For simplicity, the code for this processing is hidden in the fold.
 
 <details>
 ```{r duotang-processing, eval=FALSE, echo=TRUE}
