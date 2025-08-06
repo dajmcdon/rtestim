@@ -7,7 +7,6 @@ test_that("fast convolution matches existing version", {
   cw <- cumsum(delay_distn)
   convolved_seq <- stats::convolve(y, rev(delay_distn), type = "open")
   convolved_seq <- convolved_seq[seq_along(y)] / cw
-  convolved_seq[1] <- 0 # there's an Inf here
 
   exact_convolved_seq <- function(y, delay) {
     n <- length(delay)
@@ -16,7 +15,6 @@ test_that("fast convolution matches existing version", {
   }
 
   ecs <- exact_convolved_seq(y, delay_distn)
-  ecs[1] <- 0 # there's an NaN here
   expect_equal(ecs, convolved_seq)
 
   fcs <- fast_convolve(y, delay_distn)
