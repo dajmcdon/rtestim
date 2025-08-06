@@ -31,8 +31,8 @@ discretize_gamma <- function(x, shape = 2.5, scale = 2.5, rate = 1 / scale) {
   if (is.unsorted(x, strictly = TRUE)) {
     cli_abort("`x` must be sorted in increasing order.")
   }
-  pgm <- stats::pgamma(x, shape = shape, rate = rate)
-  pgm <- c(0, pgm)
-  pgm <- diff(pgm)
+  pgmr <- stats::pgamma(x + 1, shape = shape, rate = rate)
+  pgml <- stats::pgamma(x - 1, shape = shape, rate = rate)
+  pgm <- pgmr - pgml
   pgm / sum(pgm)
 }
