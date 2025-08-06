@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rtestim</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -124,17 +124,17 @@ decreasing order.</p></dd>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># get the Rt at a single value of lambda</span></span></span>
 <span class="r-in"><span><span class="fu">interpolate_rt</span><span class="op">(</span><span class="va">out</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10.5</span>, <span class="fl">11.5</span>, <span class="fl">12.5</span><span class="op">)</span>, lambda <span class="op">=</span> <span class="va">out</span><span class="op">$</span><span class="va">lambda</span><span class="op">[</span><span class="fl">20</span><span class="op">]</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1.271699 1.330518 1.388280</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1.266720 1.315322 1.363146</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">rpois</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">dnorm</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">100</span>, <span class="fl">50</span>, <span class="fl">15</span><span class="op">)</span> <span class="op">*</span> <span class="fl">500</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="estimate_rt.html">estimate_rt</a></span><span class="op">(</span><span class="va">y</span>, nsol <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">interpolate_rt</span><span class="op">(</span><span class="va">out</span>, xout <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.5</span>, <span class="fl">2.5</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           [,1]      [,2]      [,3]      [,4]     [,5]     [,6]     [,7]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 0.9400601 0.9450540 0.9482746 0.9499832 1.021779 1.147269 1.525102</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 0.9603300 0.9694403 0.9749279 0.9778787 1.035098 1.121487 1.324955</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           [,1]      [,2]      [,3]      [,4]      [,5]     [,6]     [,7]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 0.9494042 0.9483473 0.9530090 0.9558256 0.9876951 1.039471 1.180910</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 0.9673453 0.9705684 0.9767073 0.9803061 1.0055073 1.039470 1.107582</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          [,8]     [,9]    [,10]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 1.981008 2.785992 1.941565</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 1.520084 1.782627 1.811711</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 1.330219 1.473012 1.401269</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 1.159646 1.263801 1.475785</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
