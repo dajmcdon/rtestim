@@ -57,10 +57,17 @@ List rtestim_path(NumericVector y,
   // Generate lambda sequence if necessary
   if (abs(lambda[nsol - 1]) < tolerance / 100 && lambdamax <= 0) {
     VectorXd b(n - korder);
-    VectorXd wy = nvec_to_evec(w - y);
-    b = qr.solve(wy);  // very approximate;
-    NumericVector bp = evec_to_nvec(b);
-    lambdamax = max(abs(bp)) / n;
+    if (korder == 0) {
+      VectorXd wy = nvec_to_evec(y * pow(w, 2.0));
+      b = qr.solve(wy);
+      NumericVector bp = evec_to_nvec(b);
+      lambdamax = max(abs(bp)) / n;
+    } else {
+      VectorXd wy = nvec_to_evec(w - y);
+      b = qr.solve(wy);  // very approximate;
+      NumericVector bp = evec_to_nvec(b);
+      lambdamax = max(abs(bp)) / n;
+    }
   }
   create_lambda(lambda, lambdamin, lambdamax, lambda_min_ratio, nsol);
 
@@ -80,7 +87,7 @@ List rtestim_path(NumericVector y,
     Rcpp::checkUserInterrupt();
 
     if (korder == 0) {
-      beta = tvdenoising::rcpp_wtvd(y, lambda[i], w);
+      beta = tvdenoising::rcpp_wtvd(y / w, lambda[i], w);
       niter[i] = 0;
     } else {
       _rho = (rho < 0) ? lambda[i] : rho;

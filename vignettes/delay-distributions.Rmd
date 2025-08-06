@@ -14,6 +14,7 @@ library(dplyr)
 library(nnet)
 library(forcats)
 library(tidyr)
+library(Matrix)
 theme_set(theme_bw())
 ```
 
@@ -38,16 +39,16 @@ in the renewal equation, and this vignette illustrates these in turn. The
 renewal equation specifies that the expected incidence at time $t$ is a 
 weighted sum of previous incidence, multiplied by $R_t$:
 \begin{equation}
-\mathbb{E}[I_t \mid I_1,\ldots,I_{t-1}] = R_t \sum_{a=1}^t w_a I_{t-a},
+\mathbb{E}[I_t \mid I_1,\ldots,I_{t-1}] = R_t \sum_{a=0}^t w_a I_{t-a},
 \end{equation}
 calculated by convolving the
 preceding $a$ days of new infections with the discretized generation (or serial)
 interval distribution $w$ of length $t$. It is the allowable distributions 
-$\{w\}_{a=1}^n$ that are the focus.
+$\{w\}_{a=0}^n$ that are the focus.
 
 ## Discretization
 
-First, it is important to recognize that the sequence $\{w\}_{a=1}^n$ is usually
+First, it is important to recognize that the sequence $\{w\}_{a=0}^n$ is usually
 a discretization of a probability density function, most frequently gamma or 
 Weibull. This is because observed incidence happens at discrete time points
 like days or weeks, while time is continuous. Using the default (parametric) 
@@ -73,22 +74,21 @@ ggplot(data.frame(x = seq(.001, 20, length.out = 100)), aes(x)) +
 ```
 
 The default is the orange curve shown above. Given an incidence sequence of 
-length $n$, internally, `delay_calculator()` creates $\{w\}_{a=1}^n$ by 
+length $n$, internally, `delay_calculator()` creates $\{w\}_{a=0}^n$ by 
 \[
-w_a = F(a) - F(a - 1),
+w_a = F(a + 1) - F(a - 1),
 \]
 and then renormalizing with `w / sum(w)` to ensure that it sums to 1. Here, $F$
 is the cumulative distribution function for Gamma (though similar works for any
 continuous distribution). Note that this formula assumes that the probability
-of a 0 delay is 0 and that the probability of a delay of $a$ is really
-\[
-\int_{a-1}^a f_W(w) \, dw = F(a) - F(a-1).
-\]
+of a 0 delay is _not_ 0. This is related to the phenomenon of "double interval
+censoring": a primary infection on day $t$ may have occurred any time between
+0:00 and 23:59 and the same for a secondary infection on day $t+1$. So even if
+the gap in reported days is only "1 day", those infections may have happened as
+little as a few minutes apart, or as much as 48 hours apart.
 
 When using this default, the delay distribution is necessarily assumed to be the same for all $t$, and we
 compute the convolution of `w` and `I` with the Fast Fourier Transform. 
-Finally, an adjustment is made to handle the first observation. We define
-$I_0 = I_1$.
 
 Just to illustrate this behaviour, we show the results for the default setting
 on the included `cancovid` data.
@@ -111,7 +111,7 @@ distribution.
 ```{r cancov-nonpar}
 # Data from Backer et al.
 delay <- read.csv("backer.csv") |>
-  filter(delay > 0) |>
+  filter(delay >= 0) |>
   select(-delay)
 delay <- rowSums(delay)
 delay <- delay / sum(delay)
@@ -146,13 +146,13 @@ this by examining the two CDFs.
 ```{r cdfs, echo = FALSE}
 cdfs <- data.frame(
   x = 0:20,
-  default = pgamma(0:20, shape = 2.5, scale = 2.5),
-  backer = cumsum(c(0, delay, rep(0, 20 - length(delay))))
+  default = cumsum(discretize_gamma(0:20, shape = 2.5, scale = 2.5)),
+  backer = cumsum(c(delay, rep(0, 21 - length(delay))))
 )
 ggplot(cdfs |> pivot_longer(-x), aes(x, value, color = name)) +
   geom_step() +
-  scale_y_continuous(expand = expansion(0)) +
-  scale_color_manual(values = c("orange", "cornflowerblue"), name = "")
+  scale_y_continuous(expand = expansion(0), limits = c(0, 1)) +
+  scale_color_manual(values = c("darkorange", "cornflowerblue"), name = "")
 ```
 
 ## Time-varying delays
@@ -165,10 +165,9 @@ necessary code is the following.
 ```{r backer-matrix, eval=FALSE}
 # library(Matrix)
 n <- nrow(cancovid)
-backer_delay <- c(0, delay, rep(0, n - length(delay) - 1))
+backer_delay <- c(delay, rep(0, n - length(delay) - 1))
 delay_mat <- matrix(0, n, n)
-delay_mat[1,1] <- 1
-for (iter in 2:n) delay_mat[iter, 1:iter] <- rev(backer_delay[1:iter])
+for (iter in 1:n) delay_mat[iter, 1:iter] <- rev(backer_delay[1:iter])
 delay_mat <- drop0(as(delay_mat, "CsparseMatrix")) # make it sparse, not necessary
 delay_mat <- delay_mat / rowSums(delay_mat) # renormalize
 ```
@@ -401,11 +400,9 @@ We use these delays during the period they were most prevalent to
 estimate Rt. First, we build the delay matrix.
 
 ```{r tvar-matrix, message=FALSE}
-library(Matrix)
 n <- nrow(cancovid)
 delay_mat <- matrix(0, n, n)
-delay_mat[1,1] <- 1
-for (iter in 2:n) {
+for (iter in 1:n) {
   current_var <- can_pred_class$var[iter]
   current_pars <- delay_dstns_can |> filter(type == current_var)
   delay <- discretize_gamma(0:(iter - 1), current_pars$shape, current_pars$scale)
