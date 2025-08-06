@@ -31,7 +31,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rtestim</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0.9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0.9002</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -83,21 +83,22 @@
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.stats.ox.ac.uk/pub/MASS4/" class="external-link">nnet</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://forcats.tidyverse.org/" class="external-link">forcats</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org" class="external-link">tidyr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://Matrix.R-forge.R-project.org" class="external-link">Matrix</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme_get.html" class="external-link">theme_set</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>This package accommodates 3 different ways of specifying a delay
 distribution in the renewal equation, and this vignette illustrates
 these in turn. The renewal equation specifies that the expected
 incidence at time <span class="math inline">\(t\)</span> is a weighted
 sum of previous incidence, multiplied by <span class="math inline">\(R_t\)</span>: <span class="math display">\[\begin{equation}
-\mathbb{E}[I_t \mid I_1,\ldots,I_{t-1}] = R_t \sum_{a=1}^t w_a I_{t-a},
+\mathbb{E}[I_t \mid I_1,\ldots,I_{t-1}] = R_t \sum_{a=0}^t w_a I_{t-a},
 \end{equation}\]</span> calculated by convolving the preceding <span class="math inline">\(a\)</span> days of new infections with the
 discretized generation (or serial) interval distribution <span class="math inline">\(w\)</span> of length <span class="math inline">\(t\)</span>. It is the allowable distributions
-<span class="math inline">\(\{w\}_{a=1}^n\)</span> that are the
+<span class="math inline">\(\{w\}_{a=0}^n\)</span> that are the
 focus.</p>
 <div class="section level2">
 <h2 id="discretization">Discretization<a class="anchor" aria-label="anchor" href="#discretization"></a>
 </h2>
-<p>First, it is important to recognize that the sequence <span class="math inline">\(\{w\}_{a=1}^n\)</span> is usually a discretization
+<p>First, it is important to recognize that the sequence <span class="math inline">\(\{w\}_{a=0}^n\)</span> is usually a discretization
 of a probability density function, most frequently gamma or Weibull.
 This is because observed incidence happens at discrete time points like
 days or weeks, while time is continuous. Using the default (parametric)
@@ -117,22 +118,23 @@ below shows a few examples densities from this family.</p>
 <p><img src="delay-distributions_files/figure-html/gamma-pdf-1.png" width="80%" style="display: block; margin: auto;"></p>
 <p>The default is the orange curve shown above. Given an incidence
 sequence of length <span class="math inline">\(n\)</span>, internally,
-<code><a href="../reference/delay_calculator.html">delay_calculator()</a></code> creates <span class="math inline">\(\{w\}_{a=1}^n\)</span> by <span class="math display">\[
-w_a = F(a) - F(a - 1),
+<code><a href="../reference/delay_calculator.html">delay_calculator()</a></code> creates <span class="math inline">\(\{w\}_{a=0}^n\)</span> by <span class="math display">\[
+w_a = F(a + 1) - F(a - 1),
 \]</span> and then renormalizing with <code>w / sum(w)</code> to ensure
 that it sums to 1. Here, <span class="math inline">\(F\)</span> is the
 cumulative distribution function for Gamma (though similar works for any
 continuous distribution). Note that this formula assumes that the
-probability of a 0 delay is 0 and that the probability of a delay of
-<span class="math inline">\(a\)</span> is really <span class="math display">\[
-\int_{a-1}^a f_W(w) \, dw = F(a) - F(a-1).
-\]</span></p>
+probability of a 0 delay is <em>not</em> 0. This is related to the
+phenomenon of “double interval censoring”: a primary infection on day
+<span class="math inline">\(t\)</span> may have occurred any time
+between 0:00 and 23:59 and the same for a secondary infection on day
+<span class="math inline">\(t+1\)</span>. So even if the gap in reported
+days is only “1 day”, those infections may have happened as little as a
+few minutes apart, or as much as 48 hours apart.</p>
 <p>When using this default, the delay distribution is necessarily
 assumed to be the same for all <span class="math inline">\(t\)</span>,
 and we compute the convolution of <code>w</code> and <code>I</code> with
-the Fast Fourier Transform. Finally, an adjustment is made to handle the
-first observation. We define <span class="math inline">\(I_0 =
-I_1\)</span>.</p>
+the Fast Fourier Transform.</p>
 <p>Just to illustrate this behaviour, we show the results for the
 default setting on the included <code>cancovid</code> data.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
@@ -153,9 +155,9 @@ and use this as our (constant) delay distribution.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Data from Backer et al.</span></span>
 <span><span class="va">delay</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="st">"backer.csv"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">delay</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">delay</span> <span class="op">&gt;=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">delay</span><span class="op">)</span></span>
-<span><span class="va">delay</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="va">delay</span><span class="op">)</span></span>
+<span><span class="va">delay</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/colSums-methods.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="va">delay</span><span class="op">)</span></span>
 <span><span class="va">delay</span> <span class="op">&lt;-</span> <span class="va">delay</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">delay</span><span class="op">)</span></span></code></pre></div>
 <p><img src="delay-distributions_files/figure-html/cancov-nonpar-plot-1.png" width="80%" style="display: block; margin: auto;"></p>
 <p>This distribution looks something like a gamma, but it has finite
@@ -183,12 +185,11 @@ et al. delays, the necessary code is the following.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># library(Matrix)</span></span>
 <span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">cancovid</span><span class="op">)</span></span>
-<span><span class="va">backer_delay</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">delay</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">n</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">delay</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">backer_delay</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">delay</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">n</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">delay</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">delay_mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">n</span>, <span class="va">n</span><span class="op">)</span></span>
-<span><span class="va">delay_mat</span><span class="op">[</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
-<span><span class="kw">for</span> <span class="op">(</span><span class="va">iter</span> <span class="kw">in</span> <span class="fl">2</span><span class="op">:</span><span class="va">n</span><span class="op">)</span> <span class="va">delay_mat</span><span class="op">[</span><span class="va">iter</span>, <span class="fl">1</span><span class="op">:</span><span class="va">iter</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rev.html" class="external-link">rev</a></span><span class="op">(</span><span class="va">backer_delay</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">iter</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="va">delay_mat</span> <span class="op">&lt;-</span> <span class="fu">drop0</span><span class="op">(</span><span class="fu">as</span><span class="op">(</span><span class="va">delay_mat</span>, <span class="st">"CsparseMatrix"</span><span class="op">)</span><span class="op">)</span> <span class="co"># make it sparse, not necessary</span></span>
-<span><span class="va">delay_mat</span> <span class="op">&lt;-</span> <span class="va">delay_mat</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="va">delay_mat</span><span class="op">)</span> <span class="co"># renormalize</span></span></code></pre></div>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">iter</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">)</span> <span class="va">delay_mat</span><span class="op">[</span><span class="va">iter</span>, <span class="fl">1</span><span class="op">:</span><span class="va">iter</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rev.html" class="external-link">rev</a></span><span class="op">(</span><span class="va">backer_delay</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">iter</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">delay_mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/drop0.html" class="external-link">drop0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/methods/as.html" class="external-link">as</a></span><span class="op">(</span><span class="va">delay_mat</span>, <span class="st">"CsparseMatrix"</span><span class="op">)</span><span class="op">)</span> <span class="co"># make it sparse, not necessary</span></span>
+<span><span class="va">delay_mat</span> <span class="op">&lt;-</span> <span class="va">delay_mat</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/colSums-methods.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="va">delay_mat</span><span class="op">)</span> <span class="co"># renormalize</span></span></code></pre></div>
 <p>We could then simply pass <code>delay_mat</code> to
 <code>estimate_rt(..., delay_distn = delay_mat)</code>. The result would
 be the same as that shown above.</p>
@@ -329,11 +330,9 @@ prevalent in Canada.</p>
 <p>We use these delays during the period they were most prevalent to
 estimate Rt. First, we build the delay matrix.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://Matrix.R-forge.R-project.org" class="external-link">Matrix</a></span><span class="op">)</span></span>
-<span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">cancovid</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">cancovid</span><span class="op">)</span></span>
 <span><span class="va">delay_mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">n</span>, <span class="va">n</span><span class="op">)</span></span>
-<span><span class="va">delay_mat</span><span class="op">[</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
-<span><span class="kw">for</span> <span class="op">(</span><span class="va">iter</span> <span class="kw">in</span> <span class="fl">2</span><span class="op">:</span><span class="va">n</span><span class="op">)</span> <span class="op">{</span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">iter</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">current_var</span> <span class="op">&lt;-</span> <span class="va">can_pred_class</span><span class="op">$</span><span class="va">var</span><span class="op">[</span><span class="va">iter</span><span class="op">]</span></span>
 <span>  <span class="va">current_pars</span> <span class="op">&lt;-</span> <span class="va">delay_dstns_can</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">type</span> <span class="op">==</span> <span class="va">current_var</span><span class="op">)</span></span>
 <span>  <span class="va">delay</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/discretize_gamma.html">discretize_gamma</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="op">(</span><span class="va">iter</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span>, <span class="va">current_pars</span><span class="op">$</span><span class="va">shape</span>, <span class="va">current_pars</span><span class="op">$</span><span class="va">scale</span><span class="op">)</span></span>
