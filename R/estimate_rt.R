@@ -141,9 +141,8 @@ estimate_rt <- function(
 
   # fixes to handle leading 0 (or internal long strings)
   inf_likelihood <- weighted_past_counts < .Machine$double.eps
-  if (any(inf_likelihood[-1])) { # the first is always 0
+  if (any(inf_likelihood)) { # the first is always 0
     locs <- which(inf_likelihood)
-    locs <- locs[locs != 1L]
     cli_warn(c(
       "Some values `x` have `weighted_past_counts`",
       "precisely equal to zero. These estimates will be extrapolated.",
