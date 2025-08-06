@@ -2,11 +2,10 @@ test_that("delay calculator with even spacing works", {
   counts <- c(1:5, 5:1)
   n <- length(counts)
   delay_calculator_output <- delay_calculator(observed_counts = counts)
-  manual_output <- double(n)
   w <- discretize_gamma(0:(n - 1))
   cw <- cumsum(w)
+  manual_output <- double(n)
   for (j in 1:n) manual_output[j] <- sum(w[1:j] * counts[j:1] / cw[j])
-  manual_output[1] <- 0 # first value is 0 / 0
   expect_equal(manual_output, delay_calculator_output)
 
   w <- c(1, 2, 3, 2, 1, 1)
@@ -128,8 +127,8 @@ test_that("delay calculator accommodates alternative delays", {
   )
 
   d_mat <- matrix(0, 100, 100)
-  for (i in 2:100) d_mat[i,1:i] <- rev(dist_gamma[1:i])
+  for (i in 1:100) d_mat[i,1:i] <- rev(dist_gamma[1:i])
   d_mat <- drop0(as(d_mat, "CsparseMatrix"))
-  d_mat[-1, ] <- d_mat[-1, ] / Matrix::rowSums(d_mat[-1, ])
+  d_mat <- d_mat / Matrix::rowSums(d_mat)
   expect_equal(wpc, delay_calculator(y, delay_distn = d_mat))
 })
