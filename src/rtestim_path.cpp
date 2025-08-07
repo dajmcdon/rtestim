@@ -40,11 +40,9 @@ List rtestim_path(NumericVector y,
   NumericVector nknots(nsol);
 
   // Build D matrices as needed
-  Eigen::SparseMatrix<double> D;
   Eigen::SparseMatrix<double> Dk;
   Eigen::SparseMatrix<double> DkDk;
-  D = get_D(korder, x);
-  qr.compute(D.transpose());
+
   int m = n;
   if (korder > 0) {
     Dk = get_Dtil(korder, x);
@@ -57,16 +55,18 @@ List rtestim_path(NumericVector y,
   // Generate lambda sequence if necessary
   if (abs(lambda[nsol - 1]) < tolerance / 100 && lambdamax <= 0) {
     VectorXd b(n - korder);
+    Eigen::SparseMatrix<double> D;
+    D = get_D(korder, x);
     if (korder == 0) {
-      VectorXd wy = nvec_to_evec(y * pow(w, 2.0));
-      b = qr.solve(wy);
-      NumericVector bp = evec_to_nvec(b);
-      lambdamax = max(abs(bp)) / n;
+      Eigen::ArrayXd sqrtw = nvec_to_evec(w).array().sqrt();
+      qr.compute((D * sqrtw.inverse().matrix().asDiagonal()).transpose() );
+      b = qr.solve((nvec_to_evec(y).array() / sqrtw).matrix());
+      lambdamax = b.lpNorm<Eigen::Infinity>();
     } else {
+      qr.compute(D.transpose());
       VectorXd wy = nvec_to_evec(w - y);
       b = qr.solve(wy);  // very approximate;
-      NumericVector bp = evec_to_nvec(b);
-      lambdamax = max(abs(bp)) / n;
+      lambdamax = b.lpNorm<Eigen::Infinity>() / n;
     }
   }
   create_lambda(lambda, lambdamin, lambdamax, lambda_min_ratio, nsol);
