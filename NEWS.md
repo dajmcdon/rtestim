@@ -1,4 +1,4 @@
-# rtestim (development version)
+# rtestim 1.0.2
 
 # rtestim 1.0.2
 
