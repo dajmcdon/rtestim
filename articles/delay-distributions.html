@@ -70,7 +70,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Delay distributions</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/dajmcdon/rtestim/blob/main/vignettes/delay-distributions.Rmd" class="external-link"><code>vignettes/delay-distributions.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/dajmcdon/rtestim/blob/main/vignettes/articles/delay-distributions.Rmd" class="external-link"><code>vignettes/articles/delay-distributions.Rmd</code></a></small>
       <div class="d-none name"><code>delay-distributions.Rmd</code></div>
     </div>
 
@@ -115,7 +115,7 @@ f_W(w) = \frac{1}{\Gamma(k)\theta^k} w^{k-1} e^{-w/\theta} I(w &gt; 0),
 \]</span> where <span class="math inline">\(I\)</span> is the indicator
 function. The mean of this distribution is <span class="math inline">\(k\theta\)</span>, and the variance is <span class="math inline">\(k\theta^2\)</span>. Both <span class="math inline">\(k\)</span> and <span class="math inline">\(\theta\)</span> must be greater than 0. The figure
 below shows a few examples densities from this family.</p>
-<p><img src="delay-distributions_files/figure-html/gamma-pdf-1.png" width="80%" style="display: block; margin: auto;"></p>
+<p><img src="delay-distributions_files/figure-html/gamma-pdf-1.png" class="r-plt" alt="" width="80%" style="display: block; margin: auto;"></p>
 <p>The default is the orange curve shown above. Given an incidence
 sequence of length <span class="math inline">\(n\)</span>, internally,
 <code><a href="../reference/delay_calculator.html">delay_calculator()</a></code> creates <span class="math inline">\(\{w\}_{a=0}^n\)</span> by <span class="math display">\[
@@ -140,7 +140,7 @@ default setting on the included <code>cancovid</code> data.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">can_default</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/estimate_rt.html">estimate_rt</a></span><span class="op">(</span><span class="va">cancovid</span><span class="op">$</span><span class="va">incident_cases</span>, x <span class="op">=</span> <span class="va">cancovid</span><span class="op">$</span><span class="va">date</span>, nsol <span class="op">=</span> <span class="fl">20L</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">can_default</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="delay-distributions_files/figure-html/can-default-1.png" width="80%" style="display: block; margin: auto;"></p>
+<p><img src="delay-distributions_files/figure-html/can-default-1.png" class="r-plt" alt="" width="80%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2">
 <h2 id="constant-non-parametric-delay-distribution">Constant, non-parametric delay distribution<a class="anchor" aria-label="anchor" href="#constant-non-parametric-delay-distribution"></a>
@@ -159,7 +159,7 @@ and use this as our (constant) delay distribution.</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">delay</span><span class="op">)</span></span>
 <span><span class="va">delay</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/colSums-methods.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="va">delay</span><span class="op">)</span></span>
 <span><span class="va">delay</span> <span class="op">&lt;-</span> <span class="va">delay</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">delay</span><span class="op">)</span></span></code></pre></div>
-<p><img src="delay-distributions_files/figure-html/cancov-nonpar-plot-1.png" width="80%" style="display: block; margin: auto;"></p>
+<p><img src="delay-distributions_files/figure-html/cancov-nonpar-plot-1.png" class="r-plt" alt="" width="80%" style="display: block; margin: auto;"></p>
 <p>This distribution looks something like a gamma, but it has finite
 support. We can easily use it instead.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
@@ -169,11 +169,11 @@ support. We can easily use it instead.</p>
 <span>  delay_distn <span class="op">=</span> <span class="va">delay</span>,</span>
 <span>  nsol <span class="op">=</span> <span class="fl">20L</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">can_nonpar</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="delay-distributions_files/figure-html/can-nonpar-1.png" width="80%" style="display: block; margin: auto;"></p>
+<p><img src="delay-distributions_files/figure-html/can-nonpar-1.png" class="r-plt" alt="" width="80%" style="display: block; margin: auto;"></p>
 <p>The result is much less dramatic than the previous version. This is
 likely because the distribution is much more concentrated near short
 delays. We can see this by examining the two CDFs.</p>
-<p><img src="delay-distributions_files/figure-html/cdfs-1.png" width="80%" style="display: block; margin: auto;"></p>
+<p><img src="delay-distributions_files/figure-html/cdfs-1.png" class="r-plt" alt="" width="80%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2">
 <h2 id="time-varying-delays">Time-varying delays<a class="anchor" aria-label="anchor" href="#time-varying-delays"></a>
@@ -262,11 +262,11 @@ hidden in the fold.</p>
 </details><p>We smooth the raw data using multinomial logistic regression on a
 third order orthogonal polynomial to produce the following estimated
 variant proportions in Canada.</p>
-<p><img src="delay-distributions_files/figure-html/duotang-counts-1.png" width="80%" style="display: block; margin: auto;"></p>
+<p><img src="delay-distributions_files/figure-html/duotang-counts-1.png" class="r-plt" alt="" width="80%" style="display: block; margin: auto;"></p>
 <p>Using the estimated proportions, we label each date with the dominant
 variant at the time (and restrict ourselves to the time period of the
 included case data).</p>
-<p><img src="delay-distributions_files/figure-html/unnamed-chunk-2-1.png" width="80%" style="display: block; margin: auto;"></p>
+<p><img src="delay-distributions_files/figure-html/unnamed-chunk-2-1.png" class="r-plt" alt="" width="80%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2">
 <h2 id="creating-delay-distributions">Creating delay distributions<a class="anchor" aria-label="anchor" href="#creating-delay-distributions"></a>
@@ -289,12 +289,12 @@ distribution. This analysis is hidden below the fold.</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">type</span>, <span class="va">para</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
 <span>    no_n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>    n <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span> <span class="op">~</span> <span class="va">n</span>, <span class="va">no_n</span> <span class="op">~</span> <span class="fl">1</span>, <span class="cn">TRUE</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="va">n</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span>    n <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span> <span class="op">~</span> <span class="va">n</span>, <span class="va">no_n</span> <span class="op">~</span> <span class="fl">1</span>, <span class="cn">TRUE</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="va">n</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
-<span>    mean <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">mean</span><span class="op">)</span> <span class="op">~</span> <span class="va">mean</span>, <span class="cn">TRUE</span> <span class="op">~</span> <span class="va">median</span><span class="op">)</span>,</span>
-<span>    sd <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">sd</span><span class="op">)</span> <span class="op">~</span> <span class="va">sd</span>, <span class="cn">TRUE</span> <span class="op">~</span> <span class="va">se</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span></span>
+<span>    mean <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">mean</span><span class="op">)</span> <span class="op">~</span> <span class="va">mean</span>, <span class="cn">TRUE</span> <span class="op">~</span> <span class="va">median</span><span class="op">)</span>,</span>
+<span>    sd <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">sd</span><span class="op">)</span> <span class="op">~</span> <span class="va">sd</span>, <span class="cn">TRUE</span> <span class="op">~</span> <span class="va">se</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">type</span>, <span class="va">para</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span></span>
@@ -326,7 +326,7 @@ distribution. This analysis is hidden below the fold.</p>
 periods (IP), and generation times (GT) are also available. Below, we
 visualize the estimated delays for the 4 variants that were most
 prevalent in Canada.</p>
-<p><img src="delay-distributions_files/figure-html/variant-si-plot-1.png" width="80%" style="display: block; margin: auto;"></p>
+<p><img src="delay-distributions_files/figure-html/variant-si-plot-1.png" class="r-plt" alt="" width="80%" style="display: block; margin: auto;"></p>
 <p>We use these delays during the period they were most prevalent to
 estimate Rt. First, we build the delay matrix.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
@@ -348,7 +348,7 @@ estimate Rt. First, we build the delay matrix.</p>
 <span>  delay_distn <span class="op">=</span> <span class="va">delay_mat</span>,</span>
 <span>  nsol <span class="op">=</span> <span class="fl">20L</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">can_tvar</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="delay-distributions_files/figure-html/tvar-Rt-1.png" width="80%" style="display: block; margin: auto;"></p>
+<p><img src="delay-distributions_files/figure-html/tvar-Rt-1.png" class="r-plt" alt="" width="80%" style="display: block; margin: auto;"></p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
@@ -361,7 +361,7 @@ estimate Rt. First, we build the delay matrix.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

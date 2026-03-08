@@ -141,12 +141,12 @@ the first observation must be strictly larger than 0.</p>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">101</span>, <span class="va">case_counts</span><span class="op">)</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">case_counts</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"cornflowerblue"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Time"</span>, y <span class="op">=</span> <span class="st">"Case Counts"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="rtestim_files/figure-html/unnamed-chunk-2-1.png" width="80%" style="display: block; margin: auto;"></p>
+<p><img src="rtestim_files/figure-html/unnamed-chunk-2-1.png" class="r-plt" alt="" width="80%" style="display: block; margin: auto;"></p>
 <p>Next, we fit the model and visualize the resulting <span class="math inline">\(\{R_t\}_{t=1}^n\)</span>:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/estimate_rt.html">estimate_rt</a></span><span class="op">(</span>observed_counts <span class="op">=</span> <span class="va">case_counts</span>, nsol <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mod</span><span class="op">)</span></span></code></pre></div>
-<p><img src="rtestim_files/figure-html/unnamed-chunk-3-1.png" width="80%" style="display: block; margin: auto;"></p>
+<p><img src="rtestim_files/figure-html/unnamed-chunk-3-1.png" class="r-plt" alt="" width="80%" style="display: block; margin: auto;"></p>
 <p><a href="https://github.com/dajmcdon/rtestim" class="external-link">rtestim</a> estimates a spectrum of <span class="math inline">\(\{R_t\}_{t=1}^n\)</span>s for a range of <span class="math inline">\(\lambda\)</span> values, where each <span class="math inline">\(\{R_t\}_{t=1}^n\)</span> corresponds to a specific
 <span class="math inline">\(\lambda\)</span> value. If no <span class="math inline">\(\lambda\)</span> value is supplied by the user,
 <a href="https://github.com/dajmcdon/rtestim" class="external-link">rtestim</a> will automatically calculate a sequence of <span class="math inline">\(\lambda\)</span> values. The additional parameter
@@ -168,7 +168,7 @@ minimum.</p>
 <span class="math inline">\(\lambda\)</span> in ascending order.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mod_cv</span><span class="op">)</span></span></code></pre></div>
-<p><img src="rtestim_files/figure-html/unnamed-chunk-5-1.png" width="80%" style="display: block; margin: auto;"></p>
+<p><img src="rtestim_files/figure-html/unnamed-chunk-5-1.png" class="r-plt" alt="" width="80%" style="display: block; margin: auto;"></p>
 <p>The plot above displays vertical lines that correspond to the
 cross-validation scores for specific values of <span class="math inline">\(\lambda\)</span>. The blue point at the center of
 each line represents the mean score for that value of <span class="math inline">\(\lambda\)</span> across all cross-validation
@@ -185,7 +185,7 @@ error is within one standard error of the minimum, called
 cross-validation error while prioritizing smoothness.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mod_cv</span>, which_lambda <span class="op">=</span> <span class="st">"lambda.1se"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="rtestim_files/figure-html/unnamed-chunk-6-1.png" width="80%" style="display: block; margin: auto;"></p>
+<p><img src="rtestim_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" alt="" width="80%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
 <h3 id="uneven-reporting-frequency">Uneven Reporting Frequency<a class="anchor" aria-label="anchor" href="#uneven-reporting-frequency"></a>
@@ -202,13 +202,13 @@ representing the days at which we observe the case counts.</p>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">observation_time</span>, <span class="va">case_counts</span><span class="op">)</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">case_counts</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"cornflowerblue"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Time"</span>, y <span class="op">=</span> <span class="st">"Case Counts"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="rtestim_files/figure-html/unnamed-chunk-7-1.png" width="80%" style="display: block; margin: auto;"></p>
+<p><img src="rtestim_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="80%" style="display: block; margin: auto;"></p>
 <p>We can then fit the model by passing the observation time point as
 <code>x</code>.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/estimate_rt.html">estimate_rt</a></span><span class="op">(</span>observed_counts <span class="op">=</span> <span class="va">case_counts</span>, x <span class="op">=</span> <span class="va">observation_time</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mod</span><span class="op">)</span></span></code></pre></div>
-<p><img src="rtestim_files/figure-html/unnamed-chunk-8-1.png" width="80%" style="display: block; margin: auto;"></p>
+<p><img src="rtestim_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="80%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
 <h3 id="changing-degree-of-difference-operator">Changing degree of difference operator<a class="anchor" aria-label="anchor" href="#changing-degree-of-difference-operator"></a>
@@ -220,7 +220,7 @@ curves for example, use the command</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/estimate_rt.html">estimate_rt</a></span><span class="op">(</span>observed_counts <span class="op">=</span> <span class="va">case_counts</span>, korder <span class="op">=</span> <span class="fl">0</span>, nsol <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mod</span><span class="op">)</span></span></code></pre></div>
-<p><img src="rtestim_files/figure-html/unnamed-chunk-9-1.png" width="80%" style="display: block; margin: auto;"></p>
+<p><img src="rtestim_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="" width="80%" style="display: block; margin: auto;"></p>
 </div>
 </div>
 <div class="section level2">
@@ -240,7 +240,7 @@ use this data to estimate <span class="math inline">\(R_t\)</span>.</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">can</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="rtestim_files/figure-html/unnamed-chunk-10-1.png" width="80%" style="display: block; margin: auto;"></p>
+<p><img src="rtestim_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="80%" style="display: block; margin: auto;"></p>
 <div class="section level3">
 <h3 id="approximate-confidence-bands">Approximate confidence bands<a class="anchor" aria-label="anchor" href="#approximate-confidence-bands"></a>
 </h3>
@@ -273,7 +273,7 @@ they likely don’t have guaranteed coverage.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1,243 more rows</span></span></span></code></pre>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">can_cb</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="rtestim_files/figure-html/unnamed-chunk-11-1.png" width="80%" style="display: block; margin: auto;"></p>
+<p><img src="rtestim_files/figure-html/unnamed-chunk-11-1.png" class="r-plt" alt="" width="80%" style="display: block; margin: auto;"></p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
@@ -287,7 +287,7 @@ they likely don’t have guaranteed coverage.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>
