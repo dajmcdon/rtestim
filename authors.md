@@ -11,7 +11,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/dajmcdon/rtestim/blob/main/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/dajmcdon/rtestim/blob/v1.0.2/DESCRIPTION)
 
 McDonald D, Liu J (2026). *rtestim: Estimate the Effective Reproductive
 Number with Trend Filtering*. R package version 1.0.2,

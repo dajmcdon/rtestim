@@ -2,7 +2,11 @@
 
 ## rtestim 1.0.2
 
+CRAN release: 2026-03-11
+
 ## rtestim 1.0.2
+
+CRAN release: 2026-03-11
 
 - Rerun
   [`Rcpp::compileAttributes()`](https://rdrr.io/pkg/Rcpp/man/compileAttributes.html)
