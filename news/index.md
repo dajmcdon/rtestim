@@ -1,5 +1,7 @@
 # Changelog
 
+## rtestim (development version)
+
 ## rtestim 1.0.2
 
 CRAN release: 2026-03-11
