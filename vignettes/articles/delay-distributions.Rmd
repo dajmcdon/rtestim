@@ -160,7 +160,7 @@ ggplot(cdfs |> pivot_longer(-x), aes(x, value, color = name)) +
 Finally, we also allow time-varying delay distributions. This is accomplished
 with a matrix. This requires a bit of work, but is not too challenging. For 
 example, to create the correct matrix using the Baker et al. delays, the 
-necessary code is the following.
+necessary code is the following (note that this is _not_ yet time varying):
 
 ```{r backer-matrix, eval=FALSE}
 # library(Matrix)
@@ -396,10 +396,25 @@ delay_dstns_can |>
 ```
 
 
-We use these delays during the period they were most prevalent to 
-estimate Rt. First, we build the delay matrix.
+We use these delays weighted by the probabilities of the circulating variants to 
+estimate $R_t$. First, we build the delay matrix.
 
 ```{r tvar-matrix, message=FALSE}
+can_props_voc <- can_props_smoothed |>
+  filter(Date <= max(cancovid$date)) |>
+  transmute(
+    Date = Date, 
+    `Ancestral lineage` = other, 
+    Alpha = Alpha + Beta, # Beta didn't really circulate 
+    Delta = Delta, 
+    Omicron = 1 - (`Ancestral lineage` + Alpha + Delta)
+  )
+
+can_tvar_delay <- can_props_voc |>
+  pivot_longer(-Date) |>
+  left_join(delay_dstns_can |> select(name = type, shape, scale), by = "name") |>
+
+
 n <- nrow(cancovid)
 delay_mat <- matrix(0, n, n)
 for (iter in 1:n) {
