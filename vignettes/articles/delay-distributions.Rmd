@@ -137,12 +137,18 @@ Finally, we also allow time-varying delay distributions. This is accomplished wi
 ```{r backer-matrix, eval=FALSE}
 # library(Matrix)
 n <- nrow(cancovid)
-backer_delay <- c(delay, rep(0, n - length(delay) - 1))
-delay_mat <- matrix(0, n, n)
-for (iter in 1:n) {
-  delay_mat[iter, 1:iter] <- rev(backer_delay[1:iter])
-}
-delay_mat <- drop0(as(delay_mat, "CsparseMatrix")) # make it sparse, not necessary
+dd <- length(delay)
+# one line, optimized version
+delay_mat <- drop0(toeplitz2(c(rep(0, n - 1), delay, rep(0, n - dd)), n, n))
+
+# illustration of doing the same with a loop
+# backer_delay <- c(delay, rep(0, n - dd))
+# delay_mat <- matrix(0, n, n)
+# for (iter in 1:n) {
+#   delay_mat[iter, 1:iter] <- rev(backer_delay[1:iter])
+# }
+# delay_mat <- drop0(as(delay_mat, "CsparseMatrix")) # sparseify, unnecessary
+
 delay_mat <- delay_mat / rowSums(delay_mat) # renormalize
 ```
 
