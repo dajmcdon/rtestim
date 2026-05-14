@@ -2,9 +2,8 @@
 
 ## rtestim (development version)
 
-## rtestim 1.0.2
-
-CRAN release: 2026-03-11
+- Correct minor issue in the construction of the time-varying delay
+  example in `vignettes/articles/delay-distributions.Rmd`
 
 ## rtestim 1.0.2
 

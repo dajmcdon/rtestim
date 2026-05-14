@@ -13,6 +13,7 @@ You can install the development version of rtestim from
 [GitHub](https://github.com/) with:
 
 ``` r
+
 # install.packages("remotes")
 remotes::install_github("dajmcdon/rtestim")
 ```
@@ -20,6 +21,7 @@ remotes::install_github("dajmcdon/rtestim")
 Or the released version on CRAN
 
 ``` r
+
 install.packages("rtestim")
 ```
 
@@ -30,6 +32,7 @@ epidemic. Because the model uses regularized regression, we estimate the
 model at a range of tuning parameters simultaneously.
 
 ``` r
+
 set.seed(12345)
 library(rtestim)
 library(ggplot2)
@@ -48,6 +51,7 @@ We fit the model and visualize the resulting estimated sequences of
 \\R_t\\:
 
 ``` r
+
 mod <- estimate_rt(observed_counts = dat$incident_cases, nsol = 20)
 plot(mod)
 ```
@@ -59,6 +63,7 @@ parameters for which \\R_t\\ is estimated. A built in function for
 cross-validation can be used to select the tuning parameter.
 
 ``` r
+
 mod_cv <- cv_estimate_rt(dat$incident_cases, nsol = 20)
 plot(mod_cv, which_lambda = "lambda.1se")
 ```

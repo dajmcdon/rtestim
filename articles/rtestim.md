@@ -1,6 +1,7 @@
 # rtestim Package Vignette
 
 ``` r
+
 library(rtestim)
 library(ggplot2)
 theme_set(theme_bw())
@@ -61,6 +62,7 @@ mean parameter that roughly follows a wave. Note that the first
 observation must be strictly larger than 0.
 
 ``` r
+
 set.seed(12345)
 case_counts <- c(1, rpois(100, dnorm(1:100, 50, 15) * 500 + 1))
 ggplot(data.frame(x = 1:101, case_counts), aes(x, case_counts)) +
@@ -73,6 +75,7 @@ ggplot(data.frame(x = 1:101, case_counts), aes(x, case_counts)) +
 Next, we fit the model and visualize the resulting \\\\R_t\\\_{t=1}^n\\:
 
 ``` r
+
 mod <- estimate_rt(observed_counts = case_counts, nsol = 20)
 plot(mod)
 ```
@@ -99,6 +102,7 @@ can instead use `lambda.1se`, the largest value of \\\lambda\\ within
 one standard error of the minimum.
 
 ``` r
+
 mod_cv <- cv_estimate_rt(observed_counts = case_counts)
 ```
 
@@ -106,6 +110,7 @@ The following command plots the cross validation errors for each
 \\\lambda\\ in ascending order.
 
 ``` r
+
 plot(mod_cv)
 ```
 
@@ -128,6 +133,7 @@ Users may wish to visualize the particular \\\\R_t\\\_{t=1}^n\\ which
 minimizes the cross-validation error while prioritizing smoothness.
 
 ``` r
+
 plot(mod_cv, which_lambda = "lambda.1se")
 ```
 
@@ -143,6 +149,7 @@ demonstrate this, we generate a sequence of integers representing the
 days at which we observe the case counts.
 
 ``` r
+
 observation_incr <- rpois(101, lambda = 2)
 observation_incr[observation_incr == 0] <- 1
 observation_time <- cumsum(observation_incr)
@@ -156,6 +163,7 @@ ggplot(data.frame(x = observation_time, case_counts), aes(x, case_counts)) +
 We can then fit the model by passing the observation time point as `x`.
 
 ``` r
+
 mod <- estimate_rt(observed_counts = case_counts, x = observation_time)
 plot(mod)
 ```
@@ -170,6 +178,7 @@ estimate \\\\R_t\\\_{t=1}^n\\. To estimate \\\\R_t\\\_{t=1}^n\\ with
 piece-wise constant curves for example, use the command
 
 ``` r
+
 mod <- estimate_rt(observed_counts = case_counts, korder = 0, nsol = 20)
 plot(mod)
 ```
@@ -184,6 +193,7 @@ downloaded on 4 July 2023 is included in the package. We use this data
 to estimate \\R_t\\.
 
 ``` r
+
 can <- estimate_rt(
   observed_counts = cancovid$incident_cases,
   x = cancovid$date,
@@ -205,6 +215,7 @@ intended to be fast and to provide some idea of uncertainty, but they
 likely don’t have guaranteed coverage.
 
 ``` r
+
 can_cb <- confband(can, lambda = can$lambda[10], level = c(.5, .8, .95))
 can_cb
 ```
@@ -231,6 +242,7 @@ can_cb
     #> # ℹ 1,243 more rows
 
 ``` r
+
 plot(can_cb) + coord_cartesian(ylim = c(0.5, 2))
 ```
 

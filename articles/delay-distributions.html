@@ -110,27 +110,25 @@ delay distributions requires calculating a discrete approximation.</p>
 <p>By default, <code><a href="../reference/estimate_rt.html">estimate_rt()</a></code> uses a gamma distribution
 parameterized by the shape <span class="math inline">\(k\)</span> and
 scale <span class="math inline">\(\theta\)</span>. This density has pdf
-<span class="math display">\[
-f_W(w) = \frac{1}{\Gamma(k)\theta^k} w^{k-1} e^{-w/\theta} I(w &gt; 0),
-\]</span> where <span class="math inline">\(I\)</span> is the indicator
-function. The mean of this distribution is <span class="math inline">\(k\theta\)</span>, and the variance is <span class="math inline">\(k\theta^2\)</span>. Both <span class="math inline">\(k\)</span> and <span class="math inline">\(\theta\)</span> must be greater than 0. The figure
+<span class="math display">\[ f_W(w) = \frac{1}{\Gamma
+(k)\theta^k} w\^{k-1} e\^{-w/\theta} I(w \&gt; 0), \]</span> where <span class="math inline">\(I\)</span> is the indicator function. The mean of
+this distribution is <span class="math inline">\(k\theta\)</span>, and
+the variance is <span class="math inline">\(k\theta^2\)</span>. Both
+<span class="math inline">\(k\)</span> and <span class="math inline">\(\theta\)</span> must be greater than 0. The figure
 below shows a few examples densities from this family.</p>
 <p><img src="delay-distributions_files/figure-html/gamma-pdf-1.png" class="r-plt" alt="" width="80%" style="display: block; margin: auto;"></p>
 <p>The default is the orange curve shown above. Given an incidence
 sequence of length <span class="math inline">\(n\)</span>, internally,
-<code><a href="../reference/delay_calculator.html">delay_calculator()</a></code> creates <span class="math inline">\(\{w\}_{a=0}^n\)</span> by <span class="math display">\[
-w_a = F(a + 1) - F(a - 1),
-\]</span> and then renormalizing with <code>w / sum(w)</code> to ensure
-that it sums to 1. Here, <span class="math inline">\(F\)</span> is the
-cumulative distribution function for Gamma (though similar works for any
-continuous distribution). Note that this formula assumes that the
-probability of a 0 delay is <em>not</em> 0. This is related to the
-phenomenon of “double interval censoring”: a primary infection on day
-<span class="math inline">\(t\)</span> may have occurred any time
-between 0:00 and 23:59 and the same for a secondary infection on day
-<span class="math inline">\(t+1\)</span>. So even if the gap in reported
-days is only “1 day”, those infections may have happened as little as a
-few minutes apart, or as much as 48 hours apart.</p>
+<code><a href="../reference/delay_calculator.html">delay_calculator()</a></code> creates <span class="math inline">\(\{w\}_{a=0}^n\)</span> by <span class="math display">\[ w_a
+= F(a + 1) - F(a - 1), \]</span> and then renormalizing with
+<code>w / sum(w)</code> to ensure that it sums to 1. Here, <span class="math inline">\(F\)</span> is the cumulative distribution function
+for Gamma (though similar works for any continuous distribution). Note
+that this formula assumes that the probability of a 0 delay is
+<em>not</em> 0. This is related to the phenomenon of “double interval
+censoring”: a primary infection on day <span class="math inline">\(t\)</span> may have occurred any time between 0:00
+and 23:59 and the same for a secondary infection on day <span class="math inline">\(t+1\)</span>. So even if the gap in reported days
+is only “1 day”, those infections may have happened as little as a few
+minutes apart, or as much as 48 hours apart.</p>
 <p>When using this default, the delay distribution is necessarily
 assumed to be the same for all <span class="math inline">\(t\)</span>,
 and we compute the convolution of <code>w</code> and <code>I</code> with
@@ -138,7 +136,11 @@ the Fast Fourier Transform.</p>
 <p>Just to illustrate this behaviour, we show the results for the
 default setting on the included <code>cancovid</code> data.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">can_default</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/estimate_rt.html">estimate_rt</a></span><span class="op">(</span><span class="va">cancovid</span><span class="op">$</span><span class="va">incident_cases</span>, x <span class="op">=</span> <span class="va">cancovid</span><span class="op">$</span><span class="va">date</span>, nsol <span class="op">=</span> <span class="fl">20L</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">can_default</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/estimate_rt.html">estimate_rt</a></span><span class="op">(</span></span>
+<span>  <span class="va">cancovid</span><span class="op">$</span><span class="va">incident_cases</span>,</span>
+<span>  x <span class="op">=</span> <span class="va">cancovid</span><span class="op">$</span><span class="va">date</span>,</span>
+<span>  nsol <span class="op">=</span> <span class="fl">20L</span></span>
+<span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">can_default</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="delay-distributions_files/figure-html/can-default-1.png" class="r-plt" alt="" width="80%" style="display: block; margin: auto;"></p>
 </div>
@@ -164,10 +166,11 @@ and use this as our (constant) delay distribution.</p>
 support. We can easily use it instead.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">can_nonpar</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/estimate_rt.html">estimate_rt</a></span><span class="op">(</span></span>
-<span>  <span class="va">cancovid</span><span class="op">$</span><span class="va">incident_cases</span>, </span>
-<span>  x <span class="op">=</span> <span class="va">cancovid</span><span class="op">$</span><span class="va">date</span>, </span>
+<span>  <span class="va">cancovid</span><span class="op">$</span><span class="va">incident_cases</span>,</span>
+<span>  x <span class="op">=</span> <span class="va">cancovid</span><span class="op">$</span><span class="va">date</span>,</span>
 <span>  delay_distn <span class="op">=</span> <span class="va">delay</span>,</span>
-<span>  nsol <span class="op">=</span> <span class="fl">20L</span><span class="op">)</span></span>
+<span>  nsol <span class="op">=</span> <span class="fl">20L</span></span>
+<span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">can_nonpar</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="delay-distributions_files/figure-html/can-nonpar-1.png" class="r-plt" alt="" width="80%" style="display: block; margin: auto;"></p>
 <p>The result is much less dramatic than the previous version. This is
@@ -181,14 +184,23 @@ delays. We can see this by examining the two CDFs.</p>
 <p>Finally, we also allow time-varying delay distributions. This is
 accomplished with a matrix. This requires a bit of work, but is not too
 challenging. For example, to create the correct matrix using the Baker
-et al. delays, the necessary code is the following.</p>
+et al. delays, the necessary code is the following (note that this is
+<em>not</em> yet time varying):</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># library(Matrix)</span></span>
 <span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">cancovid</span><span class="op">)</span></span>
-<span><span class="va">backer_delay</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">delay</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">n</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">delay</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">delay_mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">n</span>, <span class="va">n</span><span class="op">)</span></span>
-<span><span class="kw">for</span> <span class="op">(</span><span class="va">iter</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">)</span> <span class="va">delay_mat</span><span class="op">[</span><span class="va">iter</span>, <span class="fl">1</span><span class="op">:</span><span class="va">iter</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rev.html" class="external-link">rev</a></span><span class="op">(</span><span class="va">backer_delay</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">iter</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="va">delay_mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/drop0.html" class="external-link">drop0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/methods/as.html" class="external-link">as</a></span><span class="op">(</span><span class="va">delay_mat</span>, <span class="st">"CsparseMatrix"</span><span class="op">)</span><span class="op">)</span> <span class="co"># make it sparse, not necessary</span></span>
+<span><span class="va">dd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">delay</span><span class="op">)</span></span>
+<span><span class="co"># one line, optimized version</span></span>
+<span><span class="va">delay_mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/drop0.html" class="external-link">drop0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/toeplitz.html" class="external-link">toeplitz2</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">n</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span>, <span class="va">delay</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">n</span> <span class="op">-</span> <span class="va">dd</span><span class="op">)</span><span class="op">)</span>, <span class="va">n</span>, <span class="va">n</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># illustration of doing the same with a loop</span></span>
+<span><span class="co"># backer_delay &lt;- c(delay, rep(0, n - dd))</span></span>
+<span><span class="co"># delay_mat &lt;- matrix(0, n, n)</span></span>
+<span><span class="co"># for (iter in 1:n) {</span></span>
+<span><span class="co">#   delay_mat[iter, 1:iter] &lt;- rev(backer_delay[1:iter])</span></span>
+<span><span class="co"># }</span></span>
+<span><span class="co"># delay_mat &lt;- drop0(as(delay_mat, "CsparseMatrix")) # sparseify, unnecessary</span></span>
+<span></span>
 <span><span class="va">delay_mat</span> <span class="op">&lt;-</span> <span class="va">delay_mat</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/colSums-methods.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="va">delay_mat</span><span class="op">)</span> <span class="co"># renormalize</span></span></code></pre></div>
 <p>We could then simply pass <code>delay_mat</code> to
 <code>estimate_rt(..., delay_distn = delay_mat)</code>. The result would
@@ -204,16 +216,32 @@ Duotang notebook</a>. For simplicity, the code for this processing is
 hidden in the fold.</p>
 <details><div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Run on 19 April 2024</span></span>
-<span><span class="va">duotang</span> <span class="op">&lt;-</span> <span class="fu">read_tsv</span><span class="op">(</span><span class="st">"https://github.com/CoVaRR-NET/duotang/raw/main/data_needed/virusseq.metadata.csv.gz"</span><span class="op">)</span></span>
+<span><span class="va">duotang</span> <span class="op">&lt;-</span> <span class="fu">read_tsv</span><span class="op">(</span></span>
+<span>  <span class="st">"https://github.com/CoVaRR-NET/duotang/raw/main/data_needed/virusseq.metadata.csv.gz"</span></span>
+<span><span class="op">)</span></span>
 <span><span class="va">columnlist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>  <span class="st">"fasta_header_name"</span>, <span class="st">"province"</span>, <span class="st">"host_gender"</span>, <span class="st">"host_age_bin"</span>,</span>
-<span>  <span class="st">"sample_collection_date"</span>, <span class="st">"sample_collected_by"</span>,</span>
-<span>  <span class="st">"purpose_of_sampling"</span>, <span class="st">"purpose_of_sequencing"</span>, <span class="st">"lineage"</span>,</span>
-<span>  <span class="st">"raw_lineage"</span>, <span class="st">"gisaid_accession"</span>, <span class="st">"isolate"</span></span>
+<span>  <span class="st">"fasta_header_name"</span>,</span>
+<span>  <span class="st">"province"</span>,</span>
+<span>  <span class="st">"host_gender"</span>,</span>
+<span>  <span class="st">"host_age_bin"</span>,</span>
+<span>  <span class="st">"sample_collection_date"</span>,</span>
+<span>  <span class="st">"sample_collected_by"</span>,</span>
+<span>  <span class="st">"purpose_of_sampling"</span>,</span>
+<span>  <span class="st">"purpose_of_sequencing"</span>,</span>
+<span>  <span class="st">"lineage"</span>,</span>
+<span>  <span class="st">"raw_lineage"</span>,</span>
+<span>  <span class="st">"gisaid_accession"</span>,</span>
+<span>  <span class="st">"isolate"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">unknown.str</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>  <span class="st">"Undeclared"</span>, <span class="st">"Not Provided"</span>, <span class="st">"Restricted Access"</span>, <span class="st">"Missing"</span>,</span>
-<span>  <span class="st">"Not Applicable"</span>, <span class="st">""</span>, <span class="st">"NA"</span>, <span class="st">"unknow"</span></span>
+<span>  <span class="st">"Undeclared"</span>,</span>
+<span>  <span class="st">"Not Provided"</span>,</span>
+<span>  <span class="st">"Restricted Access"</span>,</span>
+<span>  <span class="st">"Missing"</span>,</span>
+<span>  <span class="st">"Not Applicable"</span>,</span>
+<span>  <span class="st">""</span>,</span>
+<span>  <span class="st">"NA"</span>,</span>
+<span>  <span class="st">"unknow"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">duotang</span> <span class="op">&lt;-</span> <span class="va">duotang</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>province <span class="op">=</span> <span class="va">geo_loc_name_state_province_territory</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -229,21 +257,35 @@ hidden in the fold.</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>gisaid_accession <span class="op">=</span> <span class="fu">str_replace</span><span class="op">(</span><span class="va">gisaid_accession</span>, <span class="st">"EPI_ISL_"</span>, <span class="st">""</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>GID <span class="op">=</span> <span class="va">gisaid_accession</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rowwise.html" class="external-link">rowwise</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>raw_lineage <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"^X"</span>, <span class="va">raw_lineage</span><span class="op">)</span>,</span>
-<span>    <span class="fu">str_replace_all</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
-<span>      <span class="fu">realtorawlineage</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/substr.html" class="external-link">substr</a></span><span class="op">(</span></span>
-<span>        <span class="va">raw_lineage</span>, <span class="fl">1</span>, <span class="fu">str_locate</span><span class="op">(</span><span class="va">raw_lineage</span>, <span class="st">"\\."</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span></span>
-<span>      <span class="op">)</span><span class="op">)</span>,</span>
-<span>      <span class="st">"."</span>,</span>
-<span>      <span class="fu"><a href="https://rdrr.io/r/base/substr.html" class="external-link">substr</a></span><span class="op">(</span><span class="va">raw_lineage</span>, <span class="fu">str_locate</span><span class="op">(</span><span class="va">raw_lineage</span>, <span class="st">"\\."</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/nchar.html" class="external-link">nchar</a></span><span class="op">(</span><span class="va">raw_lineage</span><span class="op">)</span><span class="op">)</span></span>
-<span>    <span class="op">)</span>, <span class="st">"[\r\n]"</span>, <span class="st">""</span><span class="op">)</span>,</span>
-<span>    <span class="va">raw_lineage</span></span>
-<span>  <span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>    raw_lineage <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"^X"</span>, <span class="va">raw_lineage</span><span class="op">)</span>,</span>
+<span>      <span class="fu">str_replace_all</span><span class="op">(</span></span>
+<span>        <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
+<span>          <span class="fu">realtorawlineage</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/substr.html" class="external-link">substr</a></span><span class="op">(</span></span>
+<span>            <span class="va">raw_lineage</span>,</span>
+<span>            <span class="fl">1</span>,</span>
+<span>            <span class="fu">str_locate</span><span class="op">(</span><span class="va">raw_lineage</span>, <span class="st">"\\."</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span></span>
+<span>          <span class="op">)</span><span class="op">)</span>,</span>
+<span>          <span class="st">"."</span>,</span>
+<span>          <span class="fu"><a href="https://rdrr.io/r/base/substr.html" class="external-link">substr</a></span><span class="op">(</span></span>
+<span>            <span class="va">raw_lineage</span>,</span>
+<span>            <span class="fu">str_locate</span><span class="op">(</span><span class="va">raw_lineage</span>, <span class="st">"\\."</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1</span>,</span>
+<span>            <span class="fu"><a href="https://rdrr.io/r/base/nchar.html" class="external-link">nchar</a></span><span class="op">(</span><span class="va">raw_lineage</span><span class="op">)</span></span>
+<span>          <span class="op">)</span></span>
+<span>        <span class="op">)</span>,</span>
+<span>        <span class="st">"[\r\n]"</span>,</span>
+<span>        <span class="st">""</span></span>
+<span>      <span class="op">)</span>,</span>
+<span>      <span class="va">raw_lineage</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">dico</span> <span class="op">&lt;-</span> <span class="fu">makepangolindico</span><span class="op">(</span><span class="op">)</span> <span class="co"># rebuild the lineage dictionary so the correct names gets assigned for XBB descedants not named XBB</span></span>
 <span></span>
-<span><span class="va">VOCVOI</span> <span class="op">&lt;-</span> <span class="fu">read_csv</span><span class="op">(</span><span class="st">"https://raw.githubusercontent.com/CoVaRR-NET/duotang/main/resources/vocvoi.csv"</span><span class="op">)</span></span>
+<span><span class="va">VOCVOI</span> <span class="op">&lt;-</span> <span class="fu">read_csv</span><span class="op">(</span></span>
+<span>  <span class="st">"https://raw.githubusercontent.com/CoVaRR-NET/duotang/main/resources/vocvoi.csv"</span></span>
+<span><span class="op">)</span></span>
 <span><span class="va">meta</span><span class="op">$</span><span class="va">pango_group</span> <span class="op">&lt;-</span> <span class="fu">create.pango.group</span><span class="op">(</span><span class="va">VOCVOI</span>, <span class="va">meta</span><span class="op">)</span></span>
 <span><span class="va">meta</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">meta</span>, <span class="va">province</span>, <span class="va">week</span>, <span class="va">pango_group</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>week <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="va">week</span><span class="op">)</span><span class="op">)</span></span>
@@ -283,7 +325,7 @@ distribution. This analysis is hidden below the fold.</p>
 <code class="sourceCode R"><span><span class="va">data_raw</span> <span class="op">&lt;-</span> <span class="fu">readxl</span><span class="fu">::</span><span class="fu">read_excel</span><span class="op">(</span><span class="st">"xu-etal-DATA_RAW.xlsx"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">type</span>, <span class="va">para</span>, n <span class="op">=</span> <span class="va">Sample_size</span>, <span class="va">mean</span>, <span class="va">sd</span>, <span class="va">se</span>, <span class="va">median</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">type</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">type</span>, <span class="va">para</span><span class="op">)</span>, <span class="va">as.numeric</span><span class="op">)</span><span class="op">)</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">type</span>, <span class="va">para</span><span class="op">)</span>, <span class="va">as.numeric</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">bonehead_meta</span> <span class="op">&lt;-</span> <span class="va">data_raw</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">type</span>, <span class="va">para</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -302,16 +344,17 @@ distribution. This analysis is hidden below the fold.</p>
 <span>    sd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="va">sd</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
 <span>    .groups <span class="op">=</span> <span class="st">"drop"</span></span>
 <span>  <span class="op">)</span></span>
-<span><span class="co">## There's only one Beta and only IP. </span></span>
-<span><span class="co">## We use the corresponding sd for Alpha IP, </span></span>
-<span><span class="co">## and duplicate Alpha for GT / ST</span></span>
+<span><span class="co"># There's only one Beta and only IP.</span></span>
+<span><span class="co"># We use the corresponding sd for Alpha IP,</span></span>
+<span><span class="co"># and duplicate Alpha for GT / ST</span></span>
 <span></span>
 <span><span class="va">Beta_IP</span> <span class="op">&lt;-</span> <span class="va">bonehead_meta</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">type</span> <span class="op">==</span> <span class="st">"Beta"</span><span class="op">)</span></span>
-<span><span class="va">Beta_IP</span><span class="op">$</span><span class="va">sd</span> <span class="op">=</span> <span class="va">bonehead_meta</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">type</span> <span class="op">==</span> <span class="st">"Alpha"</span>, <span class="va">para</span> <span class="op">==</span> <span class="st">"IP"</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">sd</span><span class="op">)</span></span>
+<span><span class="va">Beta_IP</span><span class="op">$</span><span class="va">sd</span> <span class="op">=</span> <span class="va">bonehead_meta</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">type</span> <span class="op">==</span> <span class="st">"Alpha"</span>, <span class="va">para</span> <span class="op">==</span> <span class="st">"IP"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">sd</span><span class="op">)</span></span>
 <span><span class="va">Beta</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span></span>
 <span>  <span class="va">Beta_IP</span>,</span>
-<span>  <span class="va">bonehead_meta</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="va">bonehead_meta</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">type</span> <span class="op">==</span> <span class="st">"Alpha"</span>, <span class="va">para</span> <span class="op">!=</span> <span class="st">"IP"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>type <span class="op">=</span> <span class="st">"Beta"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
@@ -327,26 +370,47 @@ periods (IP), and generation times (GT) are also available. Below, we
 visualize the estimated delays for the 4 variants that were most
 prevalent in Canada.</p>
 <p><img src="delay-distributions_files/figure-html/variant-si-plot-1.png" class="r-plt" alt="" width="80%" style="display: block; margin: auto;"></p>
-<p>We use these delays during the period they were most prevalent to
-estimate Rt. First, we build the delay matrix.</p>
+<p>We use these delays weighted by the probabilities of the circulating
+variants to estimate <span class="math inline">\(R_t\)</span>. First, we
+build the delay matrix.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">cancovid</span><span class="op">)</span></span>
-<span><span class="va">delay_mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">n</span>, <span class="va">n</span><span class="op">)</span></span>
-<span><span class="kw">for</span> <span class="op">(</span><span class="va">iter</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">current_var</span> <span class="op">&lt;-</span> <span class="va">can_pred_class</span><span class="op">$</span><span class="va">var</span><span class="op">[</span><span class="va">iter</span><span class="op">]</span></span>
-<span>  <span class="va">current_pars</span> <span class="op">&lt;-</span> <span class="va">delay_dstns_can</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">type</span> <span class="op">==</span> <span class="va">current_var</span><span class="op">)</span></span>
-<span>  <span class="va">delay</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/discretize_gamma.html">discretize_gamma</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="op">(</span><span class="va">iter</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span>, <span class="va">current_pars</span><span class="op">$</span><span class="va">shape</span>, <span class="va">current_pars</span><span class="op">$</span><span class="va">scale</span><span class="op">)</span></span>
-<span>  <span class="va">delay_mat</span><span class="op">[</span><span class="va">iter</span>, <span class="fl">1</span><span class="op">:</span><span class="va">iter</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rev.html" class="external-link">rev</a></span><span class="op">(</span><span class="va">delay</span><span class="op">)</span></span>
-<span><span class="op">}</span></span>
-<span><span class="va">delay_mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/drop0.html" class="external-link">drop0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/methods/as.html" class="external-link">as</a></span><span class="op">(</span><span class="va">delay_mat</span>, <span class="st">"CsparseMatrix"</span><span class="op">)</span><span class="op">)</span> <span class="co"># make it sparse, not necessary</span></span>
+<code class="sourceCode R"><span><span class="va">can_props_voc</span> <span class="op">&lt;-</span> <span class="va">can_props_smoothed</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Date</span> <span class="op">&lt;=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">cancovid</span><span class="op">$</span><span class="va">date</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span></span>
+<span>    Date <span class="op">=</span> <span class="va">Date</span>,</span>
+<span>    `Ancestral lineage` <span class="op">=</span> <span class="va">other</span>,</span>
+<span>    Alpha <span class="op">=</span> <span class="va">Alpha</span> <span class="op">+</span> <span class="va">Beta</span>, <span class="co"># Beta didn't really circulate</span></span>
+<span>    Delta <span class="op">=</span> <span class="va">Delta</span>,</span>
+<span>    Omicron <span class="op">=</span> <span class="fl">1</span> <span class="op">-</span> <span class="op">(</span><span class="va">`Ancestral lineage`</span> <span class="op">+</span> <span class="va">Alpha</span> <span class="op">+</span> <span class="va">Delta</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="co"># The delays are truncated to have probability 0 after 30 days</span></span>
+<span><span class="va">can_lagd_delays</span> <span class="op">&lt;-</span> <span class="va">delay_dstns_can</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rowwise.html" class="external-link">rowwise</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span>name <span class="op">=</span> <span class="va">type</span>, delay <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="../reference/discretize_gamma.html">discretize_gamma</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">30</span>, <span class="va">shape</span>, <span class="va">scale</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">can_tvar_delay</span> <span class="op">&lt;-</span> <span class="va">can_props_voc</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span><span class="op">-</span><span class="va">Date</span>, values_to <span class="op">=</span> <span class="st">"prop"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">can_lagd_delays</span>, by <span class="op">=</span> <span class="st">"name"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>delay <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/colSums-methods.html" class="external-link">colSums</a></span><span class="op">(</span><span class="va">prop</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="va">delay</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, .by <span class="op">=</span> <span class="va">Date</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">right_join</a></span><span class="op">(</span><span class="va">cancovid</span>, by <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/join_by.html" class="external-link">join_by</a></span><span class="op">(</span><span class="va">Date</span> <span class="op">==</span> <span class="va">date</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">Date</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/fill.html" class="external-link">fill</a></span><span class="op">(</span><span class="va">delay</span>, .direction <span class="op">=</span> <span class="st">"downup"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">delay</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">can_tvar_delay</span><span class="op">)</span></span>
+<span><span class="va">narrow_delay_mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="va">can_tvar_delay</span><span class="op">)</span> <span class="co"># n x 31 matrix</span></span>
+<span><span class="va">delay_mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/bandSparse.html" class="external-link">bandSparse</a></span><span class="op">(</span><span class="va">n</span>, <span class="va">n</span>, k <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">30</span>, diagonals <span class="op">=</span> <span class="va">narrow_delay_mat</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">delay_mat</span> <span class="op">&lt;-</span> <span class="va">delay_mat</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/colSums-methods.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="va">delay_mat</span><span class="op">)</span> <span class="co"># renormalize</span></span></code></pre></div>
 <p>Finally, we use this time-varying delay matrix to estimate Rt.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">can_tvar</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/estimate_rt.html">estimate_rt</a></span><span class="op">(</span></span>
-<span>  <span class="va">cancovid</span><span class="op">$</span><span class="va">incident_cases</span>, </span>
-<span>  x <span class="op">=</span> <span class="va">cancovid</span><span class="op">$</span><span class="va">date</span>, </span>
+<span>  <span class="va">cancovid</span><span class="op">$</span><span class="va">incident_cases</span>,</span>
+<span>  x <span class="op">=</span> <span class="va">cancovid</span><span class="op">$</span><span class="va">date</span>,</span>
 <span>  delay_distn <span class="op">=</span> <span class="va">delay_mat</span>,</span>
-<span>  nsol <span class="op">=</span> <span class="fl">20L</span><span class="op">)</span></span>
+<span>  nsol <span class="op">=</span> <span class="fl">20L</span></span>
+<span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">can_tvar</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="delay-distributions_files/figure-html/tvar-Rt-1.png" class="r-plt" alt="" width="80%" style="display: block; margin: auto;"></p>
 </div>

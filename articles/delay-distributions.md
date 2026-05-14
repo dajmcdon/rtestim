@@ -1,6 +1,7 @@
 # Delay distributions
 
 ``` r
+
 library(rtestim)
 library(ggplot2)
 library(dplyr)
@@ -36,11 +37,12 @@ a discrete approximation.
 By default,
 [`estimate_rt()`](https://dajmcdon.github.io/rtestim/reference/estimate_rt.md)
 uses a gamma distribution parameterized by the shape \\k\\ and scale
-\\\theta\\. This density has pdf \\ f_W(w) = \frac{1}{\Gamma(k)\theta^k}
-w^{k-1} e^{-w/\theta} I(w \> 0), \\ where \\I\\ is the indicator
-function. The mean of this distribution is \\k\theta\\, and the variance
-is \\k\theta^2\\. Both \\k\\ and \\\theta\\ must be greater than 0. The
-figure below shows a few examples densities from this family.
+\\\theta\\. This density has pdf \\ f_W(w) = \frac{1}{\Gamma
+(k)\theta^k} w\\{k-1} e\\{-w/\theta} I(w \\ 0), \\ where \\I\\ is the
+indicator function. The mean of this distribution is \\k\theta\\, and
+the variance is \\k\theta^2\\. Both \\k\\ and \\\theta\\ must be greater
+than 0. The figure below shows a few examples densities from this
+family.
 
 ![](delay-distributions_files/figure-html/gamma-pdf-1.png)
 
@@ -66,7 +68,12 @@ Just to illustrate this behaviour, we show the results for the default
 setting on the included `cancovid` data.
 
 ``` r
-can_default <- estimate_rt(cancovid$incident_cases, x = cancovid$date, nsol = 20L)
+
+can_default <- estimate_rt(
+  cancovid$incident_cases,
+  x = cancovid$date,
+  nsol = 20L
+)
 plot(can_default) + coord_cartesian(ylim = c(0.5, 2))
 ```
 
@@ -84,6 +91,7 @@ sake of illustration, we aggregate these together and use this as our
 (constant) delay distribution.
 
 ``` r
+
 # Data from Backer et al.
 delay <- read.csv("backer.csv") |>
   filter(delay >= 0) |>
@@ -98,11 +106,13 @@ This distribution looks something like a gamma, but it has finite
 support. We can easily use it instead.
 
 ``` r
+
 can_nonpar <- estimate_rt(
-  cancovid$incident_cases, 
-  x = cancovid$date, 
+  cancovid$incident_cases,
+  x = cancovid$date,
   delay_distn = delay,
-  nsol = 20L)
+  nsol = 20L
+)
 plot(can_nonpar) + coord_cartesian(ylim = c(0.5, 2))
 ```
 
@@ -119,15 +129,25 @@ delays. We can see this by examining the two CDFs.
 Finally, we also allow time-varying delay distributions. This is
 accomplished with a matrix. This requires a bit of work, but is not too
 challenging. For example, to create the correct matrix using the Baker
-et al. delays, the necessary code is the following.
+et al. delays, the necessary code is the following (note that this is
+*not* yet time varying):
 
 ``` r
+
 # library(Matrix)
 n <- nrow(cancovid)
-backer_delay <- c(delay, rep(0, n - length(delay) - 1))
-delay_mat <- matrix(0, n, n)
-for (iter in 1:n) delay_mat[iter, 1:iter] <- rev(backer_delay[1:iter])
-delay_mat <- drop0(as(delay_mat, "CsparseMatrix")) # make it sparse, not necessary
+dd <- length(delay)
+# one line, optimized version
+delay_mat <- drop0(toeplitz2(c(rep(0, n - 1), delay, rep(0, n - dd)), n, n))
+
+# illustration of doing the same with a loop
+# backer_delay <- c(delay, rep(0, n - dd))
+# delay_mat <- matrix(0, n, n)
+# for (iter in 1:n) {
+#   delay_mat[iter, 1:iter] <- rev(backer_delay[1:iter])
+# }
+# delay_mat <- drop0(as(delay_mat, "CsparseMatrix")) # sparseify, unnecessary
+
 delay_mat <- delay_mat / rowSums(delay_mat) # renormalize
 ```
 
@@ -145,17 +165,34 @@ notebook](https://covarr-net.github.io/duotang/duotang.html). For
 simplicity, the code for this processing is hidden in the fold.
 
 ``` r
+
 # Run on 19 April 2024
-duotang <- read_tsv("https://github.com/CoVaRR-NET/duotang/raw/main/data_needed/virusseq.metadata.csv.gz")
+duotang <- read_tsv(
+  "https://github.com/CoVaRR-NET/duotang/raw/main/data_needed/virusseq.metadata.csv.gz"
+)
 columnlist <- c(
-  "fasta_header_name", "province", "host_gender", "host_age_bin",
-  "sample_collection_date", "sample_collected_by",
-  "purpose_of_sampling", "purpose_of_sequencing", "lineage",
-  "raw_lineage", "gisaid_accession", "isolate"
+  "fasta_header_name",
+  "province",
+  "host_gender",
+  "host_age_bin",
+  "sample_collection_date",
+  "sample_collected_by",
+  "purpose_of_sampling",
+  "purpose_of_sequencing",
+  "lineage",
+  "raw_lineage",
+  "gisaid_accession",
+  "isolate"
 )
 unknown.str <- c(
-  "Undeclared", "Not Provided", "Restricted Access", "Missing",
-  "Not Applicable", "", "NA", "unknow"
+  "Undeclared",
+  "Not Provided",
+  "Restricted Access",
+  "Missing",
+  "Not Applicable",
+  "",
+  "NA",
+  "unknow"
 )
 duotang <- duotang |>
   rename(province = geo_loc_name_state_province_territory) |>
@@ -171,21 +208,35 @@ meta <- meta |>
   mutate(gisaid_accession = str_replace(gisaid_accession, "EPI_ISL_", "")) |>
   rename(GID = gisaid_accession) |>
   rowwise() |>
-  mutate(raw_lineage = ifelse(
-    grepl("^X", raw_lineage),
-    str_replace_all(paste0(
-      realtorawlineage(substr(
-        raw_lineage, 1, str_locate(raw_lineage, "\\.") - 1
-      )),
-      ".",
-      substr(raw_lineage, str_locate(raw_lineage, "\\.") + 1, nchar(raw_lineage))
-    ), "[\r\n]", ""),
-    raw_lineage
-  )) |>
+  mutate(
+    raw_lineage = ifelse(
+      grepl("^X", raw_lineage),
+      str_replace_all(
+        paste0(
+          realtorawlineage(substr(
+            raw_lineage,
+            1,
+            str_locate(raw_lineage, "\\.") - 1
+          )),
+          ".",
+          substr(
+            raw_lineage,
+            str_locate(raw_lineage, "\\.") + 1,
+            nchar(raw_lineage)
+          )
+        ),
+        "[\r\n]",
+        ""
+      ),
+      raw_lineage
+    )
+  ) |>
   ungroup()
 dico <- makepangolindico() # rebuild the lineage dictionary so the correct names gets assigned for XBB descedants not named XBB
 
-VOCVOI <- read_csv("https://raw.githubusercontent.com/CoVaRR-NET/duotang/main/resources/vocvoi.csv")
+VOCVOI <- read_csv(
+  "https://raw.githubusercontent.com/CoVaRR-NET/duotang/main/resources/vocvoi.csv"
+)
 meta$pango_group <- create.pango.group(VOCVOI, meta)
 meta <- select(meta, province, week, pango_group) |>
   mutate(week = as.Date(week))
@@ -229,10 +280,11 @@ the delay for each variant separately. Then we convert these to the
 analysis is hidden below the fold.
 
 ``` r
+
 data_raw <- readxl::read_excel("xu-etal-DATA_RAW.xlsx") |>
   select(type, para, n = Sample_size, mean, sd, se, median) |>
   filter(!is.na(type)) |>
-  mutate(across(-c(type, para), as.numeric)) 
+  mutate(across(-c(type, para), as.numeric))
 
 bonehead_meta <- data_raw |>
   group_by(type, para) |>
@@ -251,16 +303,17 @@ bonehead_meta <- data_raw |>
     sd = median(sd, na.rm = TRUE),
     .groups = "drop"
   )
-## There's only one Beta and only IP. 
-## We use the corresponding sd for Alpha IP, 
-## and duplicate Alpha for GT / ST
+# There's only one Beta and only IP.
+# We use the corresponding sd for Alpha IP,
+# and duplicate Alpha for GT / ST
 
 Beta_IP <- bonehead_meta |> filter(type == "Beta")
-Beta_IP$sd = bonehead_meta |> 
-  filter(type == "Alpha", para == "IP") |> pull(sd)
+Beta_IP$sd = bonehead_meta |>
+  filter(type == "Alpha", para == "IP") |>
+  pull(sd)
 Beta <- bind_rows(
   Beta_IP,
-  bonehead_meta |> 
+  bonehead_meta |>
     filter(type == "Alpha", para != "IP") |>
     mutate(type = "Beta")
 )
@@ -280,30 +333,52 @@ Canada.
 
 ![](delay-distributions_files/figure-html/variant-si-plot-1.png)
 
-We use these delays during the period they were most prevalent to
-estimate Rt. First, we build the delay matrix.
+We use these delays weighted by the probabilities of the circulating
+variants to estimate \\R_t\\. First, we build the delay matrix.
 
 ``` r
-n <- nrow(cancovid)
-delay_mat <- matrix(0, n, n)
-for (iter in 1:n) {
-  current_var <- can_pred_class$var[iter]
-  current_pars <- delay_dstns_can |> filter(type == current_var)
-  delay <- discretize_gamma(0:(iter - 1), current_pars$shape, current_pars$scale)
-  delay_mat[iter, 1:iter] <- rev(delay)
-}
-delay_mat <- drop0(as(delay_mat, "CsparseMatrix")) # make it sparse, not necessary
+
+can_props_voc <- can_props_smoothed |>
+  filter(Date <= max(cancovid$date)) |>
+  transmute(
+    Date = Date,
+    `Ancestral lineage` = other,
+    Alpha = Alpha + Beta, # Beta didn't really circulate
+    Delta = Delta,
+    Omicron = 1 - (`Ancestral lineage` + Alpha + Delta)
+  )
+
+# The delays are truncated to have probability 0 after 30 days
+can_lagd_delays <- delay_dstns_can |>
+  rowwise() |>
+  transmute(name = type, delay = list(discretize_gamma(0:30, shape, scale))) |>
+  ungroup()
+
+can_tvar_delay <- can_props_voc |>
+  pivot_longer(-Date, values_to = "prop") |>
+  left_join(can_lagd_delays, by = "name") |>
+  summarise(delay = list(colSums(prop * do.call(rbind, delay))), .by = Date) |>
+  right_join(cancovid, by = join_by(Date == date)) |>
+  arrange(Date) |>
+  fill(delay, .direction = "downup") |>
+  pull(delay)
+
+n <- length(can_tvar_delay)
+narrow_delay_mat <- do.call(rbind, can_tvar_delay) # n x 31 matrix
+delay_mat <- t(bandSparse(n, n, k = 0:30, diagonals = narrow_delay_mat))
 delay_mat <- delay_mat / rowSums(delay_mat) # renormalize
 ```
 
 Finally, we use this time-varying delay matrix to estimate Rt.
 
 ``` r
+
 can_tvar <- estimate_rt(
-  cancovid$incident_cases, 
-  x = cancovid$date, 
+  cancovid$incident_cases,
+  x = cancovid$date,
   delay_distn = delay_mat,
-  nsol = 20L)
+  nsol = 20L
+)
 plot(can_tvar) + coord_cartesian(ylim = c(0.5, 2))
 ```
 
